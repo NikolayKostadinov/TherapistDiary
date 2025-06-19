@@ -1,0 +1,38 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="USER_ALREADY_EXISTS" xml:space="preserve">
+        <value>Потребителя '{0}' съществува!</value>
+    </data>
+    <data name="LOGIN_FAILED" xml:space="preserve">
+        <value>Невалидно потребителско име '{0}' или парола!</value>
+    </data>
+    <data name="MISSING_REFRESH_TOKEN" xml:space="preserve">
+        <value>Липсва токен за обновяване!</value>
+    </data>
+    <data name="UNABLE_TO_RETRIEVE_USER_FOR_RT" xml:space="preserve">
+        <value>Неуспешно извличане на потребител за този токен за обновяване!</value>
+    </data>
+    <data name="REFRESH_TOKEN_IS_EXPIRED" xml:space="preserve">
+        <value>Tокен за обновяване e изтекъл!</value>
+    </data>
+    <data name="INVALID_FIELD_LENGTH" xml:space="preserve">
+        <value>Дължината на полето трябва да бъде между {0} и {1} символа!</value>
+    </data>
+    <data name="INVALID_NUMBER_VALUE" xml:space="preserve">
+        <value>Стойността трябва да бъде между {0} и {1}!</value>
+    </data>
+    <data name="INVALID_BULGARIAN_PHONE" xml:space="preserve">
+        <value>Телефонният номер, който въведохте {0}, е невалиден!</value>
+    </data>
+</root>
