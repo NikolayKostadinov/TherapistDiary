@@ -42,4 +42,13 @@
     <data name="INVALID_BULGARIAN_PHONE" xml:space="preserve">
         <value>The phone number you have entered {0} was invalid!</value>
     </data>
+    <data name="PATIENT_NOT_FOUND" xml:space="preserve">
+        <value>Patient Id:'{0}' not found!</value>
+    </data>
+    <data name="PAGE_NUMBER_MUST_BE_GREATER_THAN" xml:space="preserve">
+        <value>The page number must be greater than {0}!</value>
+    </data>
+    <data name="INVALID_PAGE_SIZE" xml:space="preserve">
+        <value>Page size must be between '{0}' and '{1}'</value>
+    </data>
 </root>

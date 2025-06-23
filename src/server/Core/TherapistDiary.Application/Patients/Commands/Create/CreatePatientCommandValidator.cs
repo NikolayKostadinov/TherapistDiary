@@ -1,8 +1,8 @@
 namespace TherapistDiary.Application.Patients.Commands.Create;
 
-using Common.Constants;
-using Domain.Entities;
+
 using FluentValidation;
+using TherapistDiary.Common.Constants;
 
 public class CreatePatientCommandValidator : AbstractValidator<CreatePatientRequest>
 {

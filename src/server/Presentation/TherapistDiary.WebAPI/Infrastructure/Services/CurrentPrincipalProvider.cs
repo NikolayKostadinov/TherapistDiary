@@ -1,8 +1,8 @@
 ﻿namespace TherapistDiary.WebAPI.Infrastructure.Services;
 
 using System.Security.Principal;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Http;
-using TherapistDiary.Application.Infrastructure;
 
 public class CurrentPrincipalProvider : ICurrentPrincipalProvider
 {

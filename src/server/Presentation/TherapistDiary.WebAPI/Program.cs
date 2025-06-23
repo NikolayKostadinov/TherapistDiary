@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using TherapistDiary.Application.Contracts;
-using TherapistDiary.Application.Infrastructure;
+using TherapistDiary.Application.Interfaces;
 using TherapistDiary.Application.Services;
 using TherapistDiary.Domain.Entities;
 using TherapistDiary.Domain.Repositories;
@@ -48,13 +48,6 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Add DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Application_Db"));
-});
-
-
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new ModelStateErrorFilter());
@@ -67,12 +60,6 @@ builder.Services.AddFluentValidationAutoValidation(config =>
     {
         // Disable DataAnnotations validation to avoid conflicts
         config.DisableDataAnnotationsValidation = true;
-
-        // Optional: Configure implicit validation for child properties
-        config.ImplicitlyValidateChildProperties = true;
-
-        // Optional: Configure implicit validation for root collection elements
-        config.ImplicitlyValidateRootCollectionElements = true;
     })
     .AddFluentValidationClientsideAdapters(); // Add this back for client-side validation
 
@@ -82,16 +69,6 @@ builder.Services.AddValidatorsFromAssembly(TherapistDiary.Application.AssemblyRe
 
 
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddScoped<IAuthTokenProcessor, AuthTokenProcessor>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-
-builder.Services.AddSingleton<ICurrentPrincipalProvider, CurrentPrincipalProvider>();
-
-builder.Services.AddSingleton<IInterceptor, UpdateAuditableEntitiesInterceptor>();
-builder.Services.AddSingleton<IInterceptor, UpdateDeletableEntitiesInterceptor>();
-builder.Services.AddSingleton<IInterceptor, UpdateNonDeletableEntitiesInterceptor>();
-builder.Services.AddSingleton<IInterceptor, UpdateNonDeletableEntitiesInterceptor>();
 
 builder.Services.AddAuthentication(options =>
     {

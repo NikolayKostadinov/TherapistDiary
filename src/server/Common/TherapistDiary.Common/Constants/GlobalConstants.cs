@@ -19,4 +19,11 @@ public static class GlobalConstants
     {
         public const string BulgarianPattern = @"^(\+359|0)?(87|88|89|98|99)[0-9]{7}$|^(\+359|0)?[2-9][0-9][0-9]{7}$";
     }
+
+    public static class Page
+    {
+        public const int MinPageNumber = 0;
+        public const int MinPageSize = 1;
+        public const int MaxPageSize = 100;
+    }
 }

@@ -1,15 +1,7 @@
-﻿// ------------------------------------------------------------------------------------------------
-//  <copyright file="UpdateDeletableEntitiesInterceptor.cs" company="Business Management System Ltd.">
-//      Copyright "2023" (c), Business Management System Ltd.
-//      All rights reserved.
-//  </copyright>
-//  <author>Nikolay.Kostadinov</author>
-// ------------------------------------------------------------------------------------------------
-
-namespace TherapistDiary.Persistence.Interceptors;
+﻿namespace TherapistDiary.Persistence.Interceptors;
 
 using System.Linq.Dynamic.Core;
-using Application.Infrastructure;
+using Application.Interfaces;
 using Common.Extensions;
 using Domain.Primitives;
 using Domain.Primitives.Abstract;

@@ -36,6 +36,13 @@ public static class Validator
         return Between(number, min, Inclusive, max, Inclusive);
     }
 
+    public static Func<bool> BetweenExclusive<T>(T number, T min, T max)
+        where T : IComparable<T>
+    {
+        return Between(number, min, Exclusive, max, Exclusive);
+
+    }
+
     public static Func<bool> HasValue<T>(T value)
         where T : IEquatable<T>
     {
@@ -235,4 +242,6 @@ public static class Validator
     {
         return () => value.CompareTo(limit) <= 0  ;
     }
+
+
 }

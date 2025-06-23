@@ -1,6 +1,8 @@
 ﻿namespace TherapistDiary.WebAPI.Configuration;
 
+using Application.Interfaces;
 using FluentValidation;
+using Infrastructure.Services;
 using Scrutor;
 
 public class ApplicationServiceInstaller : IServiceInstaller
@@ -10,7 +12,8 @@ public class ApplicationServiceInstaller : IServiceInstaller
         services
             .Scan(
                 selector => selector
-                    .FromAssemblies(Application.AssemblyReference.Assembly)
+                    .FromAssemblies(Application.AssemblyReference.Assembly,
+                        TherapistDiary.Infrastructure.AssemblyReference.Assembly)
                     .AddClasses(false)
                     .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                     .AsMatchingInterface()
@@ -18,5 +21,7 @@ public class ApplicationServiceInstaller : IServiceInstaller
 
 
         services.AddValidatorsFromAssembly(AssemblyReference.Assembly, includeInternalTypes: true);
+
+        services.AddSingleton<ICurrentPrincipalProvider, CurrentPrincipalProvider>();
     }
 }

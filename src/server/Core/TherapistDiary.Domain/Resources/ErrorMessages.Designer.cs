@@ -87,6 +87,15 @@ namespace TherapistDiary.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Page size must be between &apos;{0}&apos; and &apos;{1}&apos;.
+        /// </summary>
+        public static string INVALID_PAGE_SIZE {
+            get {
+                return ResourceManager.GetString("INVALID_PAGE_SIZE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid username: &apos;{0}&apos; or password!.
         /// </summary>
         public static string LOGIN_FAILED {
@@ -101,6 +110,24 @@ namespace TherapistDiary.Domain.Resources {
         public static string MISSING_REFRESH_TOKEN {
             get {
                 return ResourceManager.GetString("MISSING_REFRESH_TOKEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The page number must be greater than {0}!.
+        /// </summary>
+        public static string PAGE_NUMBER_MUST_BE_GREATER_THAN {
+            get {
+                return ResourceManager.GetString("PAGE_NUMBER_MUST_BE_GREATER_THAN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patient Id:&apos;{0}&apos; not found!.
+        /// </summary>
+        public static string PATIENT_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("PATIENT_NOT_FOUND", resourceCulture);
             }
         }
         

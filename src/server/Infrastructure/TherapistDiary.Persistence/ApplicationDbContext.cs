@@ -13,11 +13,10 @@ public class ApplicationDbContext: IdentityDbContext<User, IdentityRole<Guid>, G
 
     }
 
-    public override DbSet<User> Users { get; set; }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
         builder.ApplyDecimalTypeConfiguration(18, 5);
+        builder.ApplyDeletableConfiguration(AssemblyReference.Assembly);
     }
 }
