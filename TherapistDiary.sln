@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED86D71F-0B39-40B1-ADD5-A726B9207923}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{5021E570-DEEB-40F6-91DA-0F63027D8849}"
+	ProjectSection(SolutionItems) = preProject
+		src\server\TherapistDiary.sln.DotSettings.user = src\server\TherapistDiary.sln.DotSettings.user
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{D93100C1-9782-43FF-81D5-087C58D5A571}"
 EndProject

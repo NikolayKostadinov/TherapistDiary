@@ -1,23 +1,51 @@
 ﻿namespace TherapistDiary.WebAPI.Configuration;
 
-using FluentValidation;
+using Domain.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Persistence;
+using Persistence.Interceptors;
 using Scrutor;
-using WebAPI;
 
-public class PersistenceServiceInstaller : IServiceInstaller
+public class PersistentServiceInstaller : IServiceInstaller
 {
     public void Install(IServiceCollection services, IConfiguration configuration)
     {
+        // Register Repositories
         services
             .Scan(
-                selector => selector
+                scan => scan
                     .FromAssemblies(Persistence.AssemblyReference.Assembly)
-                    .AddClasses(false)
+                    .AddClasses(c => c.InNamespaces("TherapistDiary.Persistence.Repositories"), publicOnly: false)
                     .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                     .AsMatchingInterface()
                     .WithScopedLifetime());
 
+        // Register Interceptors
+        services
+            .Scan(
+                scan => scan
+                    .FromAssemblies(Persistence.AssemblyReference.Assembly)
+                    .AddClasses(c => c.AssignableTo<IInterceptor>())
+                    .AsImplementedInterfaces()
+                    .WithSingletonLifetime());
 
-        services.AddValidatorsFromAssembly(Persistence.AssemblyReference.Assembly, includeInternalTypes: true);
+        services.AddDbContextPool<ApplicationDbContext>(
+            (sp, optionsBuilder) =>
+            {
+                var env = sp.GetService<IHostEnvironment>();
+                var connectionString = env!.IsProduction()
+                    ? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+                    : configuration.GetConnectionString("Application_Db");
+
+                optionsBuilder.UseSqlServer(connectionString);
+
+                optionsBuilder.AddInterceptors(sp.GetServices<IInterceptor>().ToArray());
+
+                optionsBuilder.ConfigureWarnings(w =>
+                    w.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS));
+            });
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

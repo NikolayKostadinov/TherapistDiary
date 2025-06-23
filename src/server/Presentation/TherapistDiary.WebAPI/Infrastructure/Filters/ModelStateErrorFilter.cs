@@ -3,7 +3,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Domain.Responses;
+using Application.Responses;
 using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -46,6 +46,4 @@ public class ModelStateErrorFilter : ActionFilterAttribute
 
         return base.OnResultExecutionAsync(context, next);
     }
-
-
 }

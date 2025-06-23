@@ -1,4 +1,4 @@
-namespace TherapistDiary.Domain.Requests;
+namespace TherapistDiary.Application.Requests;
 
 public record RegisterRequest
 {

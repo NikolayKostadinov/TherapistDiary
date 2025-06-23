@@ -1,6 +1,6 @@
 ﻿namespace TherapistDiary.Persistence.Interceptors;
 
-using Application.Infrastructure;
+using Application.Interfaces;
 using Common.Extensions;
 using Domain.Primitives;
 using Microsoft.EntityFrameworkCore;

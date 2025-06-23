@@ -1,13 +1,13 @@
 namespace TherapistDiary.Application.Services;
 
-using Common.Extensions;
 using Contracts;
 using Domain.Entities;
 using Domain.Repositories;
-using Domain.Requests;
 using Domain.Resources;
 using Domain.Shared;
 using Microsoft.AspNetCore.Identity;
+using Requests;
+using TherapistDiary.Common.Extensions;
 using static Domain.Errors.DomainErrors;
 
 

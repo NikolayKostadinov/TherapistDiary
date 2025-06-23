@@ -1,7 +1,7 @@
 namespace TherapistDiary.Application.Contracts;
 
-using Domain.Requests;
 using Domain.Shared;
+using Requests;
 
 public interface IAccountService
 {

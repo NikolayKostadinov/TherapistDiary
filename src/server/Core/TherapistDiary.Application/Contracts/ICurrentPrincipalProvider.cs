@@ -1,4 +1,4 @@
-﻿namespace TherapistDiary.Application.Infrastructure;
+﻿namespace TherapistDiary.Application.Interfaces;
 
 using System.Security.Principal;
 

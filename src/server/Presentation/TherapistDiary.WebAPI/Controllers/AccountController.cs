@@ -2,7 +2,7 @@ namespace TherapistDiary.WebAPI.Controllers;
 
 using Abstract;
 using Application.Contracts;
-using Domain.Requests;
+using Application.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 public class AccountController: ApiController

@@ -35,4 +35,13 @@
     <data name="INVALID_BULGARIAN_PHONE" xml:space="preserve">
         <value>Телефонният номер, който въведохте {0}, е невалиден!</value>
     </data>
+    <data name="PATIENT_NOT_FOUND" xml:space="preserve">
+        <value>Пациент Id:'{0}' не е открит!</value>
+    </data>
+    <data name="PAGE_NUMBER_MUST_BE_GREATER_THAN" xml:space="preserve">
+        <value>Номера на страница трябва да бъде по-голям от '{0}'</value>
+    </data>
+    <data name="INVALID_PAGE_SIZE" xml:space="preserve">
+        <value>Размера на страницата трябва да бъде между '{0}' и '{1}'!</value>
+    </data>
 </root>
