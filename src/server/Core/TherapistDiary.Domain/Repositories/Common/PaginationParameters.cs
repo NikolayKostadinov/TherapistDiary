@@ -1,20 +1,50 @@
 namespace TherapistDiary.Domain.Repositories.Common;
 
-using Resources;
-using Shared;
 using static TherapistDiary.Common.Constants.GlobalConstants;
 
 public class PaginationParameters
 {
-    public int PageNumber{get;init;}
-    public int PageSize{get;init;}
-    public string? SearchTerm{get;init;}
-    public string? SortBy{get;init;}
-    public bool SortDescending{get;init;}
-    
-    private const int DefaultPageSize = 10;
+    // private int _pageSize;
+    // private int _pageNumber;
+    //
+    // public int PageNumber
+    // {
+    //     get => _pageNumber;
+    //     set
+    //     {
+    //         _pageNumber = value switch
+    //         {
+    //             < Page.MinPageNumber => Page.MinPageNumber,
+    //             _ => value
+    //         };
+    //     }
+    // }
+    //
+    // public int PageSize
+    // {
+    //     get => _pageSize;
+    //     private init
+    //     {
+    //         _pageSize = value switch
+    //         {
+    //             > Page.MaxPageSize => Page.MaxPageSize,
+    //             < Page.MinPageSize => Page.MinPageSize,
+    //             _ => value
+    //         };
+    //     }
+    // }
 
-    private PaginationParameters(int pageNumber, int pageSize, string? searchTerm, string? sortBy, bool sortDescending)
+    public int  PageSize { get; set; }
+    public int  PageNumber { get; set; }
+    public string? SearchTerm { get; set; }
+    public string? SortBy { get; set; }
+    public bool? SortDescending { get; set; }
+
+    public PaginationParameters()
+    {
+    }
+
+    public PaginationParameters(int pageNumber, int pageSize, string? searchTerm, string? sortBy, bool? sortDescending)
     {
         PageNumber = pageNumber;
         PageSize = pageSize;
@@ -22,21 +52,4 @@ public class PaginationParameters
         SortBy = sortBy;
         SortDescending = sortDescending;
     }
-
-    public static Result<PaginationParameters> Create(
-        int pageNumber = 1,
-        int pageSize = DefaultPageSize,
-        string? searchTerm = null,
-        string? sortBy = null,
-        bool sortDescending = false)
-    {
-        return Result.Success(new PaginationParameters(pageNumber, pageSize, searchTerm, sortBy, sortDescending))
-            .Validate(()=>pageNumber > Page.MinPageNumber, Error.Create(
-                message: string.Format(ErrorMessages.PAGE_NUMBER_MUST_BE_GREATER_THAN, Page.MinPageNumber),
-                field: nameof(PageNumber)))
-            .Validate(Validator.BetweenInclusive(pageNumber, Page.MinPageSize, Page.MaxPageSize), Error.Create(
-                message: string.Format(ErrorMessages.INVALID_NUMBER_VALUE, Page.MinPageNumber, Page.MaxPageSize),
-                field: nameof(PageNumber)));
-    }
-    
 }

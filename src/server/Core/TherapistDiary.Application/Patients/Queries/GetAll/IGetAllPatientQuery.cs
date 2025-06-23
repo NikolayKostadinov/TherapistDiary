@@ -4,6 +4,6 @@ using Common.Models;
 using TherapistDiary.Application.Responses;
 using TherapistDiary.Domain.Shared;
 
-public interface IGetAllPatientQuery : ICommand<GetGetAllPatientRequest, PagedResult<PatientResponse>>
+public interface IGetAllPatientQuery : ICommand<GetAllPatientRequest, PagedResult<PatientResponse>>
 {
 }

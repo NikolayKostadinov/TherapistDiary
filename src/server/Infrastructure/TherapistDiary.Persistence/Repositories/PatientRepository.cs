@@ -21,9 +21,11 @@ public class PatientRepository : IPatientRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Patient>> GetAllPagedAsync(PaginationParameters parameters, CancellationToken cancellationToken)
+    public async Task<(IEnumerable<Patient> patients, int totalCount, int totalPages)> GetAllPagedAsync(PaginationParameters parameters, CancellationToken cancellationToken)
     {
         var query = _context.Set<Patient>().AsQueryable();
+        var totalCount = query.Count();
+        var totalPages = totalCount / parameters.PageSize + (totalCount % parameters.PageSize > 0 ? 1 : 0);
 
         // Apply filtering
         if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
@@ -41,15 +43,15 @@ public class PatientRepository : IPatientRepository
         {
             query = parameters.SortBy.ToLowerInvariant() switch
             {
-                "firstname" => parameters.SortDescending
+                "firstname" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.FirstName)
                     : query.OrderBy(p => p.FirstName),
 
-                "lastname" => parameters.SortDescending
+                "lastname" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.LastName)
                     : query.OrderBy(p => p.LastName),
 
-                "phonenumber" => parameters.SortDescending
+                "phonenumber" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.PhoneNumber)
                     : query.OrderBy(p => p.PhoneNumber),
 
@@ -58,10 +60,11 @@ public class PatientRepository : IPatientRepository
         }
 
         // Apply pagination
-        return await query.AsQueryable()
+
+        return (await query.AsQueryable()
             .Skip((parameters.PageNumber - 1) * parameters.PageSize)
             .Take(parameters.PageSize)
-            .ToDynamicListAsync<Patient>(cancellationToken);
+            .ToDynamicListAsync<Patient>(cancellationToken), totalCount, totalPages);
     }
 
 

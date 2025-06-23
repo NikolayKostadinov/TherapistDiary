@@ -2,8 +2,9 @@ namespace TherapistDiary.Application.Common.Models;
 
 public class PagedResult<T>
 {
-    public PagedResult(int totalCount, int page, int pageSize, int totalPages, bool hasNextPage, bool hasPreviousPage)
+    public PagedResult(List<T> items, int totalCount, int page, int pageSize, int totalPages, bool hasNextPage, bool hasPreviousPage)
     {
+        Items = items;
         TotalCount = totalCount;
         Page = page;
         PageSize = pageSize;
@@ -12,7 +13,7 @@ public class PagedResult<T>
         HasPreviousPage = hasPreviousPage;
     }
 
-    public List<T> Items { get; init; } = new();
+    public List<T> Items { get; init; }
     public int TotalCount { get; init; }
     public int Page { get; init; }
     public int PageSize { get; init; }
