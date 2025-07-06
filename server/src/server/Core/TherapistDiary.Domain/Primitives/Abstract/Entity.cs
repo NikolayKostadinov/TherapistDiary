@@ -10,8 +10,6 @@ public abstract class Entity<T> : IEquatable<Entity<T>>, IEntity<T>
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public T Id { get; protected init; }
 
-    // public Guid IdV7 { get; set; }
-
     public static bool operator ==(Entity<T>? first, Entity<T>? second) =>
         first is not null && second is not null && first.Equals(second);
 

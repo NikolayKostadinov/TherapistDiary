@@ -48,8 +48,7 @@ public class Patient : DeletableEntity
         return patient.Validate(Operations.Create);
     }
 
-    private
-        Result<Patient> Validate(Operations operation)
+    private Result<Patient> Validate(Operations operation)
     {
         return Result.Success(this)
             .Validate(Validator.Length.Between(FirstName, Person.NameMinLength, Person.FirstNameMaxLength),

@@ -2,17 +2,17 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-namespace Persistence.Seed;
+namespace TherapistDiary.Persistence.Seed;
 
 using System;
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using TherapistDiary.Common.Extensions;
-using TherapistDiary.Domain.Entities;
+using Common.Extensions;
+using Domain.Entities;
 using TherapistDiary.Domain.Infrastructure;
-using TherapistDiary.Persistence;
-using TherapistDiary.Persistence.Interfaces;
+using Persistence;
+using Interfaces;
 
 public class ApplicationInitializer : ISeeder
 {

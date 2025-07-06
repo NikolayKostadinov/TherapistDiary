@@ -1,11 +1,11 @@
 ﻿namespace TherapistDiary.WebAPI.Configuration;
 
 using Domain.Infrastructure;
-using global::Persistence.Seed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Persistence;
 using Persistence.Interceptors;
+using Persistence.Seed;
 using Scrutor;
 
 public class PersistentServiceInstaller : IServiceInstaller
@@ -51,5 +51,6 @@ public class PersistentServiceInstaller : IServiceInstaller
 
         // ------------------------------- Global ISeed SetUp ------------------------------------------------------------
         services.AddScoped<ApplicationInitializer>();
+        services.AddScoped<TherapiesSeed>();
     }
 }

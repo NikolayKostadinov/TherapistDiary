@@ -26,4 +26,17 @@ public static class GlobalConstants
         public const int MinPageSize = 1;
         public const int MaxPageSize = 100;
     }
+
+    public static class TherapyType
+    {
+        public const int NameMaxLength = 50;
+        public const int BannerPictureUrlMinLength = 15;
+        public const int BannerPictureUrlMaxLength = 2048;
+
+    }
+
+    public static class Therapy
+    {
+        public const int NameMaxLength = 50;
+    }
 }
