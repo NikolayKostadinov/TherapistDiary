@@ -105,6 +105,17 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
+// Add CORS services
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyAllowedOrigins",
+        policy =>
+        {
+            policy.WithOrigins("*")     // Specify the allowed origin
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -118,6 +129,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Make sure to add this before app.UseRouting() and after any other middleware
+// that might need to read the CORS headers
+app.UseCors("MyAllowedOrigins");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
