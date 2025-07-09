@@ -1,7 +1,7 @@
 ﻿namespace TherapistDiary.Persistence.Interceptors;
 
 using System.Linq.Dynamic.Core;
-using Application.Interfaces;
+using Application.Contracts;
 using Common.Extensions;
 using Domain.Primitives;
 using Domain.Primitives.Abstract;

@@ -1,6 +1,8 @@
 namespace TherapistDiary.Domain.Repositories;
 
-public class ITherapyTypesRepository
+using Dtos;
+
+public interface ITherapyTypesRepository
 {
-    
+    public Task<IEnumerable<TherapyTypeListDto>> GetAllTherapyTypesWithTherapiesAsync(CancellationToken cancellationToken);
 }

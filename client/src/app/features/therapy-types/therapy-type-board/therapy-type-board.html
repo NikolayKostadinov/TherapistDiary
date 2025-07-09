@@ -1,0 +1,24 @@
+<div class="container-fluid service py-5">
+    <div class="container py-5">
+        <div class="section-title mb-5 wow fadeInUp" data-wow-delay="0.2s">
+            <div class="sub-style">
+                <h4 class="sub-title px-3 mb-0">Какво предлагаме</h4>
+            </div>
+            <h1 class="display-3 mb-4">Психотерапия от опитен специалист.</h1>
+            <p class="mb-0">Нуждаете се от психолог или психотерапевт?</p>
+            <p> Ние от Център Хармония сме до вас. Не чакайте болката да расте. Всеки човек заслужава подкрепа –
+                дайте си шанс за ново начало!</p>
+        </div>
+        @if(isLoaded()){
+        <div class="row g-4 justify-content-center">
+            @for (therapyType of therapyTypes(); track therapyType.id) {
+            <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
+                <app-therapy-type-item [therapy-type]='therapyType' />
+            </div>
+            }
+        </div>
+        } @else{
+        <app-spinner />
+        }
+    </div>
+</div>

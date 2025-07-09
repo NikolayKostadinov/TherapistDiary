@@ -1,8 +1,8 @@
 ﻿namespace TherapistDiary.Persistence.Infrastructure;
 
 using System.Security.Principal;
+using Application.Contracts;
 using Application.Infrastructure;
-using Application.Interfaces;
 
 public class DesignTimePrincipalProvider : ICurrentPrincipalProvider
 {

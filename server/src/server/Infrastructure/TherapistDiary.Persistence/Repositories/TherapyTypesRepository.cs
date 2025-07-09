@@ -6,22 +6,22 @@ using Domain.Entities;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-public class TherapistRepository: ITherapistRepository
+public class TherapyTypesRepository: ITherapyTypesRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public TherapistRepository(ApplicationDbContext context)
+    public TherapyTypesRepository(ApplicationDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    public async Task<IEnumerable<TherapistListDto>> GetAllForTeamAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<TherapyTypeListDto>> GetAllTherapyTypesWithTherapiesAsync(
+        CancellationToken cancellationToken)
     {
-        return await _context.Set<User>()
-            .Include(x=>x.UserRoles)
-            .ThenInclude(x=>x.Role)
-            .Where(x=>x.UserRoles.Any(ur=>ur.Role.Name == "Therapist"))
-            .To<TherapistListDto>()
+        return await _context.Set<TherapyType>()
+            .Include(x=>x.Therapies)
+            .OrderBy(x=>x.CreatedOn)
+            .To<TherapyTypeListDto>()
             .ToListAsync(cancellationToken);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace TherapistDiary.Application.Interfaces;
+﻿namespace TherapistDiary.Application.Contracts;
 
 using System.Security.Principal;
 

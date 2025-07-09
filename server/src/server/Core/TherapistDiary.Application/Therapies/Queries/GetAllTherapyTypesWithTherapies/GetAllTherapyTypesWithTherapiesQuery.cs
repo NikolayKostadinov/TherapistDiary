@@ -7,18 +7,19 @@ using Domain.Shared;
 
 public class GetAllTherapyTypesWithTherapiesQuery : IGetAllTherapyTypesWithTherapiesQuery
 {
-    private readonly ITherapistRepository _therapistRepository;
+    private readonly ITherapyTypesRepository _therapyTypesRepository;
 
-    public GetAllTherapyTypesWithTherapiesQuery(ITherapistRepository therapistRepository)
+    public GetAllTherapyTypesWithTherapiesQuery(ITherapyTypesRepository therapyTypesRepository)
     {
-        _therapistRepository = therapistRepository ?? throw new ArgumentNullException(nameof(therapistRepository));
+        _therapyTypesRepository =
+            therapyTypesRepository ?? throw new ArgumentNullException(nameof(therapyTypesRepository));
     }
 
-    public async Task<Result<IEnumerable<TherapistListResponse>>> Handle(GetAllTherapyTypesWithTherapiesRequest request,
+    public async Task<Result<IEnumerable<TherapyTypeListResponse>>> Handle(GetAllTherapyTypesWithTherapiesRequest request,
         CancellationToken cancellationToken)
     {
-        var therapists = await _therapistRepository.GetAllForTeamAsync(cancellationToken);
+        var therapists = await _therapyTypesRepository.GetAllTherapyTypesWithTherapiesAsync(cancellationToken);
 
-        return therapists.To<List<TherapistListResponse>>();
+        return therapists.To<List<TherapyTypeListResponse>>();
     }
 }

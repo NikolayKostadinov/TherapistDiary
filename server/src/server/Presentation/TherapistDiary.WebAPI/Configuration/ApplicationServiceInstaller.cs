@@ -1,6 +1,6 @@
 ﻿namespace TherapistDiary.WebAPI.Configuration;
 
-using Application.Interfaces;
+using Application.Contracts;
 using FluentValidation;
 using Infrastructure.Services;
 using Scrutor;

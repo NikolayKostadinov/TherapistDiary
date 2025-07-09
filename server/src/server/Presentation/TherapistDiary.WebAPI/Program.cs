@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using TherapistDiary.Application.Contracts;
-using TherapistDiary.Application.Interfaces;
 using TherapistDiary.Application.Services;
 using TherapistDiary.Domain.Entities;
 using TherapistDiary.Domain.Repositories;

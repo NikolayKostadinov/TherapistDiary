@@ -3,6 +3,6 @@ namespace TherapistDiary.Application.Therapies.Queries.GetAllTherapyTypesWithThe
 using Responses;
 using Domain.Shared;
 
-public interface IGetAllTherapyTypesWithTherapiesQuery : ICommand<GetAllTherapyTypesWithTherapiesRequest, IEnumerable<TherapistListResponse>>
+public interface IGetAllTherapyTypesWithTherapiesQuery : ICommand<GetAllTherapyTypesWithTherapiesRequest, IEnumerable<TherapyTypeListResponse>>
 {
 }

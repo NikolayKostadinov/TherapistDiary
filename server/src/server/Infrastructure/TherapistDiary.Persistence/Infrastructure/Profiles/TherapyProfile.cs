@@ -4,10 +4,11 @@ using AutoMapper;
 using Domain.Dtos;
 using Domain.Entities;
 
-public class TherapistProfile : Profile
+public class TherapyProfile : Profile
 {
-    public TherapistProfile()
+    public TherapyProfile()
     {
-        CreateMap<User, TherapistListDto>();
+        CreateMap<Therapy, TherapyListDto>();
+        CreateMap<TherapyType, TherapyTypeListDto>();
     }
 }
