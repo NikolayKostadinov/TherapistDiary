@@ -1,12 +1,6 @@
 <div class="therapists-item rounded">
-    <div class="therapists-img rounded-top h-100 position-relative">
-        @if(!imageLoaded()) {
-        <div class="position-absolute top-50 start-50 translate-middle">
-            <app-spinner />
-        </div>
-        }
-        <img [src]="therapist.profilePictureUrl" class="img-fluid rounded-top w-100" alt="Profile image"
-            [style.opacity]="imageLoaded() ? '1' : '0'" (load)="onImageLoad()" (error)="onImageError()">
+    <div class="therapists-img rounded-top h-100">
+        <img [src]="therapist.profilePictureUrl" class="img-fluid rounded-top w-100" alt="">
         <div class="therapists-icon d-flex justify-content-center">
             <a class="btn btn-primary rounded-pill text-white" href=""><i class="fa fa-calendar"></i>
                 Запазете час</a>

@@ -1,7 +1,6 @@
 import { Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { TherapistsService } from '../services/therapists.service';
-import { TherapistListModel } from '../models';
-import { Observable } from 'rxjs';
+import { TherapistListModel } from '../models/therapist.list.model';
 import { CommonModule } from '@angular/common';
 import { TherapistItem } from "../therapist-item/therapist-item";
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';

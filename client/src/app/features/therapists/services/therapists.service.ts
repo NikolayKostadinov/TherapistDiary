@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { baseUrl, therapistsUrl } from '../../../common/constants';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TherapistListModel } from '../models';
+import { TherapistListModel } from '../models/therapist.list.model';
 
 @Injectable({
     providedIn: 'root'
