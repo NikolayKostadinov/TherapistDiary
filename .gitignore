@@ -1,0 +1,522 @@
+# =======================
+# TherapistDiary Project
+# Combined .gitignore for Angular Client and .NET Server
+# =======================
+
+# ================================
+# GENERAL
+# ================================
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ================================
+# ANGULAR CLIENT
+# ================================
+
+# Compiled output
+client/dist/
+client/tmp/
+client/out-tsc/
+client/bazel-out/
+
+# Node.js dependencies
+client/node_modules/
+
+# npm/yarn
+client/.npm
+client/.yarn/
+client/.yarn-integrity
+client/yarn-error.log
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/lerna-debug.log*
+client/.pnpm-debug.log*
+
+# Angular specific
+client/.angular/
+client/.angular/cache/
+
+# Environment files
+client/.env
+client/.env.local
+client/.env.development.local
+client/.env.test.local
+client/.env.production.local
+
+# Testing
+client/coverage/
+client/.nyc_output/
+
+# e2e testing
+client/e2e/*.js
+client/e2e/*.map
+
+# System files
+client/.sass-cache/
+client/connect.lock
+client/typings/
+
+# ================================
+# .NET SERVER
+# ================================
+
+# Build results
+server/[Dd]ebug/
+server/[Dd]ebugPublic/
+server/[Rr]elease/
+server/[Rr]eleases/
+server/x64/
+server/x86/
+server/[Ww][Ii][Nn]32/
+server/[Aa][Rr][Mm]/
+server/[Aa][Rr][Mm]64/
+server/bld/
+server/[Bb]in/
+server/[Oo]bj/
+server/[Ll]og/
+server/[Ll]ogs/
+
+# Visual Studio files
+server/*.rsuser
+server/*.suo
+server/*.user
+server/*.userosscache
+server/*.sln.docstates
+server/*.userprefs
+
+# Mono auto generated files
+server/mono_crash.*
+
+# Build Results of an ATL Project
+server/[Dd]ebugPS/
+server/[Rr]eleasePS/
+server/dlldata.c
+
+# Benchmark Results
+server/BenchmarkDotNet.Artifacts/
+
+# .NET Core
+server/project.lock.json
+server/project.fragment.lock.json
+server/artifacts/
+
+# StyleCop
+server/StyleCopReport.xml
+
+# Files built by Visual Studio
+server/*_i.c
+server/*_p.c
+server/*_h.h
+server/*.ilk
+server/*.meta
+server/*.obj
+server/*.iobj
+server/*.pch
+server/*.pdb
+server/*.ipdb
+server/*.pgc
+server/*.pgd
+server/*.rsp
+server/*.sbr
+server/*.tlb
+server/*.tli
+server/*.tlh
+server/*.tmp
+server/*.tmp_proj
+server/*_wpftmp.csproj
+server/*.log
+server/*.tlog
+server/*.vspscc
+server/*.vssscc
+server/.builds
+server/*.pidb
+server/*.svclog
+server/*.scc
+
+# Chutzpah Test files
+server/_Chutzpah*
+
+# Visual C++ cache files
+server/ipch/
+server/*.aps
+server/*.ncb
+server/*.opendb
+server/*.opensdf
+server/*.sdf
+server/*.cachefile
+server/*.VC.db
+server/*.VC.VC.opendb
+
+# Visual Studio profiler
+server/*.psess
+server/*.vsp
+server/*.vspx
+server/*.sap
+
+# Visual Studio Trace Files
+server/*.e2e
+
+# TFS 2012 Local Workspace
+server/$tf/
+
+# Guidance Automation Toolkit
+server/*.gpState
+
+# ReSharper
+server/_ReSharper*/
+server/*.[Rr]e[Ss]harper
+server/*.DotSettings.user
+
+# JustCode
+server/.JustCode
+
+# TeamCity
+server/_TeamCity*
+
+# DotCover
+server/*.dotCover
+
+# AxoCover
+server/.axoCover/*
+server/!.axoCover/settings.json
+
+# Coverlet
+server/coverage*.json
+server/coverage*.xml
+server/coverage*.info
+
+# Visual Studio code coverage results
+server/*.coverage
+server/*.coveragexml
+
+# NCrunch
+server/_NCrunch_*
+server/.*crunch*.local.xml
+server/nCrunchTemp_*
+
+# MightyMoose
+server/*.mm.*
+server/AutoTest.Net/
+
+# Web workbench (sass)
+server/.sass-cache/
+
+# Installshield output folder
+server/[Ee]xpress/
+
+# DocProject
+server/DocProject/buildhelp/
+server/DocProject/Help/*.HxT
+server/DocProject/Help/*.HxC
+server/DocProject/Help/Html2
+server/DocProject/Help/html
+
+# Click-Once directory
+server/publish/
+
+# Publish Web Output
+server/*.[Pp]ublish.xml
+server/*.azurePubxml
+server/*.pubxml
+server/*.publishproj
+
+# Microsoft Azure Web App publish settings
+server/PublishProfiles/
+
+# NuGet Packages
+server/*.nupkg
+server/*.snupkg
+server/**/[Pp]ackages/*
+server/!**/[Pp]ackages/build/
+server/*.nuget.props
+server/*.nuget.targets
+
+# Microsoft Azure Build Output
+server/csx/
+server/*.build.csdef
+
+# Microsoft Azure Emulator
+server/ecf/
+server/rcf/
+
+# Windows Store app package directories and files
+server/AppPackages/
+server/BundleArtifacts/
+server/Package.StoreAssociation.xml
+server/_pkginfo.txt
+server/*.appx
+server/*.appxbundle
+server/*.appxupload
+
+# Visual Studio cache files
+server/*.cachefile
+server/*.VC.db
+server/*.VC.VC.opendb
+
+# Others
+server/ClientBin/
+server/~$*
+server/*~
+server/*.dbmdl
+server/*.dbproj.schemaview
+server/*.jfm
+server/*.pfx
+server/*.publishsettings
+server/orleans.codegen.cs
+
+# Including strong name files can present a security risk
+server/**/[Ss]trong[Nn]ame.[Kk]ey
+
+# SQL Server files
+server/*.mdf
+server/*.ldf
+server/*.ndf
+
+# Business Intelligence projects
+server/*.rdl.data
+server/*.bim.layout
+server/*.bim_*.settings
+server/*.rptproj.rsuser
+server/*- [Bb]ackup.rdl
+server/*- [Bb]ackup ([0-9]).rdl
+server/*- [Bb]ackup ([0-9][0-9]).rdl
+
+# Microsoft Fakes
+server/FakesAssemblies/
+
+# GhostDoc plugin setting file
+server/*.GhostDoc.xml
+
+# Node.js Tools for Visual Studio
+server/.ntvs_analysis.dat
+server/node_modules/
+
+# Visual Studio 6 build log
+server/*.plg
+
+# Visual Studio 6 workspace options file
+server/*.opt
+
+# Visual Studio 6 auto-generated workspace file (contains which files were open etc.)
+server/*.vbw
+
+# Visual Studio 6 auto-generated project file (contains which files were open etc.)
+server/*.vbp
+
+# Visual Studio 6 workspace and project file (working project files containing files to include in project)
+server/*.dsw
+server/*.dsp
+
+# Visual Studio 6 technical files
+server/*.ncb
+server/*.aps
+
+# Visual Studio LightSwitch build output
+server/**/*.HTMLClient/GeneratedArtifacts
+server/**/*.DesktopClient/GeneratedArtifacts
+server/**/*.DesktopClient/ModelManifest.xml
+server/**/*.Server/GeneratedArtifacts
+server/**/*.Server/ModelManifest.xml
+server/_Pvt_Extensions
+
+# Paket dependency manager
+server/.paket/paket.exe
+server/paket-files/
+
+# FAKE - F# Make
+server/.fake/
+
+# CodeRush personal settings
+server/.cr/personal
+
+# Python Tools for Visual Studio (PTVS)
+server/__pycache__/
+server/*.pyc
+
+# Cake - Uncomment if you are using it
+server/tools/**
+server/!tools/packages.config
+
+# Tabs Studio
+server/*.tss
+
+# Telerik's JustMock configuration file
+server/*.jmconfig
+
+# BizTalk build output
+server/*.btp.cs
+server/*.btm.cs
+server/*.odx.cs
+server/*.xsd.cs
+
+# OpenCover UI analysis results
+server/OpenCover/
+
+# Azure Stream Analytics local run output
+server/ASALocalRun/
+
+# MSBuild Binary and Structured Log
+server/*.binlog
+
+# NVidia Nsight GPU debugger configuration file
+server/*.nvuser
+
+# MFractors (Xamarin productivity tool) working folder
+server/.mfractor/
+
+# Local History for Visual Studio
+server/.localhistory/
+
+# Visual Studio History (VSHistory) files
+server/.vshistory/
+
+# BeatPulse healthcheck temp database
+server/healthchecksdb
+
+# Backup folder for Package Reference Convert tool in Visual Studio 2017
+server/MigrationBackup/
+
+# Ionide (cross platform F# VS Code tools) working folder
+server/.ionide/
+
+# Fody - auto-generated XML schema
+server/FodyWeavers.xsd
+
+# VS Code files for those working on multiple tools
+server/.vscode/*
+server/!.vscode/settings.json
+server/!.vscode/tasks.json
+server/!.vscode/launch.json
+server/!.vscode/extensions.json
+server/*.code-workspace
+
+# Local History for Visual Studio Code
+server/.history/
+
+# Windows Installer files from build outputs
+server/*.cab
+server/*.msi
+server/*.msix
+server/*.msm
+server/*.msp
+
+# JetBrains Rider
+server/*.sln.iml
+
+# ================================
+# DATABASE & CONFIGURATION
+# ================================
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files with sensitive data
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/appsettings.Local.json
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+
+# Secrets
+**/secrets.json
+**/user-secrets.json
+
+# ================================
+# DEPLOYMENT & BUILD ARTIFACTS
+# ================================
+
+# Docker
+.dockerignore
+Dockerfile.prod
+docker-compose.override.yml
+
+# Deployment packages
+*.zip
+*.tar.gz
+*.rar
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+.coverage
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
