@@ -1,0 +1,54 @@
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=P@ssw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-server-data:/var/opt/mssql
+    networks:
+      - therapist-diary-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P P@ssw0rd -Q 'SELECT 1' -C"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 80s
+
+  therapist-diary-api:
+    build:
+      context: .
+      dockerfile: src/Presentation/TherapistDiary.WebAPI/Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RUNNING_IN_CONTAINER=true
+      - ASPNETCORE_URLS=https://+:5000;http://+:5001
+      - ASPNETCORE_HTTPS_PORT=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - DB_CONNECTION_STRING=Server=sql-server;Database=TherapistDiaryDb;User Id=sa;Password=P@ssw0rd;MultipleActiveResultSets=true;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30
+      - JwtOptions__Secret=The answer is 42!The answer is 42!The answer is 42 length is 64!
+      - JwtOptions__Issuer=https://api.manhattan_tech.com
+      - JwtOptions__Audience=https://therapist-diary.manhattan_tech.com
+      - JwtOptions__ExpirationTimeInMinutes=15
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    depends_on:
+      sql-server:
+        condition: service_healthy
+    networks:
+      - therapist-diary-network
+    restart: unless-stopped
+
+volumes:
+  sql-server-data:
+
+networks:
+  therapist-diary-network:

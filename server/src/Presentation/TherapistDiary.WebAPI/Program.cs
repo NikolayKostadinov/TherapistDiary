@@ -80,15 +80,6 @@ builder.Services.AddAuthentication(options =>
             ValidAudience = jwtOptions.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret))
         };
-
-        // options.Events = new JwtBearerEvents
-        // {
-        //     OnMessageReceived = context =>
-        //     {
-        //         context.Token = context.Request.Cookies["ACCESS_TOKEN"];
-        //         return Task.CompletedTask;
-        //     }
-        // };
     });
 
 builder.Services.AddAuthorization();
@@ -115,7 +106,10 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference(options => { options.Title = "Therapist Diary API"; });
+    System.Console.WriteLine("Now you can see API on: https://localhost:5000/scalar/v1");
 }
+
+
 
 app.UseHttpsRedirection();
 
@@ -131,6 +125,5 @@ app.MapControllers();
 
 // In the pipeline:
 app.MapHealthChecks("/health");
-
 
 app.Run();

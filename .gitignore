@@ -76,20 +76,20 @@ client/typings/
 # ================================
 
 # Build results
-server/[Dd]ebug/
-server/[Dd]ebugPublic/
-server/[Rr]elease/
-server/[Rr]eleases/
-server/x64/
-server/x86/
-server/[Ww][Ii][Nn]32/
-server/[Aa][Rr][Mm]/
-server/[Aa][Rr][Mm]64/
-server/bld/
-server/[Bb]in/
-server/[Oo]bj/
-server/[Ll]og/
-server/[Ll]ogs/
+**/[Dd]ebug/
+**/[Dd]ebugPublic/
+**/[Rr]elease/
+**/[Rr]eleases/
+**/x64/
+**/x86/
+**/[Ww][Ii][Nn]32/
+**/[Aa][Rr][Mm]/
+**/[Aa][Rr][Mm]64/
+**/bld/
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
+**/[Ll]ogs/
 
 # Visual Studio files
 server/*.rsuser
@@ -104,6 +104,7 @@ server/mono_crash.*
 
 # Build Results of an ATL Project
 server/[Dd]ebugPS/
+server/.vs/
 server/[Rr]eleasePS/
 server/dlldata.c
 

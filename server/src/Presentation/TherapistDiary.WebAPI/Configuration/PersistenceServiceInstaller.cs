@@ -35,7 +35,12 @@ public class PersistentServiceInstaller : IServiceInstaller
             (sp, optionsBuilder) =>
             {
                 var env = sp.GetService<IHostEnvironment>();
-                var connectionString = env!.IsProduction()
+
+                // Check if running in container or production environment
+                var isRunningInContainer = IsRunningInContainer();
+                var isProduction = env!.IsProduction();
+
+                var connectionString = (isRunningInContainer || isProduction)
                     ? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
                     : configuration.GetConnectionString("Application_Db");
 
@@ -52,5 +57,17 @@ public class PersistentServiceInstaller : IServiceInstaller
         // ------------------------------- Global ISeed SetUp ------------------------------------------------------------
         services.AddScoped<ApplicationInitializer>();
         services.AddScoped<TherapiesSeed>();
+    }
+
+    private static bool IsRunningInContainer()
+    {
+
+        if (Environment.GetEnvironmentVariable("RUNNING_IN_CONTAINER") == "true")
+            return true;
+
+        if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+            return true;
+
+        return File.Exists("/.dockerenv");
     }
 }
