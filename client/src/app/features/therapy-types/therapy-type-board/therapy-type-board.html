@@ -9,16 +9,15 @@
             <p> Ние от Център Хармония сме до вас. Не чакайте болката да расте. Всеки човек заслужава подкрепа –
                 дайте си шанс за ново начало!</p>
         </div>
-        @if(isLoaded()){
+
         <div class="row g-4 justify-content-center">
-            @for (therapyType of therapyTypes(); track therapyType.id) {
+            @for (therapyType of therapyTypes; track therapyType.id) {
             <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
                 <app-therapy-type-item [therapy-type]='therapyType' />
             </div>
+            } @empty {
+            <app-spinner />
             }
         </div>
-        } @else{
-        <app-spinner />
-        }
     </div>
 </div>

@@ -15,8 +15,7 @@ import { Spinner } from "../../../layout/spinner/spinner";
 
 export class TherapistBoard implements OnInit {
 
-    therapists = signal<TherapistListModel[]>([]);
-    isLoaded = signal(false);
+    therapists!: TherapistListModel[];
 
 
     constructor(private readonly therapistsService: TherapistsService, private readonly destroyref: DestroyRef) { }
@@ -28,12 +27,10 @@ export class TherapistBoard implements OnInit {
             .subscribe({
                 next: (therapists) => {
                     console.log('Therapists received:', therapists);
-                    this.therapists.set(therapists);
-                    this.isLoaded.set(true);
+                    this.therapists = therapists;
                 },
                 error: (error) => {
                     console.error('Error loading therapists:', error);
-                    this.isLoaded.set(true); // Set to true even on error to hide spinner
                 }
             });
     }

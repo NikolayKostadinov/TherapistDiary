@@ -12,8 +12,7 @@ import { TherapyTypeItem } from "../therapy-type-item/therapy-type-item";
     styleUrl: './therapy-type-board.css'
 })
 export class TherapyTypeBoard implements OnInit {
-    isLoaded = signal(false);
-    therapyTypes = signal<TherapyTypeListModel[]>([]);
+    therapyTypes!: TherapyTypeListModel[];
 
     constructor(private readonly therapyTypesService: TherapyTypeService, private destroyref: DestroyRef) { }
 
@@ -24,12 +23,10 @@ export class TherapyTypeBoard implements OnInit {
             .subscribe({
                 next: (therapyTypes) => {
                     console.log('Therapy types received:', therapyTypes);
-                    this.therapyTypes.set(therapyTypes);
-                    this.isLoaded.set(true);
+                    this.therapyTypes = therapyTypes;
                 },
                 error: (error) => {
                     console.error('Error loading therapy types:', error);
-                    this.isLoaded.set(true); // Set to true even on error to hide spinner
                 }
             })
     }

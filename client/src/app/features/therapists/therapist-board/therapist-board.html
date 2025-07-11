@@ -10,16 +10,16 @@
                 безопасност.</p>
         </div>
 
-        @if(isLoaded()){
+
         <div class="row g-4 justify-content-center">
-            @for (therapist of therapists(); track therapist.id) {
+            @for (therapist of therapists; track therapist.id) {
             <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
                 <app-therapist-item [therapist]="therapist" />
             </div>
             }
+            @empty {
+            <app-spinner />
+            }
         </div>
-        } @else{
-        <app-spinner />
-        }
     </div>
 </div>
