@@ -1,9 +1,9 @@
-using System;
-using TherapistDiary.Domain.Entities;
-using Xunit;
+
 
 namespace TherapistDiary.UnitTests.Core.Domain
 {
+    using TherapistDiary.Domain.Entities;
+
     public class PatientTests
     {
         [Fact]

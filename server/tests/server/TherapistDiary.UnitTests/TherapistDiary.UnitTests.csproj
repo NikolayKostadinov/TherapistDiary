@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Core\TherapistDiary.Domain\TherapistDiary.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\server\Common\TherapistDiary.Common\TherapistDiary.Common.csproj" />
     <ProjectReference Include="..\..\..\src\server\Core\TherapistDiary.Application\TherapistDiary.Application.csproj" />
     <ProjectReference Include="..\..\..\src\server\Core\TherapistDiary.Domain\TherapistDiary.Domain.csproj" />
