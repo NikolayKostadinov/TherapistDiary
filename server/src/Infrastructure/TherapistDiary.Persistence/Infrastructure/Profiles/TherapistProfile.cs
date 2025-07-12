@@ -9,5 +9,6 @@ public class TherapistProfile : Profile
     public TherapistProfile()
     {
         CreateMap<User, TherapistListDto>();
+        CreateMap<User, TherapistDetailsDto>();
     }
 }

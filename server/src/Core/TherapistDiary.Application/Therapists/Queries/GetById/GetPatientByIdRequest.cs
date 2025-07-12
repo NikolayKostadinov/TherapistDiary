@@ -1,6 +1,6 @@
-// namespace TherapistDiary.Application.Patients.Queries.GetById;
-//
-// public record GetPatientByIdRequest
-// {
-//     public required Guid Id { get; init; }
-// }
+namespace TherapistDiary.Application.Therapists.Queries.GetById;
+
+public record GetTherapistByIdRequest
+{
+    public required Guid Id { get; init; }
+}

@@ -44,4 +44,7 @@
     <data name="INVALID_PAGE_SIZE" xml:space="preserve">
         <value>Размера на страницата трябва да бъде между '{0}' и '{1}'!</value>
     </data>
+    <data name="THERAPIST_NOT_FOUND" xml:space="preserve">
+        <value>Терапевт Id:'{0}' не е открит!</value>
+    </data>
 </root>

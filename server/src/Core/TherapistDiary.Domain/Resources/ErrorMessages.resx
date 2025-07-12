@@ -51,4 +51,7 @@
     <data name="INVALID_PAGE_SIZE" xml:space="preserve">
         <value>Page size must be between '{0}' and '{1}'</value>
     </data>
+    <data name="THERAPIST_NOT_FOUND" xml:space="preserve">
+        <value>Therapist Id:'{0}' not found!</value>
+    </data>
 </root>

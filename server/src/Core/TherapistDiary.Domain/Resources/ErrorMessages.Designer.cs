@@ -141,6 +141,15 @@ namespace TherapistDiary.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Therapist Id:&apos;{0}&apos; not found!.
+        /// </summary>
+        public static string THERAPIST_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("THERAPIST_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to retrieve user for refresh token!.
         /// </summary>
         public static string UNABLE_TO_RETRIEVE_USER_FOR_RT {
