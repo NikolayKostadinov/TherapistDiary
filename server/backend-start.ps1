@@ -100,13 +100,26 @@ if (-not $SkipRestore) {
             Write-Host "💾 Restoring database from backup..." -ForegroundColor Cyan
             
             $backupFileName = Split-Path $backupToRestore -Leaf
-            $containerBackupPath = "/var/opt/mssql/backup/$backupFileName"
             
-            try {
-                # Copy backup file to container
-                docker cp $backupToRestore "server-sql-server-1:$containerBackupPath"
+            # Check if API container is already running (shouldn't be during startup, but just in case)
+            $apiContainer = docker ps --filter "name=server-therapist-diary-api-1" --format "table {{.Names}}" | Select-String "server-therapist-diary-api-1"
+            
+            if ($apiContainer) {
+                # If API is running, use the restore-backup.ps1 script which handles stopping/starting API
+                Write-Host "🔄 Using restore script (API container detected)..." -ForegroundColor Yellow
+                & ".\restore-backup.ps1" -BackupFileName $backupFileName
+            } else {
+                # Direct restore since API is not running yet
+                $containerBackupPath = "/var/opt/mssql/backup/$backupFileName"
                 
-                if ($LASTEXITCODE -eq 0) {
+                try {
+                    # Since backup directory is mounted, file should already be available
+                    # But let's ensure it exists in the container
+                    if (-not (Test-Path $backupToRestore)) {
+                        Write-Host "❌ Backup file not found: $backupToRestore" -ForegroundColor Red
+                        exit 1
+                    }
+                    
                     # Check if database exists and drop it if it does
                     $checkDbCommand = "IF EXISTS (SELECT name FROM sys.databases WHERE name = 'TherapistDiaryDb') DROP DATABASE [TherapistDiaryDb]"
                     docker exec server-sql-server-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "P@ssw0rd" -Q "$checkDbCommand" -C
@@ -117,18 +130,13 @@ if (-not $SkipRestore) {
                     
                     if ($LASTEXITCODE -eq 0) {
                         Write-Host "✅ Database restored successfully!" -ForegroundColor Green
-                        
-                        # Clean up backup file from container
-                        docker exec server-sql-server-1 rm -f $containerBackupPath
                     } else {
                         Write-Host "❌ Database restore failed" -ForegroundColor Red
                     }
-                } else {
-                    Write-Host "❌ Failed to copy backup file to container" -ForegroundColor Red
                 }
-            }
-            catch {
-                Write-Host "❌ Error during restore process: $($_.Exception.Message)" -ForegroundColor Red
+                catch {
+                    Write-Host "❌ Error during restore process: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
     } else {
@@ -146,9 +154,24 @@ $apiContainer = docker ps --filter "name=server-therapist-diary-api-1" --format 
 if ($apiContainer) {
     Write-Host "✅ API container is running" -ForegroundColor Green
     
-    # Test API endpoint
+    # Test API endpoint (using workaround for PowerShell 5.1 certificate handling)
     try {
-        $response = Invoke-WebRequest -Uri "https://localhost:5000/api/health" -SkipCertificateCheck -TimeoutSec 10 -ErrorAction SilentlyContinue
+        # Temporarily ignore SSL certificate errors for PowerShell 5.1
+        add-type @"
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+public class TrustAllCertsPolicy : ICertificatePolicy {
+    public bool CheckValidationResult(
+        ServicePoint srvPoint, X509Certificate certificate,
+        WebRequest request, int certificateProblem) {
+        return true;
+    }
+}
+"@
+        [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        
+        $response = Invoke-WebRequest -Uri "https://localhost:5000/health" -TimeoutSec 10 -ErrorAction SilentlyContinue
         if ($response.StatusCode -eq 200) {
             Write-Host "✅ API is responding successfully!" -ForegroundColor Green
         } else {
@@ -156,7 +179,19 @@ if ($apiContainer) {
         }
     }
     catch {
-        Write-Host "⚠️ API health check failed, but container is running" -ForegroundColor Yellow
+        Write-Host "⚠️ API health check failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "🔍 Trying HTTP endpoint..." -ForegroundColor Gray
+        
+        # Fallback to HTTP if HTTPS fails
+        try {
+            $httpResponse = Invoke-WebRequest -Uri "http://localhost:5000/health" -TimeoutSec 5 -ErrorAction SilentlyContinue
+            if ($httpResponse.StatusCode -eq 200) {
+                Write-Host "✅ API responding on HTTP (HTTPS redirect working)" -ForegroundColor Green
+            }
+        }
+        catch {
+            Write-Host "⚠️ Both HTTPS and HTTP health checks failed, but container is running" -ForegroundColor Yellow
+        }
     }
 } else {
     Write-Host "❌ API container failed to start" -ForegroundColor Red

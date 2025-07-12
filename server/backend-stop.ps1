@@ -28,29 +28,24 @@ $sqlContainer = docker ps --filter "name=server-sql-server-1" --format "{{.Names
 if ($sqlContainer) {
     Write-Host "💾 Creating database backup..." -ForegroundColor Cyan
     
-    # Create backup inside the container
+    # Set up backup directory with proper permissions
+    Write-Host "🔧 Setting up backup directory permissions..." -ForegroundColor Yellow
+    docker exec server-sql-server-1 bash -c "mkdir -p /var/opt/mssql/backup && chown mssql:mssql /var/opt/mssql/backup && chmod 755 /var/opt/mssql/backup"
+    
+    # Create backup inside the container (which is now mounted to host ./backups directory)
     $backupPath = "/var/opt/mssql/backup/$BackupName.bak"
     $backupCommand = "BACKUP DATABASE [TherapistDiaryDb] TO DISK = '$backupPath' WITH FORMAT, INIT, NAME = 'TherapistDiary Full Backup', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
     
     try {
         # Execute backup command
-        docker exec server-sql-server-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "P@ssw0rd" -Q "$backupCommand" -C
+        $backupResult = docker exec server-sql-server-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "P@ssw0rd" -Q "$backupCommand" -C
         
         if ($LASTEXITCODE -eq 0) {
-            # Copy backup file from container to host
+            # Backup is automatically available in host ./backups directory due to volume mount
             $hostBackupPath = Join-Path $backupsDir "$BackupName.bak"
-            docker cp "server-sql-server-1:$backupPath" $hostBackupPath
-            
-            if ($LASTEXITCODE -eq 0) {
-                Write-Host "✅ Database backup created successfully: $hostBackupPath" -ForegroundColor Green
-                
-                # Clean up backup file from container
-                docker exec server-sql-server-1 rm -f $backupPath
-            } else {
-                Write-Host "❌ Failed to copy backup file from container" -ForegroundColor Red
-            }
+            Write-Host "✅ Database backup created successfully: $hostBackupPath" -ForegroundColor Green
         } else {
-            Write-Host "❌ Database backup failed" -ForegroundColor Red
+            Write-Host "❌ Failed to create database backup" -ForegroundColor Red
         }
     }
     catch {
