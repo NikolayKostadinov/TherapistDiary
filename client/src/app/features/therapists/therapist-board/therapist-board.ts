@@ -5,32 +5,37 @@ import { CommonModule } from '@angular/common';
 import { TherapistItem } from "../therapist-item/therapist-item";
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Spinner } from "../../../layout/spinner/spinner";
+import { ToasterService } from '../../../layout/toaster/toaster.service';
+import { ScrollAnimationDirective } from '../../../common/directives';
 
 @Component({
     selector: 'app-therapist-board',
-    imports: [CommonModule, TherapistItem, Spinner],
+    imports: [CommonModule, TherapistItem, Spinner, ScrollAnimationDirective],
     templateUrl: './therapist-board.html',
     styleUrl: './therapist-board.css'
 })
 
 export class TherapistBoard implements OnInit {
 
-    therapists!: TherapistListModel[];
+    therapists = signal<TherapistListModel[]>([]);
 
 
-    constructor(private readonly therapistsService: TherapistsService, private readonly destroyref: DestroyRef) { }
+    constructor(
+        private readonly therapistsService: TherapistsService,
+        private readonly destroyref: DestroyRef,
+        private toasterService: ToasterService
+    ) { }
 
     ngOnInit(): void {
-        console.log('TherapistBoard ngOnInit called');
         this.therapistsService.getTherapists()
             .pipe(takeUntilDestroyed(this.destroyref))
             .subscribe({
                 next: (therapists) => {
-                    console.log('Therapists received:', therapists);
-                    this.therapists = therapists;
+                    this.therapists.set(therapists);
                 },
                 error: (error) => {
-                    console.error('Error loading therapists:', error);
+                    this.toasterService.error('Неуспешно зареждане на терапевтите. Моля, опитайте отново.');
+                    console.log(error);
                 }
             });
     }

@@ -1,13 +1,7 @@
 
     <div class="service-item rounded">
         <div class="service-img rounded-top">
-            @if(!imageLoaded()) {
-            <div class="position-absolute top-50 start-50 translate-middle">
-                <app-spinner />
-            </div>
-            }
-            <img [src]="therapyType.bannerPictureUrl" class="img-fluid rounded-top w-100" alt="Therapy type"
-                [style.opacity]="imageLoaded() ? '1' : '0'" (load)="onImageLoad()" (error)="onImageError()">
+            <img [src]="therapyType.bannerPictureUrl" class="img-fluid rounded-top w-100" alt="Therapy type">
         </div>
         <div class="service-content rounded-bottom bg-light p-4">
             <div class="service-content-inner">

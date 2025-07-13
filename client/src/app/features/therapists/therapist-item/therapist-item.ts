@@ -1,4 +1,4 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { TherapistListModel } from '../models/therapist.list.model';
 
 @Component({

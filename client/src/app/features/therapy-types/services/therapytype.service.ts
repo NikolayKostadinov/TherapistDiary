@@ -10,6 +10,7 @@ import { TherapyTypeListModel } from '../models';
 export class TherapyTypeService {
 
     private apiUrl = `${baseUrl}/${therapyTypesUrl}`;
+
     constructor(private readonly httpClient: HttpClient) { }
 
     getTherapyTypes(): Observable<TherapyTypeListModel[]> {

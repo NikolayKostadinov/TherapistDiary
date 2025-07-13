@@ -1,6 +1,6 @@
 <div class="container-fluid therapists py-5">
     <div class="container py-5">
-        <div class="section-title mb-5 wow fadeInUp" data-wow-delay="0.1s">
+        <div class="section-title mb-5" appScrollAnimation animationType="fadeInUp" [animationDelay]="100">
             <div class="sub-style">
                 <h4 class="sub-title px-3 mb-0">Нашият екип</h4>
             </div>
@@ -12,8 +12,9 @@
 
 
         <div class="row g-4 justify-content-center">
-            @for (therapist of therapists; track therapist.id) {
-            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
+            @for (therapist of therapists(); track therapist.id; let i = $index) {
+            <div class="col-md-6 col-lg-6 col-xl-3" appScrollAnimation animationType="fadeInUp"
+                [animationDelay]="100 + (i * 150)">
                 <app-therapist-item [therapist]="therapist" />
             </div>
             }

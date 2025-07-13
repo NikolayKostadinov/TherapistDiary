@@ -10,6 +10,7 @@ import { TherapistListModel } from '../models/therapist.list.model';
 export class TherapistsService {
 
     private apiUrl = `${baseUrl}/${therapistsUrl}`;
+
     constructor(private readonly httpClient: HttpClient) { }
 
     getTherapists(): Observable<TherapistListModel[]> {
