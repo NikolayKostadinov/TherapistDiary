@@ -1,0 +1,60 @@
+.bio-text {
+    text-align: justify;
+}
+
+.heading::after {
+    content: "";
+    width: 70%;
+    position: absolute;
+    top: 2rem;
+    left: 25%;
+    /* transform: translateY(-50%); */
+    margin-top: 8px;
+    margin-left: -100px;
+    border: 1px solid var(--bs-primary) !important;
+}
+
+.contact-header-wrapper {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.phoneicon {
+    height: 80px;
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--bs-primary) !important;
+    border-radius: 50%;
+}
+
+.ph-number {
+    font-family: "Open Sans", sans-serif;
+}
+
+.btn-back {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    border: none;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    color: var(--bs-white);
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.5s;
+    opacity: 1;
+}
+
+.btn-back:hover {
+    box-shadow: inset 150px 0 0 0 var(--bs-light) !important;
+    color: var(--bs-primary) !important;
+}

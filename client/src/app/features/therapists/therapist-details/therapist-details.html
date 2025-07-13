@@ -1,0 +1,54 @@
+<div class="container-fluid appointment mt-4">
+    <div class="container py-5">
+        <div class="row g-5 align-items-center">
+
+            <!-- begin -->
+            <div class="wow fadeInLeft" data-wow-delay="0.2">
+                <div class="section-title text-start">
+                    <div class="section-title mb-5" appScrollAnimation animationType="fadeInUp" [animationDelay]="100">
+                        <div>
+                            <button class="btn-back" (click)="goBack()">
+                                <div class="owl-prev"><i class="bi bi-arrow-left"></i></div>
+                            </button>
+                        </div>
+                        <div>
+                            <div class="sub-style">
+                                <h4 class="sub-title px-3 mb-0">Детаили за терапевта</h4>
+                            </div>
+                            <h1 class="display-3 mb-4">{{therapistDetails().fullName}}</h1>
+                            <h3 class="mb-0">{{therapistDetails().specialty}}</h3>
+                        </div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-sm-6" appScrollAnimation animationType="fadeInLeft" [animationDelay]="400">
+                            <div class="d-flex flex-column h-100">
+                                <div class="mb-4">
+                                    <h4 class="heading mb-5"><i class="fa fa-check text-primary me-2"></i>
+                                        Биографични данни
+                                    </h4>
+                                    <p class="mb-0 bio-text">{{therapistDetails().biography}}</p>
+                                </div>
+                                <div class="text-start mb-4">
+                                    <div class="d-flex flex-column text-center mb-4">
+                                        <div class="contact-header-wrapper">
+                                            <div class="phoneicon">
+                                                <i class="fa fa-phone-alt fa-2x text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-dark">за контакти:</h4>
+                                                <h5 class="ph-number mb-0">+012 345 67890</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" appScrollAnimation animationType="fadeInRight" [animationDelay]="400">
+                            <img [src]="therapistDetails().profilePictureUrl" class="img-fluid rounded w-100 h-auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

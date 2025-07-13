@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, signal } from '@angular/core';
 import { TherapyTypeService } from '../services/therapytype.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TherapyTypeListModel } from '../models';
@@ -15,6 +15,7 @@ import { ScrollAnimationDirective } from '../../../common/directives';
 })
 export class TherapyTypeBoard implements OnInit {
     therapyTypes = signal<TherapyTypeListModel[]>([]);
+    @Input('is-home') isHome: boolean = false;
 
     constructor(
         private readonly therapyTypesService: TherapyTypeService,

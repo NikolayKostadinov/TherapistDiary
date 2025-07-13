@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { baseUrl, therapistsUrl } from '../../../common/constants';
+import { baseUrl, therapistsUrl } from '../../common/constants';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TherapistListModel } from '../models/therapist.list.model';
+import { TherapistDetailsModel, TherapistListModel } from './models';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +13,11 @@ export class TherapistsService {
 
     constructor(private readonly httpClient: HttpClient) { }
 
-    getTherapists(): Observable<TherapistListModel[]> {
+    getAllTherapists(): Observable<TherapistListModel[]> {
         return this.httpClient.get<TherapistListModel[]>(this.apiUrl);
+    }
+
+    getTherapist(userId: number | string): Observable<TherapistDetailsModel> {
+        return this.httpClient.get<TherapistDetailsModel>(`${this.apiUrl}/${userId}`);
     }
 }

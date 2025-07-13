@@ -1,5 +1,5 @@
-import { Component, DestroyRef, OnInit, signal } from '@angular/core';
-import { TherapistsService } from '../services/therapists.service';
+import { Component, DestroyRef, Input, OnInit, signal } from '@angular/core';
+import { TherapistsService } from '../therapists.service';
 import { TherapistListModel } from '../models/therapist.list.model';
 import { CommonModule } from '@angular/common';
 import { TherapistItem } from "../therapist-item/therapist-item";
@@ -17,8 +17,8 @@ import { ScrollAnimationDirective } from '../../../common/directives';
 
 export class TherapistBoard implements OnInit {
 
+    @Input('is-home') isHome: boolean = false;
     therapists = signal<TherapistListModel[]>([]);
-
 
     constructor(
         private readonly therapistsService: TherapistsService,
@@ -27,7 +27,7 @@ export class TherapistBoard implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.therapistsService.getTherapists()
+        this.therapistsService.getAllTherapists()
             .pipe(takeUntilDestroyed(this.destroyref))
             .subscribe({
                 next: (therapists) => {
