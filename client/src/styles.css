@@ -1,3 +1,11 @@
+/* Prevent horizontal scroll globally */
+html,
+body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+}
+
 /*** Fixed Navbar Compensation Start ***/
 body {
     padding-top: 130px;

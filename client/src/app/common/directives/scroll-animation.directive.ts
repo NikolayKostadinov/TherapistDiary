@@ -6,7 +6,7 @@ import { AnimationBuilder, AnimationFactory, AnimationPlayer, style, animate } f
     standalone: true
 })
 export class ScrollAnimationDirective implements OnInit, OnDestroy {
-    @Input() animationType: 'fadeInUp' | 'fadeInLeft' | 'fadeInRight' | 'fadeIn' = 'fadeInUp';
+    @Input() animationType: 'fadeInUp' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight' | 'fadeIn' = 'fadeInUp';
     @Input() animationDelay: number = 0;
     @Input() animationDuration: number = 600;
 
@@ -39,6 +39,10 @@ export class ScrollAnimationDirective implements OnInit, OnDestroy {
             case 'fadeInUp':
                 element.style.opacity = '0';
                 element.style.transform = 'translateY(50%)';
+                break;
+            case 'fadeInDown':
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(-50%)';
                 break;
             case 'fadeInLeft':
                 element.style.opacity = '0';
@@ -84,6 +88,13 @@ export class ScrollAnimationDirective implements OnInit, OnDestroy {
     private createAnimation(): AnimationFactory {
         switch (this.animationType) {
             case 'fadeInUp':
+                return this.animationBuilder.build([
+                    animate(`${this.animationDuration}ms ease-out`, style({
+                        opacity: 1,
+                        transform: 'translateY(0)'
+                    }))
+                ]);
+            case 'fadeInDown':
                 return this.animationBuilder.build([
                     animate(`${this.animationDuration}ms ease-out`, style({
                         opacity: 1,
