@@ -1,0 +1,107 @@
+.carousel-control-prev {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: var(--bs-primary);
+    color: var(--bs-white);
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.5s;
+    opacity: 1;
+}
+
+
+.carousel-control-next {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: var(--bs-primary);
+    color: var(--bs-white);
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.5s;
+    opacity: 1;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    box-shadow: inset 150px 0 0 0 var(--bs-light) !important;
+    color: var(--bs-primary) !important;
+}
+
+@media (max-width: 576px) {
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        top: 630px;
+        transition: 0.5s;
+    }
+
+    .carousel-caption {
+        width: 95% !important;
+    }
+
+}
+
+.carousel-item img {
+    position: relative;
+    width: 100%;
+    height: 700px;
+    margin-top: 10px;
+    display: block;
+    object-fit: cover;
+    transition: 0.5s;
+}
+
+
+
+@media (max-width: 992px) {
+
+    .carousel-item img {
+        margin-top: 0;
+        transition: 0.5s;
+    }
+
+}
+
+@media (min-width: 992px) {
+
+    .header-carousel .owl-nav .owl-prev,
+    .header-carousel .owl-nav .owl-next,
+    .carousel-control-prev,
+    .carousel-control-next {
+        margin-top: 50px;
+    }
+}
+
+.header-carousel .header-carousel-item .carousel-caption,
+.carousel-item .carousel-caption {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 100px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, .5);
+}
+
+.header-carousel .header-carousel-item .carousel-caption .carousel-caption-content,
+.carousel-caption-content {
+    position: relative;
+    width: 75%;
+}
