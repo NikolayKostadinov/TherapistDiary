@@ -1,4 +1,18 @@
-/*** Spinner Start ***/
+/*** Fixed Navbar Compensation Start ***/
+body {
+    padding-top: 130px;
+    /* Compensate for fixed topbar + navbar (45px + 85px) */
+}
+
+@media (max-width: 991.98px) {
+    body {
+        padding-top: 75px;
+        /* Mobile - only navbar (no topbar) */
+    }
+}
+
+/*** Fixed Navbar Compensation End ***/
+
 /*** Spinner ***/
 #spinner {
     opacity: 0;
@@ -233,6 +247,7 @@
     box-shadow: inset 600px 0 0 0 var(--bs-light) !important;
     color: var(--bs-primary) !important;
 }
+
 /*** Appointment End ***/
 
 
