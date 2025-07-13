@@ -91,7 +91,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("MyAllowedOrigins",
         policy =>
         {
-            policy.WithOrigins("*")     // Specify the allowed origin
+            policy.AllowAnyOrigin()     // Allow all origins for development
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
