@@ -1,0 +1,20 @@
+<div class="toaster-container">
+    @for (message of messages(); track message.id) {
+    <div class="toast" [ngClass]="'toast-' + message.type" [@slideInOut]="message.state || 'visible'" role="alert">
+        <div class="toast-header">
+            <i [class]="getIconClass(message.type)"></i>
+            <strong class="toast-title">
+                {{ message.type === 'success' ? 'Успех' :
+                message.type === 'error' ? 'Грешка' :
+                message.type === 'warning' ? 'Внимание' : 'Информация' }}
+            </strong>
+            <button type="button" class="btn-close" (click)="onClose(message.id)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="toast-body">
+            {{ message.message }}
+        </div>
+    </div>
+    }
+</div>
