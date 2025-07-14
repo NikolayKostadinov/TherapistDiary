@@ -1,5 +1,5 @@
 import { Component, OnInit, DestroyRef, signal } from '@angular/core';
-import { TherapistsService } from '../therapists.service';
+import { TherapistsService } from '../services/therapists.service';
 import { ToasterService } from '../../../layout';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';

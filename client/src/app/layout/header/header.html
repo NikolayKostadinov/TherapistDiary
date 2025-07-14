@@ -45,11 +45,15 @@
                     <a routerLink="/therapists" class="nav-item nav-link" routerLinkActive="active">Терапевти</a>
                     <a routerLink="/therapy-types" class="nav-item nav-link" routerLinkActive="active">Терапии</a>
                     <a routerLink="/about" class="nav-item nav-link" routerLinkActive="active">За нас</a>
-
+                    @if(isAuthenticated()){
+                    <a (click)="logout()" class="nav-item nav-link" style="cursor: pointer;">Изход</a>
+                    }@else {
+                    <a class="nav-item nav-link" style="cursor: pointer;">Регистрация</a>
+                    <a routerLink="/login" class="nav-item nav-link" style="cursor: pointer;">Вход</a>
+                    }
                 </div>
-                <a href="#"
-                    class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0">Запазете
-                    час</a>
+                <a class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0"
+                    style="cursor: pointer;">Запазете час</a>
             </div>
         </nav>
     </div>

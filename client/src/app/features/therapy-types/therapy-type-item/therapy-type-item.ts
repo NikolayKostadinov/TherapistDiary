@@ -1,7 +1,5 @@
-import { Component, Input, signal, OnInit } from '@angular/core';
-import { therapyTypesUrl } from '../../../common/constants';
+import { Component, Input } from '@angular/core';
 import { TherapyTypeListModel } from '../models';
-import { Spinner } from "../../../layout/spinner/spinner";
 
 @Component({
     selector: 'app-therapy-type-item',

@@ -1,5 +1,5 @@
 import { Component, DestroyRef, Input, OnInit, signal } from '@angular/core';
-import { TherapistsService } from '../therapists.service';
+import { TherapistsService } from '../services/therapists.service';
 import { TherapistListModel } from '../models/therapist.list.model';
 import { CommonModule } from '@angular/common';
 import { TherapistItem } from "../therapist-item/therapist-item";

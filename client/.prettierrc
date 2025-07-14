@@ -1,0 +1,42 @@
+{
+  "semi": true,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "printWidth": 200,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
+  "htmlWhitespaceSensitivity": "ignore",
+  "bracketSameLine": true,
+  "singleAttributePerLine": false,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 200,
+        "tabWidth": 4,
+        "parser": "angular",
+        "htmlWhitespaceSensitivity": "ignore",
+        "bracketSameLine": true,
+        "singleAttributePerLine": false,
+        "insertPragma": false,
+        "proseWrap": "preserve"
+      }
+    },
+    {
+      "files": "*.component.html",
+      "options": {
+        "printWidth": 200,
+        "tabWidth": 4,
+        "parser": "angular",
+        "htmlWhitespaceSensitivity": "ignore",
+        "bracketSameLine": true,
+        "singleAttributePerLine": false,
+        "insertPragma": false,
+        "proseWrap": "preserve"
+      }
+    }
+  ]
+}

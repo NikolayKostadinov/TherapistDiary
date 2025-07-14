@@ -93,7 +93,8 @@ builder.Services.AddCors(options =>
         {
             policy.AllowAnyOrigin()     // Allow all origins for development
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .AllowAnyMethod()
+                  .WithExposedHeaders("X-Access-Token", "X-Refresh-Token");
         });
 });
 

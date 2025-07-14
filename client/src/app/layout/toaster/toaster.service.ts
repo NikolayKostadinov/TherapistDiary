@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { ToasterMessage, ToasterConfig, ToasterState } from './toaster.model';
-import { defaultDuration } from '../../common/constants';
+import { UI_CONSTANTS } from '../../common/ui-constants';
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +16,7 @@ export class ToasterService {
             id,
             message: config.message,
             type: config.type,
-            duration: config.duration ?? defaultDuration,
+            duration: config.duration ?? UI_CONSTANTS.TOAST_DURATION,
             autoClose: config.autoClose ?? true,
             state: 'entering'
         };

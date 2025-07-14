@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
-import { baseUrl, therapyTypesUrl } from '../../../common/constants';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TherapyTypeListModel } from '../models';
+import { API_ENDPOINTS } from '../../../common/api-endpoints';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TherapyTypeService {
 
-    private apiUrl = `${baseUrl}/${therapyTypesUrl}`;
+    private apiUrl = `${environment.baseUrl}${API_ENDPOINTS.THERAPY_TYPES}`;
 
     constructor(private readonly httpClient: HttpClient) { }
 
