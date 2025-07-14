@@ -7,13 +7,12 @@ param(
 
 Write-Host "🚀 Starting backend services..." -ForegroundColor Green
 
-# Build and start Docker Compose services (rebuild API for fresh deployment)
-Write-Host "� Building and starting Docker Compose services..." -ForegroundColor Cyan
-Write-Host "📦 Rebuilding therapist-diary-api for fresh deployment..." -ForegroundColor Yellow
-docker compose up -d --build therapist-diary-api
+# Start Docker Compose services
+Write-Host "🐳 Starting Docker Compose services..." -ForegroundColor Cyan
+docker compose up -d
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Failed to build and start Docker services" -ForegroundColor Red
+    Write-Host "❌ Failed to start Docker services" -ForegroundColor Red
     exit 1
 }
 
@@ -154,24 +153,48 @@ $apiContainer = docker ps --filter "name=server-therapist-diary-api-1" --format 
 if ($apiContainer) {
     Write-Host "✅ API container is running" -ForegroundColor Green
     
-    # Test API endpoint (using workaround for PowerShell 5.1 certificate handling)
+    # Test API endpoint (compatible with Windows 10 and 11)
     try {
-        # Temporarily ignore SSL certificate errors for PowerShell 5.1
-        add-type @"
+        # Check PowerShell version and use appropriate method
+        if ($PSVersionTable.PSVersion.Major -ge 6) {
+            # PowerShell 7+ - use SkipCertificateCheck
+            $response = Invoke-WebRequest -Uri "https://localhost:5000/health" -SkipCertificateCheck -TimeoutSec 10 -ErrorAction SilentlyContinue
+        } else {
+            # Windows PowerShell 5.1 - use modern approach with fallback
+            try {
+                # Try modern ServerCertificateValidationCallback first
+                if (-not ([System.Management.Automation.PSTypeName]'TrustAllCertsPolicy').Type) {
+                    try {
+                        add-type @"
 using System.Net;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-public class TrustAllCertsPolicy : ICertificatePolicy {
-    public bool CheckValidationResult(
-        ServicePoint srvPoint, X509Certificate certificate,
-        WebRequest request, int certificateProblem) {
+public class TrustAllCertsPolicy {
+    public static bool ValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) {
         return true;
     }
 }
 "@
-        [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+                    }
+                    catch {
+                        # If modern approach fails, fall back to simpler method
+                        Write-Host "⚠️ Using fallback SSL handling for this system" -ForegroundColor Yellow
+                    }
+                }
+                
+                if (([System.Management.Automation.PSTypeName]'TrustAllCertsPolicy').Type) {
+                    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = [TrustAllCertsPolicy]::ValidationCallback
+                }
+                [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+                $response = Invoke-WebRequest -Uri "https://localhost:5000/health" -TimeoutSec 10 -ErrorAction SilentlyContinue
+            }
+            catch {
+                # If HTTPS fails completely, try HTTP directly
+                Write-Host "⚠️ HTTPS failed, trying HTTP directly..." -ForegroundColor Yellow
+                $response = Invoke-WebRequest -Uri "http://localhost:5000/health" -TimeoutSec 10 -ErrorAction SilentlyContinue
+            }
+        }
         
-        $response = Invoke-WebRequest -Uri "https://localhost:5000/health" -TimeoutSec 10 -ErrorAction SilentlyContinue
         if ($response.StatusCode -eq 200) {
             Write-Host "✅ API is responding successfully!" -ForegroundColor Green
         } else {

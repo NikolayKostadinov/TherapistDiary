@@ -88,7 +88,6 @@ Gracefully stops all backend services and creates an automatic database backup.
 Starts all backend services with optional database restoration from previous backups.
 
 ### Features
-- ✅ **Fresh API deployment** - Rebuilds API container on every start
 - ✅ Automated service startup with health checks
 - ✅ Multiple restore options (interactive, latest, specific file)
 - ✅ SQL Server health monitoring
@@ -127,7 +126,7 @@ Starts all backend services with optional database restoration from previous bac
 
 ### Process Flow
 
-1. **Build and Start Services** - Runs `docker compose up -d --build therapist-diary-api` (fresh API build)
+1. **Start Docker Services** - Runs `docker compose up -d`
 2. **Wait for SQL Server** - Monitors health status (up to 30 attempts)
 3. **Database Restoration** (if not skipped):
    - **Interactive Mode** - Shows available backups for selection
@@ -158,8 +157,7 @@ Select backup to restore (0-2 or 's' to skip):
 
 ```
 🚀 Starting backend services...
-� Building and starting Docker Compose services...
-📦 Rebuilding therapist-diary-api for fresh deployment...
+🐳 Starting Docker Compose services...
 ⏳ Waiting for SQL Server to be ready...
 Attempt 5/30 - SQL Server status: healthy
 ✅ SQL Server is ready!
