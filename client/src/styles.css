@@ -114,6 +114,7 @@ body {
     color: var(--bs-secondary) !important;
 }
 
+/*** Section Title Start ***/
 .section-title {
     max-width: 900px;
     text-align: center;
@@ -182,6 +183,33 @@ body {
     border: 1px solid var(--bs-primary) !important;
 }
 
+/*** Topbar Start ***/
+.fixed-top .container {
+    transition: 0.5s;
+}
+
+.topbar {
+    padding: 2px 10px 2px 20px;
+    background: var(--bs-primary) !important;
+}
+
+.topbar a,
+.topbar a i {
+    transition: 0.5s;
+}
+
+.topbar a:hover,
+.topbar a i:hover {
+    color: var(--bs-secondary) !important;
+}
+
+@media (max-width: 576px) {
+    .topbar {
+        display: none;
+    }
+}
+
+/*** Topbar End ***/
 
 /*** Feature Start ***/
 .feature .feature-item {
