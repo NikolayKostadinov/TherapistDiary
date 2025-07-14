@@ -314,3 +314,10 @@ healthcheck:
 ---
 
 For issues or improvements, please check the project repository or contact the development team.
+
+## Remove all containers, images, volumes
+docker-compose down --rmi all --volumes
+
+## Manualy run dockers
+docker-compose build web
+docker-compose up --no-deps -d
