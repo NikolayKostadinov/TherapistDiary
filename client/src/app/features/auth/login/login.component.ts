@@ -56,8 +56,7 @@ export class LoginComponent {
             this.authService.login(loginData).subscribe({
                 next: (response) => {
                     this.isLoading.set(false);
-                    this.closeModal(); // Затваряме модала преди навигация
-                    this.router.navigate(['/']);
+                    this.closeModal();
                 },
                 error: (error: Error) => {
                     this.isLoading.set(false);
@@ -78,6 +77,7 @@ export class LoginComponent {
 
     closeModal() {
         this.modalClosed.emit();
+        this.router.navigate(['/']);
     }
 
     goToRegister() {

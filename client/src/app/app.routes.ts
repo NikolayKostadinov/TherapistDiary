@@ -5,19 +5,23 @@ import { TherapistBoard } from './features/therapists/therapist-board/therapist-
 import { TherapyTypeBoard } from './features/therapy-types/therapy-type-board/therapy-type-board';
 import { TherapistDetails } from './features/therapists/therapist-details/therapist-details';
 import { LoginComponent } from './features/auth';
+import { PageNotFound } from './layout/page-not-found/page-not-found';
 // import { RegisterComponent } from './features/auth/register/register.component';
+import { App } from './app';
+import { AdminGuard } from './guards/admin.guard';
+import { AuthenticatedGuard } from './guards';
 
 export const routes: Routes = [
-    { path: '', component: Home },
-    { path: 'home', redirectTo: '', pathMatch: 'full' },
-    { path: 'about', component: About },
-    { path: 'login', component: LoginComponent },
-    // { path: 'register', component: RegisterComponent },
     {
-        path: 'therapists', children: [
-            { path: '', component: TherapistBoard },
-            { path: 'details/:id', component: TherapistDetails }
+        path: '', children: [
+            { path: 'home', redirectTo: '', pathMatch: 'full' },
+            { path: '', component: Home },
+            { path: 'about', component: About },
+            { path: 'login', component: LoginComponent },
+            { path: 'therapists', component: TherapistBoard },
+            { path: 'therapists/details/:id', component: TherapistDetails },
+            { path: 'therapy-types', component: TherapyTypeBoard },
+            { path: '**', component: PageNotFound }
         ]
-    },
-    { path: 'therapy-types', component: TherapyTypeBoard }
+    }
 ];

@@ -18,7 +18,7 @@ export class TherapistsService {
         return this.httpClient.get<TherapistListModel[]>(this.apiUrl);
     }
 
-    getTherapist(userId: number | string): Observable<TherapistDetailsModel> {
+    getTherapist(userId: string): Observable<TherapistDetailsModel> {
         return this.httpClient.get<TherapistDetailsModel>(`${this.apiUrl}/${userId}`);
     }
 }

@@ -40,15 +40,17 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav ms-auto py-0">
-                    <a routerLink="" class="nav-item nav-link" routerLinkActive="active"
-                        [routerLinkActiveOptions]="{ exact: true }">Начало</a>
+                    <a routerLink="" class="nav-item nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        Начало
+                    </a>
                     <a routerLink="/therapists" class="nav-item nav-link" routerLinkActive="active">Терапевти</a>
                     <a routerLink="/therapy-types" class="nav-item nav-link" routerLinkActive="active">Терапии</a>
                     <a routerLink="/about" class="nav-item nav-link" routerLinkActive="active">За нас</a>
                     @if(isAuthenticated()){
                     <a (click)="logout()" class="nav-item nav-link" style="cursor: pointer;">Изход</a>
                     }@else {
-                    <a routerLink="/register" class="nav-item nav-link" style="cursor: pointer;">Регистрация</a>
+                    <a routerLink="/register" class="nav-item nav-link" style="cursor: pointer;"
+                        routerLinkActive="active">Регистрация</a>
                     <a (click)="openLoginModal()" class="nav-item nav-link" style="cursor: pointer;">Вход</a>
                     }
                 </div>
