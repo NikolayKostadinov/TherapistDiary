@@ -13,7 +13,7 @@ src/app/
 │   ├── directives/      # Reusable directives
 │   └── constants/       # API endpoints, UI constants
 ├── features/            # Feature modules
-│   ├── auth/           # Authentication & authorization
+│   ├── auth/           # Authentication & authorization (📖 See: src/app/features/auth/README.md)
 │   ├── therapists/     # Therapist management
 │   ├── therapy-types/  # Therapy type management
 │   ├── about/          # About page

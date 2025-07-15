@@ -48,14 +48,20 @@
                     @if(isAuthenticated()){
                     <a (click)="logout()" class="nav-item nav-link" style="cursor: pointer;">Изход</a>
                     }@else {
-                    <a class="nav-item nav-link" style="cursor: pointer;">Регистрация</a>
-                    <a routerLink="/login" class="nav-item nav-link" style="cursor: pointer;">Вход</a>
+                    <a routerLink="/register" class="nav-item nav-link" style="cursor: pointer;">Регистрация</a>
+                    <a (click)="openLoginModal()" class="nav-item nav-link" style="cursor: pointer;">Вход</a>
                     }
                 </div>
-                <a class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0"
+                <a (click)="openLoginModal()"
+                    class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0"
                     style="cursor: pointer;">Запазете час</a>
             </div>
         </nav>
     </div>
     <!-- Navbar & Hero End -->
+
+    <!-- Login Modal -->
+    @if (showLoginModal()) {
+    <app-login (modalClosed)="closeLoginModal()"></app-login>
+    }
 </header>

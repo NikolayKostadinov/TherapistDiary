@@ -12,8 +12,9 @@
                             откриете разбиране и професионална подкрепа.
                             Потърсете ни!
                         </p>
-                        <a class="btn btn-primary rounded-pill text-white py-3 px-5" style="cursor: pointer;">
-                            <i class="fas fa-calendar-plus me-2"></i>Запазете час
+                        <a (click)="openLoginModal()" class="btn btn-primary rounded-pill text-white py-3 px-5"
+                            style="cursor: pointer;">
+                            Запазете час
                         </a>
                     </div>
                 </div>
@@ -27,13 +28,10 @@
                             Център</h5>
                         <h1 class="display-1 text-capitalize text-white mb-4">Пътят към вътрешен мир</h1>
                         <p class="mb-5 fs-5">Вие сте важни. Не оставайте сами в трудностите. В Център Хармония
-                            ще
-                            откриете разбиране и професионална подкрепа.
-                            Потърсете ни!
+                            ще откриете разбиране и професионална подкрепа. Потърсете ни!
                         </p>
-                        <a class="btn btn-primary rounded-pill text-white py-3 px-5" style="cursor: pointer;">
-                            <i class="fas fa-calendar-plus me-2"></i>Запазете час
-                        </a>
+                        <a (click)="openLoginModal()" class="btn btn-primary rounded-pill text-white py-3 px-5"
+                            style="cursor: pointer;"> Запазете час </a>
                     </div>
                 </div>
             </div>
@@ -46,3 +44,8 @@
         <div class="owl-prev"><i class="bi bi-arrow-right"></i></div>
     </button>
 </div>
+
+<!-- Login Modal -->
+@if (showLoginModal()) {
+<app-login (modalClosed)="closeLoginModal()"></app-login>
+}

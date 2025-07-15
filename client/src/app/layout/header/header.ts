@@ -5,10 +5,11 @@ import { filter, map, startWith } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../../features/auth/services/auth.service';
 import { UserStateService } from '../../features/auth/services/user-state.service';
+import { LoginComponent } from '../../features/auth/login/login.component';
 
 @Component({
     selector: 'app-header',
-    imports: [CommonModule, RouterLink, RouterLinkActive],
+    imports: [CommonModule, RouterLink, RouterLinkActive, LoginComponent],
     templateUrl: './header.html',
     styleUrl: './header.css'
 })
@@ -18,6 +19,7 @@ export class Header implements OnInit, OnDestroy {
 
     isAuthenticated = signal(false);
     isScrolled = false;
+    showLoginModal = signal(false);
 
     constructor(
         private readonly router: Router,
@@ -46,5 +48,13 @@ export class Header implements OnInit, OnDestroy {
     logout(): void {
         this.authService.logout();
         this.router.navigate(['/']);
+    }
+
+    openLoginModal(): void {
+        this.showLoginModal.set(true);
+    }
+
+    closeLoginModal(): void {
+        this.showLoginModal.set(false);
     }
 }

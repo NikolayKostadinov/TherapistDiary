@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,6 +13,8 @@ import { LoginRequest } from '../models';
     styleUrl: './login.component.css'
 })
 export class LoginComponent {
+    @Output() modalClosed = new EventEmitter<void>();
+
     loginForm: FormGroup;
     isLoading = signal(false);
     errorMessage = signal('');
@@ -54,6 +56,7 @@ export class LoginComponent {
             this.authService.login(loginData).subscribe({
                 next: (response) => {
                     this.isLoading.set(false);
+                    this.closeModal(); // Затваряме модала преди навигация
                     this.router.navigate(['/']);
                 },
                 error: (error: Error) => {
@@ -71,5 +74,19 @@ export class LoginComponent {
             const control = this.loginForm.get(key);
             control?.markAsTouched();
         });
+    }
+
+    closeModal() {
+        this.modalClosed.emit();
+    }
+
+    goToRegister() {
+        this.closeModal();
+        this.router.navigate(['/register']);
+    }
+
+    @HostListener('document:keydown.escape')
+    onEscapeKey() {
+        this.closeModal();
     }
 }
