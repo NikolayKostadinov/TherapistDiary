@@ -166,5 +166,14 @@ namespace TherapistDiary.Domain.Resources {
                 return ResourceManager.GetString("USER_ALREADY_EXISTS", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User with Id: &apos;{0}&apos; not found!.
+        /// </summary>
+        public static string USER_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("USER_NOT_FOUND", resourceCulture);
+            }
+        }
     }
 }

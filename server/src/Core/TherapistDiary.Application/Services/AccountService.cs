@@ -10,7 +10,6 @@ using Requests;
 using TherapistDiary.Common.Extensions;
 using static Domain.Errors.DomainErrors;
 
-
 public class AccountService : IAccountService
 {
     private readonly IAuthTokenProcessor _authTokenProcessor;
@@ -31,29 +30,33 @@ public class AccountService : IAccountService
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
-    public async Task<Result> RegisterAsync(RegisterRequest registerRequest)
+    public async Task<Result> RegisterAsync(UserRegisterRequest userRegisterRequest)
     {
-        var userExist = await _userManager.FindByNameAsync(registerRequest.UserName) is not null;
+        var userExist = await _userManager.FindByNameAsync(userRegisterRequest.UserName) is not null;
         if (userExist)
         {
-            var message = string.Format(ErrorMessages.USER_ALREADY_EXISTS, registerRequest.UserName);
+            var message = string.Format(ErrorMessages.USER_ALREADY_EXISTS, userRegisterRequest.UserName);
             return Result.Failure(Error.Create(message));
         }
 
         var user = User.Create(
-            registerRequest.UserName,
-            registerRequest.Email,
-            registerRequest.FirstName,
-            registerRequest.LastName,
-            registerRequest.MidName);
+            userRegisterRequest.UserName,
+            userRegisterRequest.Email,
+            userRegisterRequest.FirstName,
+            userRegisterRequest.LastName,
+            userRegisterRequest.MidName,
+            userRegisterRequest.PhoneNumber,
+            userRegisterRequest.Specialty,
+            userRegisterRequest.Biography,
+            userRegisterRequest.ProfilePictureUrl);
 
-        var passwordValidationResult = await ValidatePasswordAsync(registerRequest.Password);
+        var passwordValidationResult = await ValidatePasswordAsync(userRegisterRequest.Password);
         if (!passwordValidationResult.Succeeded)
         {
-            return Result.Failure(IdentityError(passwordValidationResult, nameof(registerRequest.Password)));
+            return Result.Failure(IdentityError(passwordValidationResult, nameof(userRegisterRequest.Password)));
         }
 
-        user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, registerRequest.Password);
+        user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, userRegisterRequest.Password);
 
 
         var result = await _userManager.CreateAsync(user);
@@ -63,13 +66,93 @@ public class AccountService : IAccountService
             : Result.Failure(IdentityError(result));
     }
 
-    public async Task<Result> LoginAsync(LoginRequest loginRequest)
+    public async Task<Result> UpdateAsync(UserUpdateRequest userUpdateRequest)
     {
-        var user = await _userManager.FindByNameAsync(loginRequest.UserName);
-
-        if (user is null || !await _userManager.CheckPasswordAsync(user, loginRequest.Password))
+        var user = await _userManager.FindByIdAsync(userUpdateRequest.Id.ToString());
+        if (user is null)
         {
-            var message = string.Format(ErrorMessages.LOGIN_FAILED, loginRequest.UserName);
+            var message = string.Format(ErrorMessages.USER_NOT_FOUND, userUpdateRequest.Id);
+            return Result.Failure(Error.Create(message));
+        }
+
+        user.Update(
+            userUpdateRequest.Email,
+            userUpdateRequest.FirstName,
+            userUpdateRequest.LastName,
+            userUpdateRequest.MidName,
+            userUpdateRequest.PhoneNumber,
+            userUpdateRequest.Specialty,
+            userUpdateRequest.Biography,
+            userUpdateRequest.ProfilePictureUrl
+        );
+
+        var passwordValidationResult = await ValidatePasswordAsync(userUpdateRequest.Password);
+        if (!passwordValidationResult.Succeeded)
+        {
+            return Result.Failure(IdentityError(passwordValidationResult, nameof(userUpdateRequest.Password)));
+        }
+
+        user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, userUpdateRequest.Password);
+
+
+        var result = await _userManager.CreateAsync(user);
+
+        return result.Succeeded
+            ? Result.Success()
+            : Result.Failure(IdentityError(result));
+    }
+
+    public async Task<Result<User>> AddUserInRoleAsync(string userId, string roleName)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            var message = string.Format(ErrorMessages.USER_NOT_FOUND, userId);
+            return Result.Failure<User>(Error.Create(message));
+        }
+
+        var result = await _userManager.AddToRoleAsync(user, roleName);
+        return result.Succeeded
+            ? Result.Success(user)
+            : Result.Failure<User>(IdentityError(result));
+    }
+
+    public async Task<Result<User>> RemoveUserFromRoleAsync(string userId, string roleName)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            var message = string.Format(ErrorMessages.USER_NOT_FOUND, userId);
+            return Result.Failure<User>(Error.Create(message));
+        }
+        var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+        return result.Succeeded
+            ? Result.Success(user)
+            : Result.Failure<User>(IdentityError(result));
+    }
+
+    public async Task<Result> DeleteAsync(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user is null)
+        {
+            var message = string.Format(ErrorMessages.USER_NOT_FOUND, id);
+            return Result.Failure(Error.Create(message));
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        return result.Succeeded
+            ? Result.Success()
+            : Result.Failure(IdentityError(result));
+    }
+
+    public async Task<Result> LoginAsync(UserLoginRequest userLoginRequest)
+    {
+        var user = await _userManager.FindByNameAsync(userLoginRequest.UserName);
+
+        if (user is null || !await _userManager.CheckPasswordAsync(user, userLoginRequest.Password))
+        {
+            var message = string.Format(ErrorMessages.LOGIN_FAILED, userLoginRequest.UserName);
             return Result.Failure(Error.Create(message));
         }
 
@@ -104,7 +187,7 @@ public class AccountService : IAccountService
 
     private async Task GenerateAndStoreTokens(User user)
     {
-        var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user);
+        var (jwtToken, expirationDateInUtc) = await _authTokenProcessor.GenerateJwtToken(user);
         var refreshTokenValue = _authTokenProcessor.GenerateRefreshToken();
 
         // todo: get this from configuration
@@ -116,7 +199,8 @@ public class AccountService : IAccountService
         await _userManager.UpdateAsync(user);
 
         _authTokenProcessor.WriteAuthTokenAsHeader("X-Access-Token", jwtToken, expirationDateInUtc);
-        _authTokenProcessor.WriteAuthTokenAsHeader("X-Refresh-Token", user.RefreshToken, refreshTokenExpirationDateInUtc);
+        _authTokenProcessor.WriteAuthTokenAsHeader("X-Refresh-Token", user.RefreshToken,
+            refreshTokenExpirationDateInUtc);
     }
 
     private async Task<IdentityResult> ValidatePasswordAsync(string password)

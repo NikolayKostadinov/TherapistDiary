@@ -47,4 +47,7 @@
     <data name="THERAPIST_NOT_FOUND" xml:space="preserve">
         <value>Терапевт Id:'{0}' не е открит!</value>
     </data>
+    <data name="USER_NOT_FOUND" xml:space="preserve">
+        <value>Потребител с Id '{0}' не е открит!</value>
+    </data>
 </root>

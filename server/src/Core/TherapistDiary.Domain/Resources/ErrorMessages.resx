@@ -54,4 +54,7 @@
     <data name="THERAPIST_NOT_FOUND" xml:space="preserve">
         <value>Therapist Id:'{0}' not found!</value>
     </data>
+    <data name="USER_NOT_FOUND" xml:space="preserve">
+        <value>User with Id: '{0}' not found!</value>
+    </data>
 </root>

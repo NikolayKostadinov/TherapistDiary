@@ -1,6 +1,7 @@
 namespace TherapistDiary.Domain.Entities;
 
 using Microsoft.AspNetCore.Identity;
+using Shared;
 
 public class User : IdentityUser<Guid>
 {
@@ -22,9 +23,8 @@ public class User : IdentityUser<Guid>
 
     public virtual ICollection<UserRole> UserRoles { get; set; }
 
-
-
-    public static User Create(string userName, string email, string firstName, string lastName, string phoneNumber, string? midName = null, string? specialty = null, string? biography = null, string? profilePictureUrl = null)
+    public static User Create(string userName, string email, string firstName, string lastName,
+        string? midName = null, string? phoneNumber = null, string? specialty = null, string? biography = null, string? profilePictureUrl = null)
     {
         return new User
         {
@@ -40,9 +40,9 @@ public class User : IdentityUser<Guid>
         };
     }
 
-    public void Update(string userName, string email, string firstName, string lastName, string phoneNumber, string? midName = null, string? specialty = null, string? biography = null, string? profilePictureUrl = null)
+    public void Update(string email, string firstName, string lastName,
+        string? midName = null, string? phoneNumber = null, string? specialty = null, string? biography = null, string? profilePictureUrl = null)
     {
-        UserName = userName;
         Email = email;
         FirstName = firstName;
         LastName = lastName;
@@ -52,8 +52,6 @@ public class User : IdentityUser<Guid>
         Biography = biography;
         ProfilePictureUrl = profilePictureUrl;
     }
-
-
 
     public override string ToString() => GetFullName();
 

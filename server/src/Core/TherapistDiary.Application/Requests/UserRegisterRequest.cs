@@ -1,6 +1,6 @@
 namespace TherapistDiary.Application.Requests;
 
-public record RegisterRequest
+public record UserRegisterRequest
 {
     public required string FirstName { get; init; }
     public string? MidName { get; init; }
@@ -9,6 +9,7 @@ public record RegisterRequest
     public required string Email { get; init; }
     public required string Password { get; init; }
 
+    public string? PhoneNumber { get; set; }
     public string? Specialty { get; init; }
     public string? Biography { get; init; }
     public string? ProfilePictureUrl { get; init; }
