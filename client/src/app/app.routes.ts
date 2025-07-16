@@ -5,6 +5,7 @@ import { TherapistBoard } from './features/therapists/therapist-board/therapist-
 import { TherapyTypeBoard } from './features/therapy-types/therapy-type-board/therapy-type-board';
 import { TherapistDetails } from './features/therapists/therapist-details/therapist-details';
 import { LoginComponent } from './features/auth';
+import { ProfileFormDemoComponent } from './features/profile/profile-form/profile-form-demo.component';
 import { PageNotFound } from './layout/page-not-found/page-not-found';
 // import { RegisterComponent } from './features/auth/register/register.component';
 import { App } from './app';

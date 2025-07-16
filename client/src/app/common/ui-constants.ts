@@ -17,3 +17,9 @@ export const COLORS = {
     DANGER: '#dc3545',
     WARNING: '#ffc107'
 };
+
+export const SIZES = {
+    ONE_MB: 1024 * 1024, // 1 MB
+    FIVE_MB: 5 * 1024 * 1024, // 5 MB
+    TEN_MB: 10 * 1024 * 1024 // 10 MB
+};

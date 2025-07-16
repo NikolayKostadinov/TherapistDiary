@@ -5,5 +5,8 @@ export const API_ENDPOINTS = {
         LOGIN: '/api/account/login',
         REGISTER: '/api/account/register',
         REFRESH: '/api/account/refresh'
+    },
+    FIREBASE: {
+        UPLOAD_PROFILE_IMAGE: 'profile-pictures',
     }
 };

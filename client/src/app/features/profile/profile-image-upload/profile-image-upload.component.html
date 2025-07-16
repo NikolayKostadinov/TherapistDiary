@@ -1,0 +1,85 @@
+<div class="profile-image-upload-container">
+    <!-- Current/Uploaded Image Display -->
+    @if (imageUrl()) {
+    <div class="current-image-section">
+        <div class="image-preview-container">
+            <img [src]="imageUrl()" alt="Профилна снимка" class="current-image">
+            <div class="image-overlay">
+                <button type="button" class="btn btn-outline-light btn-sm" (click)="removeImage()">
+                    <i class="fas fa-trash"></i> Премахни
+                </button>
+            </div>
+        </div>
+        <p class="text-center text-muted mt-2">Текуща профилна снимка</p>
+    </div>
+    }
+
+    <!-- File Upload Section -->
+    <div class="upload-section">
+        <!-- File Input -->
+        <div class="file-input-container">
+            <input type="file" id="fileInput" class="form-control file-input" accept="image/*"
+                (change)="onFileSelected($event)" [disabled]="isUploading() || isDisabled()">
+
+            <label for="fileInput" class="file-input-label" [class.disabled]="isUploading() || isDisabled()">
+                <i class="fas fa-cloud-upload-alt me-2"></i>
+                @if (isUploading()) {
+                Качва се...
+                } @else {
+                Изберете снимка
+                }
+            </label>
+        </div>
+
+        <!-- File Preview -->
+        @if (previewUrl() && selectedFile()) {
+        <div class="preview-section mt-3">
+            <div class="preview-container">
+                <img [src]="previewUrl()" alt="Преглед" class="preview-image">
+            </div>
+
+            <div class="file-info mt-2">
+                <p class="mb-1"><strong>Файл:</strong> {{ selectedFile()?.name }}</p>
+                <p class="mb-3 text-muted">
+                    <strong>Размер:</strong> {{ (selectedFile()?.size! / 1024 / 1024).toFixed(2) }} MB
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" class="btn btn-primary me-2" (click)="uploadImage()" [disabled]="isUploading()">
+                    @if (isUploading()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Качва се...
+                    } @else {
+                    <i class="fas fa-upload me-2"></i>
+                    Качи снимката
+                    }
+                </button>
+
+                <button type="button" class="btn btn-secondary" (click)="cancelUpload()" [disabled]="isUploading()">
+                    <i class="fas fa-times me-2"></i>
+                    Отказ
+                </button>
+            </div>
+        </div>
+        }
+
+        <!-- Upload Instructions -->
+        @if (!previewUrl()) {
+        <div class="upload-instructions mt-3">
+            <div class="instructions-card">
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                <div>
+                    <p class="mb-1"><strong>Изисквания за снимката:</strong></p>
+                    <ul class="mb-0">
+                        <li>Формат: JPG, PNG, GIF</li>
+                        <li>Максимален размер: 1MB</li>
+                        <li>Препоръчван размер: 500x550px</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>
