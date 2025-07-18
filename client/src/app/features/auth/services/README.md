@@ -1,109 +1,61 @@
-# Auth Services
+# Auth Services Architecture
 
-Кратко описание на архитектурата и сервизите в auth модула.
+Този документ описва архитектурата и начина на работа на authentication/service слоя в приложението.
 
-## Архитектура
+## Основни класове
+
+- **AuthHttpService** – Отговаря за HTTP заявките към бекенда (login, refresh). Не пази състояние.
+- **TokenService** – Управлява токените (достъп, refresh), декодира ги, валидира ги, пази ги в localStorage.
+- **TokenStorageService** – Извлича токените от HTTP отговорите и ги подава към TokenService.
+- **UserStateService** – Държи реактивното състояние на текущия потребител и статуса на автентикация (RxJS BehaviorSubject).
+- **AuthService** – "Оркестратор". Координира login/logout/refresh, използва всички горни услуги, управлява auth flow-а.
+
+## Взаимодействие между сервизите
 
 ```
-AuthService (координатор)
-├── AuthHttpService (HTTP заявки)
-├── TokenService (JWT управление)
-├── TokenStorageService (localStorage)
-└── UserStateService (глобално състояние)
+[AuthService]
+   |---> [AuthHttpService] (login/refresh HTTP)
+   |---> [TokenStorageService] (съхранява токени)
+   |---> [TokenService] (декодира, валидира токени)
+   |---> [UserStateService] (държи auth state)
 ```
 
-## Сервизи
+- **Login flow:**
+  1. AuthService.login() вика AuthHttpService.login()
+  2. При успех TokenStorageService.storeTokensFromResponse() съхранява токените
+  3. TokenService декодира токена и подава UserInfo
+  4. UserStateService.setAuthenticated() обновява състоянието
 
-### AuthService
-Главен сервиз за автентификация. Координира всички останали сервизи.
+- **Refresh flow:**
+  1. AuthService.refreshToken() вика AuthHttpService.refreshToken()
+  2. TokenStorageService обновява токените
+  3. UserStateService.updateUserFromToken() обновява потребителя
+
+- **Logout:**
+  1. AuthService.logout() чисти токените и auth state
+
+## Пример за използване
 
 ```typescript
-login(credentials): Observable<void>    // Вход в системата
-logout(): void                         // Изход от системата  
-refreshToken(): Observable<boolean>    // Обнови токен
-```
-
-### AuthHttpService
-HTTP комуникация с бекенда.
-
-```typescript
-login(credentials): Observable<AuthResponse>
-refreshToken(token): Observable<AuthResponse>
-```
-
-### TokenService
-Управление на JWT токени - декодиране, валидация, извличане на данни.
-
-```typescript
-get userInfo(): UserInfo | null        // Данни за потребителя
-get accessToken(): string | null       // Access token
-get refreshToken(): string | null      // Refresh token
-isTokenValid(): boolean               // Валиден ли е токенът
-```
-
-### TokenStorageService
-Съхранение на токени в localStorage.
-
-```typescript
-storeTokensFromResponse(response): void  // Запази токени
-clearTokens(): void                     // Изчисти токени
-getAccessToken(): string | null         // Вземи access token
-getRefreshToken(): string | null        // Вземи refresh token
-```
-
-### UserStateService
-Глобално състояние на автентификацията (RxJS Observable).
-
-```typescript
-isAuthenticated$: Observable<boolean>      // Автентифициран ли е
-userInfo$: Observable<UserInfo | null>     // Данни за потребителя
-setAuthenticated(user): void              // Задай като автентифициран
-setUnauthenticated(): void               // Задай като неавтентифициран
-```
-
-## Auth Flow
-
-### Login
-```
-1. AuthService.login() → 2. AuthHttpService.login() → 3. TokenStorageService.storeTokens() 
-→ 4. UserStateService.setAuthenticated() → 5. Компонентите се обновяват
-```
-
-### Logout
-```
-1. AuthService.logout() → 2. TokenService.clearTokens() → 3. UserStateService.setUnauthenticated()
-```
-
-### Auto Refresh
-```
-1. Token изтича → 2. AuthService.refreshToken() → 3. Нови токени → 4. State се обновява
-```
-
-## Използване
-
-### В компоненти
-```typescript
-// Вход
 constructor(private authService: AuthService) {}
+
 login() {
-    this.authService.login(credentials).subscribe();
+  this.authService.login({ username, password }).subscribe({
+    next: () => { /* успех */ },
+    error: err => { /* грешка */ }
+  });
 }
 
-// Проверка за auth състояние
-constructor(private userState: UserStateService) {}
-ngOnInit() {
-    this.userState.isAuthenticated$.subscribe(isAuth => {
-        // Реагирай на промяна в auth статуса
-    });
+logout() {
+  this.authService.logout();
 }
+
+// За реактивно следене на статуса:
+this.userStateService.isAuthenticated$.subscribe(isAuth => { ... });
 ```
-
-### HTTP Interceptors
-Автоматично добавят Authorization header към заявките.
 
 ## Бележки
-
-- Всички сервизи са singleton (providedIn: 'root')
-- UserStateService държи текущото състояние с BehaviorSubject
-- TokenService работи само с localStorage, не прави HTTP заявки
-- AuthService е единствената точка за auth логика в компонентите
+- Всички услуги са предоставени на root ниво (singleton).
+- TokenService не прави HTTP заявки, само работи с localStorage и декодиране.
+- UserStateService е "single source of truth" за статуса на потребителя.
+- AuthService е единствената точка за auth логика в компонентите.

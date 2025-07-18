@@ -13,11 +13,13 @@ export class TokenService {
     private readonly ACCESS_TOKEN_KEY = 'X-Access-Token';
     private readonly REFRESH_TOKEN_KEY = 'X-Refresh-Token';
 
+    //todo: replace LocalStorageService with directly using of TS localStorage
+
     constructor(private readonly storageService: LocalStorageService) { }
 
 
     get accessToken(): string | null {
-        return this.storageService.getItem(this.ACCESS_TOKEN_KEY);
+        return localStorage.getItem(this.ACCESS_TOKEN_KEY);
     }
 
     set accessToken(token: string) {

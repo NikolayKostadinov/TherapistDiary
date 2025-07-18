@@ -9,7 +9,7 @@ import { LoginComponent } from '../../features/auth/login/login.component';
 
 @Component({
     selector: 'app-header',
-    imports: [CommonModule, RouterLink, RouterLinkActive, LoginComponent],
+    imports: [CommonModule, RouterLink, RouterLinkActive],
     templateUrl: './header.html',
     styleUrl: './header.css'
 })

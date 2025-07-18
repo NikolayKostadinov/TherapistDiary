@@ -4,25 +4,25 @@ import { About } from './features/about/about';
 import { TherapistBoard } from './features/therapists/therapist-board/therapist-board';
 import { TherapyTypeBoard } from './features/therapy-types/therapy-type-board/therapy-type-board';
 import { TherapistDetails } from './features/therapists/therapist-details/therapist-details';
-import { LoginComponent } from './features/auth';
-import { ProfileFormDemoComponent } from './features/profile/profile-form/profile-form-demo.component';
+import { LoginComponent } from './features/auth/login/login.component';
+import { UnauthenticatedGuard } from './guards/unauthenticated.guard';
 import { PageNotFound } from './layout/page-not-found/page-not-found';
-// import { RegisterComponent } from './features/auth/register/register.component';
-import { App } from './app';
-import { AdminGuard } from './guards/admin.guard';
-import { AuthenticatedGuard } from './guards';
 
 export const routes: Routes = [
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
+    /*--------------------------Begin Of Lazy Loading Components-----------------------------*/
+    { path: 'home', loadComponent: () => import('./features/home/home').then(c => c.Home) },
+    { path: 'about', loadComponent: () => import('./features/about/about').then(c => c.About) },
+    { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(c => c.LoginComponent), canActivate: [UnauthenticatedGuard] },
     {
-        path: '', children: [
-            { path: 'home', redirectTo: '', pathMatch: 'full' },
-            { path: '', component: Home },
-            { path: 'about', component: About },
-            { path: 'login', component: LoginComponent },
-            { path: 'therapists', component: TherapistBoard },
-            { path: 'therapists/details/:id', component: TherapistDetails },
-            { path: 'therapy-types', component: TherapyTypeBoard },
-            { path: '**', component: PageNotFound }
+        path: 'therapists',
+        children: [
+            { path: '', loadComponent: () => import('./features/therapists/therapist-board/therapist-board').then(c => c.TherapistBoard) },
+            { path: 'details/:id', loadComponent: () => import('./features/therapists/therapist-details/therapist-details').then(c => c.TherapistDetails) }
         ]
-    }
+    },
+    { path: 'therapy-types', loadComponent: () => import('./features/therapy-types/therapy-type-board/therapy-type-board').then(c => c.TherapyTypeBoard) },
+    /*--------------------------End Of Lazy Loading Components-----------------------------*/
+
+    { path: '**', component: PageNotFound },
 ];
