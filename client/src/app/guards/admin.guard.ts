@@ -1,6 +1,6 @@
 import { inject } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from "@angular/router";
-import { UserStateService } from "../features/auth";
+import { AuthService } from "../features/auth/services";
 import { ToasterService } from "../layout";
 
 export const AdminGuard: CanActivateFn = (
@@ -8,10 +8,14 @@ export const AdminGuard: CanActivateFn = (
     state: RouterStateSnapshot) => {
     const router = inject(Router);
     const toasterService = inject(ToasterService);
-    const userStateService = inject(UserStateService)
-    const isAdmin = userStateService.currentUser?.roles?.some(r => r.toLocaleLowerCase() === "administrator");
-    toasterService.error('Не сте оторизиран за тази операция!');
-    return isAdmin
-        ? isAdmin
-        : router.navigate(['home']);
-} 
+    const authService = inject(AuthService);
+    const currentUser = authService.currentUser();
+    const isAdmin = currentUser?.roles?.some(r => r.toLowerCase() === "administrator") || false;
+
+    if (!isAdmin) {
+        toasterService.error('Не сте оторизиран за тази операция!');
+        return router.navigate(['/home']);
+    }
+
+    return true;
+}; 

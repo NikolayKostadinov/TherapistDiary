@@ -1,4 +1,4 @@
-<header [class.scrolled]="isScrolled">
+<header [class.scrolled]="isScrolled()">
     <!-- Topbar Start -->
     <div class="container-fluid bg-dark px-5 d-none d-lg-block">
         <div class="row gx-0 align-items-center" style="height: 45px;">
@@ -30,7 +30,7 @@
     <!-- Navbar & Hero Start -->
     <div class="container-fluid position-relative p-0">
         <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-3 py-lg-0"
-            [class.scrolled]="isScrolled">
+            [class.scrolled]="isScrolled()">
             <a routerLink="/home" class="navbar-brand p-0">
                 <h1 class="text-primary m-0"><i class="fas fa-dove"></i> Хармония</h1>
             </a>
@@ -38,6 +38,19 @@
                 <span class="fa fa-bars"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
+                @if(isAuthenticated()){
+                <div class="navbar-nav ms-auto py-0">
+                    <a routerLink="/profile" class="nav-item nav-link profile" routerLinkActive="active">
+                        @if(currentUser()?.profilePictureUrl){
+                        <img class="profile-picture" [src]="currentUser()?.profilePictureUrl" alt="">
+                        }
+                        @else {
+                        <img class="profile-picture" src="img/no-profile.jpg" alt="">
+                        }
+                        Здравейте, {{currentUser()?.fullName}}
+                    </a>
+                </div>
+                }
                 <div class="navbar-nav ms-auto py-0">
                     <a routerLink="" class="nav-item nav-link" routerLinkActive="active"
                         [routerLinkActiveOptions]="{ exact: true }">Начало</a>
@@ -48,7 +61,7 @@
                     <a (click)="logout()" class="nav-item nav-link" style="cursor: pointer;">Изход</a>
                     }@else {
                     <a routerLink="/register" class="nav-item nav-link" routerLinkActive="active">Регистрация</a>
-                    <a routerLink="/login" class="nav-item nav-link" routerLinkActive="active">Вход</a>
+                    <a (click)="openLoginModal()" class="nav-item nav-link" style="cursor: pointer;">Вход</a>
                     }
                 </div>
                 <a href="#"
@@ -58,4 +71,9 @@
         </nav>
     </div>
     <!-- Navbar & Hero End -->
+
+    <!-- Login Modal -->
+    @if(showLoginModal()) {
+    <app-login (modalClosed)="closeLoginModal()"></app-login>
+    }
 </header>

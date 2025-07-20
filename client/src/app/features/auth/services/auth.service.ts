@@ -1,107 +1,190 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { LoginRequest, UserInfo } from '../models';
-import { TokenService } from './token.service';
-import { UserStateService } from './user-state.service';
-import { AuthHttpService } from './auth-http.service';
-import { TokenStorageService } from './token-storage.service';
-import { TOKEN_KEYS } from '../constants/token-keys';
+import { map, catchError, tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
+import { AuthHttpService } from '.';
+import { HEADER_KEYS, TOKEN_KEYS } from '../../../common/constants';
+import { JwtPayload, LoginRequest, UserInfo } from '../models';
 
-/**
- * Main authentication service that coordinates between other services
- */
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    constructor(
-        private readonly tokenService: TokenService,
-        private readonly userStateService: UserStateService,
-        private readonly authHttpService: AuthHttpService,
-        private readonly tokenStorageService: TokenStorageService
-    ) {
-        this.initializeAuthState();
+    // Private signals for internal state
+    private _accessToken = signal<string | null>(null);
+    private _refreshToken = signal<string | null>(null);
+    private _currentUser = signal<UserInfo | null>(null);
+
+    // Public readonly signals
+    readonly isLoggedIn = computed(() =>
+        !!this._accessToken() && !!this._currentUser()
+    );
+
+    readonly currentUser = computed(() =>
+        this._currentUser()
+    );
+
+    readonly accessToken = computed(() =>
+        this._accessToken()
+    );
+
+    constructor(private readonly authHttpService: AuthHttpService) {
+        this.initializeFromStorage();
+        this.setupTokenSync();
     }
 
-    private initializeAuthState(): void {
-        console.log('Initializing auth state...');
+    private initializeFromStorage(): void {
+        const accessToken = localStorage.getItem(TOKEN_KEYS.ACCESS_TOKEN);
+        const refreshToken = localStorage.getItem(TOKEN_KEYS.REFRESH_TOKEN);
 
-        const userInfo = this.tokenService.isTokenValid()
-            ? this.tokenService.userInfo
-            : null;
+        this._accessToken.set(accessToken);
+        this._refreshToken.set(refreshToken);
 
-        if (userInfo) {
-            this.userStateService.setAuthenticated(userInfo);
-            return;
+        if (accessToken) {
+            this.updateUserFromToken(accessToken);
         }
-
-        if (this.tokenService.refreshToken) {
-            this.attemptTokenRefresh();
-            return;
-        }
-
-        this.userStateService.setUnauthenticated();
     }
 
+    private setupTokenSync(): void {
+        // Auto-sync tokens with localStorage
+        effect(() => {
+            const accessToken = this._accessToken();
+            if (accessToken) {
+                localStorage.setItem(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
+            } else {
+                localStorage.removeItem(TOKEN_KEYS.ACCESS_TOKEN);
+            }
+        });
 
-    private attemptTokenRefresh(): void {
-        this.refreshToken().subscribe({
-            next: (success) => {
-                if (success) {
-                    console.log('Token refreshed successfully on app start');
-                }
-            },
-            error: (error) => {
-                console.log('Failed to refresh token on app start:', error);
-                this.logout();
+        effect(() => {
+            const refreshToken = this._refreshToken();
+            if (refreshToken) {
+                localStorage.setItem(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
+            } else {
+                localStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);
             }
         });
     }
 
+    private updateUserFromToken(token: string): void {
+        try {
+            const payload = jwtDecode<JwtPayload>(token);
+            const currentTime = Math.floor(Date.now() / 1000);
+            const isExpired = payload.exp < currentTime;
+
+            if (!isExpired) {
+                const userInfo: UserInfo = {
+                    id: payload.sub,
+                    email: payload.email,
+                    username: payload.username,
+                    fullName: payload.fullName,
+                    profilePictureUrl: payload.profilePictureUrl,
+                    roles: this.extractRoles(payload),
+                    isExpired
+                };
+
+                this._currentUser.set(userInfo);
+            } else {
+                this.logout();
+            }
+        } catch (error) {
+            console.error('Грешка при декодирането на JWT токен:', error);
+            this.logout();
+        }
+    }
+
+    private extractRoles(payload: JwtPayload): string[] {
+        if (payload.roles && Array.isArray(payload.roles)) {
+            return payload.roles;
+        }
+        return [];
+    }
 
     login(loginData: LoginRequest): Observable<void> {
-        console.log('Starting login request...');
         return this.authHttpService.login(loginData).pipe(
-            map((response) => {
-                this.tokenStorageService.storeTokensFromResponse(response);
-                const userInfo = this.tokenService.userInfo;
-                if (!userInfo) {
-                    throw new Error('Failed to decode user information from token');
+            tap((httpResponse) => {
+                // Extract tokens from headers
+                const accessToken = httpResponse.headers.get(HEADER_KEYS.AUTH_HEADER_KEY)?.replace(HEADER_KEYS.BEARER_KEY, '')
+                    || httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
+                const refreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN);
+
+                if (accessToken) {
+                    this._accessToken.set(accessToken);
+                    this.updateUserFromToken(accessToken);
                 }
 
-                this.userStateService.setAuthenticated(userInfo);
-                console.log('Login completed successfully');
+                if (refreshToken) {
+                    this._refreshToken.set(refreshToken);
+                }
             }),
+            map(() => void 0), // Return void
             catchError((error) => {
-                console.error('Login failed:', error);
                 return throwError(() => error);
             })
         );
     }
 
     logout(): void {
-        this.tokenService.clearTokens();
-        this.userStateService.setUnauthenticated();
+        // Clear all signals
+        this._accessToken.set(null);
+        this._refreshToken.set(null);
+        this._currentUser.set(null);
+    }
+
+    /**
+     * Initialize authentication state from stored tokens
+     * Called during application startup
+     */
+    initializeAuth(): void {
+        console.log('🔐 Initializing auth state from localStorage...');
+        this.initializeFromStorage();
     }
 
     refreshToken(): Observable<boolean> {
-        const refreshToken = this.tokenService.refreshToken;
+        const refreshToken = this._refreshToken();
+        console.log('AuthService.refreshToken called. RefreshToken available:', !!refreshToken);
 
         if (!refreshToken) {
-            return throwError(() => new Error('No refresh token available'));
+            console.log('No refresh token available');
+            return throwError(() => new Error('Няма наличен токен за обновяване'));
         }
 
+        console.log('Calling authHttpService.refreshToken...');
         return this.authHttpService.refreshToken(refreshToken).pipe(
-            map((response) => {
-                this.tokenStorageService.storeTokensFromResponse(response);
-                this.userStateService.updateUserFromToken();
+            tap((httpResponse) => {
+                console.log('Refresh token response received:', httpResponse.status);
+                console.log('Response headers:', httpResponse.headers.keys());
+
+                // Extract tokens from headers
+                const accessToken = httpResponse.headers.get(HEADER_KEYS.AUTH_HEADER_KEY)?.replace(HEADER_KEYS.BEARER_KEY, '') ||
+                    httpResponse.headers.get('X-Access-Token') ||
+                    httpResponse.headers.get('x-access-token');
+
+                const newRefreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN) ||
+                    httpResponse.headers.get('x-refresh-token');
+
+                console.log('Extracted access token:', !!accessToken);
+                console.log('Extracted refresh token:', !!newRefreshToken);
+
+                if (accessToken) {
+                    this._accessToken.set(accessToken);
+                    this.updateUserFromToken(accessToken);
+                    console.log('Access token updated successfully');
+                }
+
+                if (newRefreshToken) {
+                    this._refreshToken.set(newRefreshToken);
+                    console.log('Refresh token updated successfully');
+                }
+            }),
+            map(() => {
+                console.log('Token refresh completed successfully');
                 return true;
             }),
             catchError((error) => {
-                console.error('Token refresh failed:', error);
+                console.log('Token refresh failed:', error);
                 this.logout();
-                return throwError(() => new Error('Session expired. Please login again.'));
+                return throwError(() => new Error('Сесията изтече. Моля, влезте отново.'));
             })
         );
     }

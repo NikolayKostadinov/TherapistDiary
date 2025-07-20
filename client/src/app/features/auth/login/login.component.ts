@@ -89,4 +89,14 @@ export class LoginComponent {
     onEscapeKey() {
         this.closeModal();
     }
+
+    // Предотвратяване на затварянето при клик върху съдържанието на модала
+    onModalContentClick(event: Event) {
+        event.stopPropagation();
+    }
+
+    // Затваряне на модала при клик върху backdrop-а
+    // onBackdropClick() {
+    //     this.closeModal();
+    // }
 }

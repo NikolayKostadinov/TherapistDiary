@@ -7,7 +7,7 @@ using Application.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-public class AccountController: ApiController
+public class AccountController : ApiController
 {
     private readonly IAccountService _accountService;
 
@@ -15,7 +15,16 @@ public class AccountController: ApiController
         : base(logger)
     {
         _accountService = accountService;
+    }
 
+    [Authorize("AdminOrOwner")]
+    [HttpGet("{id:guid:required}", Name = nameof(GetUserById))]
+    public async Task<IActionResult> GetUserById([FromRoute] Guid id)
+    {
+        var result = await _accountService.GetUserById(id);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : HandleFailure(result);
     }
 
     [HttpPost("regiser")]
@@ -36,7 +45,7 @@ public class AccountController: ApiController
 
     [HttpDelete("delete/{id:guid:required}")]
     [Authorize("AdminOrOwner")]
-    public async Task<IActionResult> Delete( Guid id, [FromBody] UserUpdateRequest request)
+    public async Task<IActionResult> Delete(Guid id, [FromBody] UserUpdateRequest request)
     {
         request.Id = id;
         var result = await _accountService.UpdateAsync(request);

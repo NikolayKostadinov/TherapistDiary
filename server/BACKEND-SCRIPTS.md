@@ -5,10 +5,12 @@ This document describes the PowerShell scripts for managing the TherapistDiary b
 ## Overview
 
 The backend consists of two main services running in Docker containers:
+
 - **SQL Server** - Database server (port 1433)
 - **TherapistDiary API** - .NET Web API (ports 5000/5001)
 
 Two PowerShell scripts provide automated management:
+
 - `backend-stop.ps1` - Gracefully stops services with automatic database backup
 - `backend-start.ps1` - Starts services with optional database restore
 
@@ -21,7 +23,8 @@ Two PowerShell scripts provide automated management:
 ## Scripts Location
 
 Both scripts are located in the `server` directory:
-```
+
+```typesctipt
 server/
 ├── backend-start.ps1
 ├── backend-stop.ps1
@@ -33,9 +36,11 @@ server/
 ## backend-stop.ps1
 
 ### Purpose
+
 Gracefully stops all backend services and creates an automatic database backup.
 
 ### Features
+
 - ✅ Automatic timestamped database backup
 - ✅ Copies backup from container to host
 - ✅ Graceful container shutdown
@@ -45,11 +50,13 @@ Gracefully stops all backend services and creates an automatic database backup.
 ### Usage
 
 **Basic usage:**
+
 ```powershell
 .\backend-stop.ps1
 ```
 
 **With custom backup name:**
+
 ```powershell
 .\backend-stop.ps1 -BackupName "my-custom-backup"
 ```
@@ -70,7 +77,7 @@ Gracefully stops all backend services and creates an automatic database backup.
 
 ### Output Example
 
-```
+``` md
 🛑 Stopping backend services and creating database backup...
 📋 Found running containers: server-sql-server-1, server-therapist-diary-api-1
 📁 Created backups directory: D:\...\server\backups
@@ -85,9 +92,11 @@ Gracefully stops all backend services and creates an automatic database backup.
 ## backend-start.ps1
 
 ### Purpose
+
 Starts all backend services with optional database restoration from previous backups.
 
 ### Features
+
 - ✅ Automated service startup with health checks
 - ✅ Multiple restore options (interactive, latest, specific file)
 - ✅ SQL Server health monitoring
@@ -97,21 +106,25 @@ Starts all backend services with optional database restoration from previous bac
 ### Usage
 
 **Start without restore:**
+
 ```powershell
 .\backend-start.ps1 -SkipRestore
 ```
 
 **Start with interactive backup selection:**
+
 ```powershell
 .\backend-start.ps1
 ```
 
 **Start with latest backup:**
+
 ```powershell
 .\backend-start.ps1 -RestoreLatest
 ```
 
 **Start with specific backup file:**
+
 ```powershell
 .\backend-start.ps1 -BackupFile "C:\path\to\backup.bak"
 ```
@@ -180,13 +193,16 @@ server-therapist-diary-api-1  Up 2 minutes    0.0.0.0:5000->5000/tcp, 0.0.0.0:50
 ## Backup Management
 
 ### Backup Location
+
 All backups are stored in: `server/backups/`
 
 ### Backup Naming Convention
+
 - **Automatic**: `therapist-diary-backup-YYYYMMDD-HHMMSS.bak`
 - **Custom**: `{CustomName}.bak`
 
 ### Backup File Management
+
 - Backups accumulate over time - manual cleanup recommended
 - Each backup is a full database backup
 - Backup files can be used with any SQL Server instance
@@ -196,58 +212,72 @@ All backups are stored in: `server/backups/`
 ### Common Issues
 
 **1. Docker services fail to start**
+
 ```powershell
 ❌ Failed to start Docker services
 ```
+
 - **Solution**: Ensure Docker Desktop is running and check `docker-compose.yml`
 
 **2. SQL Server doesn't become healthy**
+
 ```powershell
 ❌ SQL Server failed to become healthy within timeout
 ```
+
 - **Solution**: Check SQL Server logs with `docker logs server-sql-server-1`
 - Increase timeout or check system resources
 
 **3. Database backup fails**
+
 ```powershell
 ❌ Database backup failed
 ```
+
 - **Solution**: Verify SQL Server is running and database exists
 - Check SQL Server logs for specific errors
 
 **4. Database restore fails**
+
 ```powershell
 ❌ Database restore failed
 ```
+
 - **Solution**: Ensure backup file is valid and not corrupted
 - Verify sufficient disk space in container
 
 **5. API health check fails**
+
 ```powershell
 ⚠️ API health check failed, but container is running
 ```
+
 - **Solution**: API might still be starting up - this is often normal
 - Check API logs with `docker logs server-therapist-diary-api-1`
 
 ### Debug Commands
 
 **Check container status:**
+
 ```powershell
 docker ps
 ```
 
 **View logs:**
+
 ```powershell
 docker logs server-sql-server-1
 docker logs server-therapist-diary-api-1
 ```
 
 **Check Docker Compose services:**
+
 ```powershell
 docker compose ps
 ```
 
 **Manual backup creation:**
+
 ```powershell
 docker exec server-sql-server-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "P@ssw0rd" -Q "BACKUP DATABASE [TherapistDiaryDb] TO DISK = '/var/opt/mssql/backup/manual-backup.bak'" -C
 ```
@@ -255,16 +285,19 @@ docker exec server-sql-server-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa
 ## Best Practices
 
 ### Development Workflow
+
 1. Use `.\backend-stop.ps1` to stop services (creates automatic backup)
 2. Make code changes
 3. Use `.\backend-start.ps1 -RestoreLatest` to start with previous data
 
 ### Production Deployment
+
 1. Use `.\backend-stop.ps1` before deployment
 2. Deploy new code
 3. Use `.\backend-start.ps1 -RestoreLatest` to maintain data continuity
 
 ### Backup Strategy
+
 - Regular backups are created automatically on each stop
 - Keep important backups in a separate location
 - Test restore procedures periodically
@@ -273,6 +306,7 @@ docker exec server-sql-server-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa
 ## Configuration
 
 ### Environment Variables
+
 The scripts work with the Docker Compose configuration. Key environment variables:
 
 ```yaml
@@ -283,12 +317,15 @@ environment:
 ```
 
 ### Ports
+
 - **API HTTPS**: `https://localhost:5000`
 - **API HTTP**: `http://localhost:5001`
 - **SQL Server**: `localhost:1433`
 
 ### Health Checks
+
 SQL Server health check is configured in `docker-compose.yml`:
+
 ```yaml
 healthcheck:
   test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P P@ssw0rd -Q 'SELECT 1' -C"]
@@ -316,8 +353,10 @@ healthcheck:
 For issues or improvements, please check the project repository or contact the development team.
 
 ## Remove all containers, images, volumes
+
 docker-compose down --rmi all --volumes
 
 ## Manualy run dockers
+
 docker-compose build web
 docker-compose up --no-deps -d

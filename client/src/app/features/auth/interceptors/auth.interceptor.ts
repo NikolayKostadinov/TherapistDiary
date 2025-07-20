@@ -1,27 +1,21 @@
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AuthService } from '../services/auth.service';
-import { TokenService } from '../services';
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { AuthService } from '../services';
+import { Utils } from '../../../common/utils';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-    constructor(private readonly tokenService: TokenService) { }
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+    const authService = inject(AuthService);
+    const accessToken = authService.accessToken();
 
-    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        // Get the access token
-        const accessToken = this.tokenService.accessToken;
-
-        // If token exists and this is not a login request, add Authorization header
-        if (accessToken && !request.url.includes('/login')) {
-            const authRequest = request.clone({
-                setHeaders: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            });
-            return next.handle(authRequest);
-        }
-
-        return next.handle(request);
+    if (accessToken && !req.url.includes('/login')) {
+        const authReq = req.clone({
+            setHeaders: {
+                Authorization: Utils.getAuthorizationHeader(accessToken)
+            }
+        });
+        return next(authReq);
     }
-}
+
+    return next(req);
+};
+

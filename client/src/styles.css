@@ -6,6 +6,13 @@ body {
     max-width: 100%;
 }
 
+/* Modal body class - prevent background scrolling */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+    /* Prevent scrollbar shift */
+}
+
 /*** Fixed Navbar Compensation Start ***/
 body {
     padding-top: 130px;
@@ -95,6 +102,11 @@ body {
 .btn.btn-primary:hover {
     box-shadow: inset 300px 0 0 0 var(--bs-light) !important;
     color: var(--bs-primary) !important;
+}
+
+.btn.btn-secondary:hover {
+    box-shadow: inset 300px 0 0 0 var(--bs-light) !important;
+    color: var(--bs-secondary) !important;
 }
 
 .btn.btn-light {

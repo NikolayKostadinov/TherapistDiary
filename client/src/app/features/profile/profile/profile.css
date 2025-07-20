@@ -1,0 +1,138 @@
+/* Loading състояние */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error състояние */
+.error-container {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.error-message {
+    background-color: #ffebee;
+    border: 1px solid #f44336;
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 500px;
+    text-align: center;
+}
+
+.error-message h3 {
+    color: #d32f2f;
+    margin-bottom: 0.5rem;
+}
+
+.error-message p {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.retry-btn,
+.clear-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.retry-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.retry-btn:hover {
+    background-color: #2980b9;
+}
+
+.clear-btn {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.clear-btn:hover {
+    background-color: #7f8c8d;
+}
+
+.profile-picture {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* No profile състояние */
+.no-profile {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.no-profile button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+}
+
+.no-profile button:hover {
+    background-color: #2980b9;
+}
+
+.property-content {
+    font-weight: 400;
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+    margin-left: 2rem;
+}
+
+.form-label {
+    display: inline-block;
+    position: relative;
+}
+
+.form-label::after {
+    margin-top: 8px;
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 2px;
+    background-color: var(--bs-primary);
+}
+
+.command-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem
+}
+
+.command-buttons button {
+    min-width: 10rem;
+}

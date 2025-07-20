@@ -41,7 +41,8 @@ public class AuthTokenProcessor : IAuthTokenProcessor
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
             new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.ToString()),
+            new Claim("fullName", user.FullName),
+            new Claim("profilePictureUrl", user.ProfilePictureUrl ?? string.Empty),
         };
 
         var userRoles = await _userManager.GetRolesAsync(user);

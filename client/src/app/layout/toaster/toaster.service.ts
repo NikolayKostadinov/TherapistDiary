@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { ToasterMessage, ToasterConfig, ToasterState } from './toaster.model';
-import { UI_CONSTANTS } from '../../common/ui-constants';
+import { UI_CONSTANTS } from '../../common/constants/ui-constants';
 
 @Injectable({
     providedIn: 'root'

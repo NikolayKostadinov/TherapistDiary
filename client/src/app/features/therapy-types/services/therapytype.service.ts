@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TherapyTypeListModel } from '../models';
-import { API_ENDPOINTS } from '../../../common/api-endpoints';
+import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({

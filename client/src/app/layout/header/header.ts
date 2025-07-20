@@ -1,48 +1,36 @@
-import { Component, OnInit, OnDestroy, HostListener, signal } from '@angular/core';
-import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, HostListener, signal, computed } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter, map, startWith } from 'rxjs/operators';
-import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../../features/auth/services/auth.service';
-import { UserStateService } from '../../features/auth/services/user-state.service';
-import { LoginComponent } from '../../features/auth/login/login.component';
+import { LoginComponent } from '../../features/auth';
 
 @Component({
     selector: 'app-header',
-    imports: [CommonModule, RouterLink, RouterLinkActive],
+    imports: [CommonModule, RouterLink, RouterLinkActive, LoginComponent],
     templateUrl: './header.html',
     styleUrl: './header.css'
 })
-export class Header implements OnInit, OnDestroy {
+export class Header {
     private readonly possibleHomeUri = new Set<string>(['', '/', '/home']);
-    private authSubscription?: Subscription;
 
-    isAuthenticated = signal(false);
-    isScrolled = false;
+    // Computed signals from AuthService
+    isAuthenticated = computed(() => this.authService.isLoggedIn());
+    currentUser = computed(() => this.authService.currentUser());
+    userName = computed(() => this.authService.currentUser()?.username || '');
+
+    // Local signals
+    isScrolled = signal(false);
     showLoginModal = signal(false);
 
     constructor(
         private readonly router: Router,
-        private readonly authService: AuthService,
-        private readonly userStateService: UserStateService
+        private readonly authService: AuthService
     ) { }
-
-    ngOnInit(): void {
-        // Subscribe to authentication state changes
-        this.authSubscription = this.userStateService.isAuthenticated$.subscribe(
-            isAuth => this.isAuthenticated.set(isAuth)
-        );
-    }
-
-    ngOnDestroy(): void {
-        // Clean up subscription
-        this.authSubscription?.unsubscribe();
-    }
 
     @HostListener('window:scroll', [])
     onWindowScroll(): void {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-        this.isScrolled = scrollTop > 100;
+        this.isScrolled.set(scrollTop > 100);
     }
 
     logout(): void {

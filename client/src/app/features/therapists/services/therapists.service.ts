@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TherapistDetailsModel, TherapistListModel } from '../models';
 import { environment } from '../../../../environments/environment';
-import { API_ENDPOINTS } from '../../../common/api-endpoints';
+import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 
 @Injectable({
     providedIn: 'root'

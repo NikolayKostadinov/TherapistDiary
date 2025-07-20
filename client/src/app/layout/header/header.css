@@ -232,4 +232,17 @@
     margin-top: 0;
 }
 
+.nav-link.profile {
+    padding: 23px 0 !important;
+}
+
+.profile-picture {
+    height: 3rem;
+    width: 3rem;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid var(--bs-primary);
+    margin-right: 1rem;
+}
+
 /*** Fixed Header End ***/

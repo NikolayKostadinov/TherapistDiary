@@ -1,86 +1,105 @@
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, switchMap, filter, take } from 'rxjs/operators';
+import { HttpInterceptorFn, HttpErrorResponse, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
+import { inject, signal } from '@angular/core';
+import { catchError, switchMap, filter, take, finalize } from 'rxjs/operators';
+import { throwError, Subject, Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { TokenService } from '../services';
+import { HEADER_KEYS } from '../../../common/constants';
+import { Utils } from '../../../common/utils';
 
-@Injectable()
-export class TokenRefreshInterceptor implements HttpInterceptor {
-    private isRefreshing = false;
-    private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+// Shared state for refresh process
+const isRefreshing = signal<boolean>(false);
+const refreshTokenSubject = new Subject<boolean | null>();
 
-    constructor(
-        private readonly authService: AuthService,
-        private readonly tokenService: TokenService
-    ) { }
+export const tokenRefreshInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
+    const authService = inject(AuthService);
 
-    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return next.handle(request).pipe(
-            catchError((error: HttpErrorResponse) => {
-                // Only handle 401 errors and don't refresh for login/refresh endpoints
-                if (error.status === 401 && !this.isAuthEndpoint(request.url)) {
-                    return this.handle401Error(request, next);
+    return next(req).pipe(
+        catchError((error: HttpErrorResponse) => {
+            console.log('Interceptor caught error:', error.status, 'for URL:', req.url);
+
+            // Only handle 401 errors for private endpoints (not login/refresh endpoints)
+            if (error.status === 401 && !Utils.isPublicUrl(req.url)) {
+                console.log('Handling 401 error for private URL:', req.url);
+                return handle401Error(req, next, authService);
+            }
+
+            return throwError(() => error);
+        })
+    );
+};
+
+function handle401Error(request: HttpRequest<unknown>, next: HttpHandlerFn, authService: AuthService): Observable<HttpEvent<unknown>> {
+    console.log('Handle401Error called. isRefreshing:', isRefreshing());
+
+    if (!isRefreshing()) {
+        console.log('Starting token refresh process...');
+        isRefreshing.set(true);
+        refreshTokenSubject.next(null); // Reset subject
+
+        return authService.refreshToken().pipe(
+            switchMap((success: boolean) => {
+                console.log('Token refresh result:', success);
+                isRefreshing.set(false);
+                refreshTokenSubject.next(success);
+
+                // Retry the original request with new token
+                const newToken = authService.accessToken();
+                console.log('New token available:', !!newToken);
+
+                if (newToken && success) {
+                    const authHeaderValue = Utils.getAuthorizationHeader(newToken);
+                    console.log('Retrying request with new token for:', request.url);
+                    const authRequest = request.clone({
+                        setHeaders: {
+                            Authorization: authHeaderValue
+                        }
+                    });
+                    return next(authRequest);
                 }
 
-                return throwError(() => error);
+                console.log('Token refresh succeeded but no valid token available');
+                return throwError(() => new Error('Неуспешно обновяване на токена'));
+            }),
+            catchError((err) => {
+                console.log('Token refresh failed:', err);
+                isRefreshing.set(false);
+                refreshTokenSubject.next(false);
+                // Refresh failed, logout user
+                authService.logout();
+                return throwError(() => err);
+            }),
+            finalize(() => {
+                console.log('Token refresh process finalized');
+            })
+        );
+    } else {
+        console.log('Token refresh already in progress, waiting...');
+        // If refresh is already in progress, wait for it to complete
+        return refreshTokenSubject.pipe(
+            filter(result => result !== null && result !== undefined),
+            take(1),
+            switchMap((success: boolean) => {
+                console.log('Received refresh result from queue:', success);
+
+                if (success) {
+                    const newToken = authService.accessToken();
+                    if (newToken) {
+                        const authHeaderValue = Utils.getAuthorizationHeader(newToken);
+                        console.log('Retrying queued request with new token for:', request.url);
+                        const authRequest = request.clone({
+                            setHeaders: {
+                                Authorization: authHeaderValue
+                            }
+                        });
+                        return next(authRequest);
+                    }
+                }
+
+                console.log('Queued request failed - no valid token');
+                return throwError(() => new Error('Неуспешно обновяване на токена'));
             })
         );
     }
-
-    private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        if (!this.isRefreshing) {
-            this.isRefreshing = true;
-            this.refreshTokenSubject.next(null);
-
-            return this.authService.refreshToken().pipe(
-                switchMap((success: boolean) => {
-                    this.isRefreshing = false;
-                    this.refreshTokenSubject.next(success);
-
-                    // Retry the original request with new token
-                    const newToken = this.tokenService.accessToken;
-                    if (newToken) {
-                        const authRequest = request.clone({
-                            setHeaders: {
-                                Authorization: `Bearer ${newToken}`
-                            }
-                        });
-                        return next.handle(authRequest);
-                    }
-
-                    return throwError(() => new Error('Token refresh failed'));
-                }),
-                catchError((err) => {
-                    this.isRefreshing = false;
-                    // Refresh failed, logout user
-                    this.authService.logout();
-                    return throwError(() => err);
-                })
-            );
-        } else {
-            // If refresh is already in progress, wait for it to complete
-            return this.refreshTokenSubject.pipe(
-                filter(result => result !== null),
-                take(1),
-                switchMap(() => {
-                    const newToken = this.tokenService.accessToken;
-                    if (newToken) {
-                        const authRequest = request.clone({
-                            setHeaders: {
-                                Authorization: `Bearer ${newToken}`
-                            }
-                        });
-                        return next.handle(authRequest);
-                    }
-
-                    return throwError(() => new Error('Token refresh failed'));
-                })
-            );
-        }
-    }
-
-    private isAuthEndpoint(url: string): boolean {
-        return url.includes('/login') || url.includes('/register') || url.includes('/refresh');
-    }
 }
+
+

@@ -16,6 +16,8 @@
     justify-content: center;
     z-index: 1050;
     animation: fadeIn 0.3s ease-out;
+    overflow: hidden;
+    /* Prevent scrolling */
 }
 
 .modal-dialog {
@@ -24,6 +26,8 @@
     max-height: 90vh;
     overflow-y: auto;
     animation: slideIn 0.3s ease-out;
+    position: relative;
+    z-index: 1051;
 }
 
 .modal-content {

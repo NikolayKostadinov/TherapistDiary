@@ -32,8 +32,8 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
     disabled = signal(false);
 
     // ControlValueAccessor properties
-    private onChange = (value: string | null) => {};
-    private onTouched = () => {};
+    private onChange = (value: string | null) => { };
+    private onTouched = () => { };
 
     ngOnInit() {
         if (this.currentImageUrl) {
@@ -43,7 +43,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
 
     onFileSelected(event: Event) {
         if (this.disabled()) return;
-        
+
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
 
@@ -61,7 +61,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
             }
 
             this.selectedFile.set(file);
-            
+
             // Create preview
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -73,9 +73,9 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
 
     uploadImage() {
         if (this.disabled()) return;
-        
+
         const file = this.selectedFile();
-        
+
         if (!file || !this.userId) {
             this.toasterService.error('Няма избран файл или потребител.');
             return;
@@ -90,11 +90,11 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
                 this.selectedFile.set(null);
                 this.isUploading.set(false);
                 this.toasterService.success('Профилната снимка е качена успешно!');
-                
+
                 // Notify form control of value change
                 this.onChange(downloadUrl);
                 this.onTouched();
-                
+
                 // Reset file input
                 const fileInput = document.getElementById('fileInput') as HTMLInputElement;
                 if (fileInput) {
@@ -102,7 +102,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
                 }
             },
             error: (error) => {
-                console.error('Upload error:', error);
+                console.error('Грешка при качване:', error);
                 this.isUploading.set(false);
                 this.toasterService.error('Грешка при качване на снимката. Опитайте отново.');
             }
@@ -111,10 +111,10 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
 
     cancelUpload() {
         if (this.disabled()) return;
-        
+
         this.selectedFile.set(null);
         this.previewUrl.set(null);
-        
+
         // Reset file input
         const fileInput = document.getElementById('fileInput') as HTMLInputElement;
         if (fileInput) {
@@ -124,7 +124,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
 
     removeImage() {
         if (this.disabled()) return;
-        
+
         this.imageUrl.set(null);
         this.onChange(null);
         this.onTouched();

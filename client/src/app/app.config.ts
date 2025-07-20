@@ -1,29 +1,25 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, provideAppInitializer, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
-import { AuthInterceptor } from './features/auth/interceptors/auth.interceptor';
-import { TokenRefreshInterceptor } from './features/auth/interceptors/token-refresh.interceptor';
+import { authInterceptor, tokenRefreshInterceptor } from './features/auth/interceptors';
+import { AuthService } from './features/auth/services';
 
 export const appConfig: ApplicationConfig = {
     providers: [
         provideBrowserGlobalErrorListeners(),
         provideZonelessChangeDetection(),
         provideRouter(routes),
-        provideHttpClient(),
+        provideHttpClient(withInterceptors([
+            authInterceptor,
+            tokenRefreshInterceptor
+        ])),
         provideAnimations(),
-        // Authentication interceptors
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: AuthInterceptor,
-            multi: true
-        },
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: TokenRefreshInterceptor,
-            multi: true
-        }
+        provideAppInitializer(() => {
+            const authService = inject(AuthService);
+            authService.initializeAuth();
+        })
     ]
 };

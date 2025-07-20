@@ -1,61 +1,70 @@
-# Auth Services Architecture
+# Authentication Services
 
-Този документ описва архитектурата и начина на работа на authentication/service слоя в приложението.
+## Overview
 
-## Основни класове
+This directory contains a **simplified 2-service architecture** for authentication, built with **Angular Signals** for reactive state management.
 
-- **AuthHttpService** – Отговаря за HTTP заявките към бекенда (login, refresh). Не пази състояние.
-- **TokenService** – Управлява токените (достъп, refresh), декодира ги, валидира ги, пази ги в localStorage.
-- **TokenStorageService** – Извлича токените от HTTP отговорите и ги подава към TokenService.
-- **UserStateService** – Държи реактивното състояние на текущия потребител и статуса на автентикация (RxJS BehaviorSubject).
-- **AuthService** – "Оркестратор". Координира login/logout/refresh, използва всички горни услуги, управлява auth flow-а.
+## Services
 
-## Взаимодействие между сервизите
+### 1. `AuthService` - Main Authentication Logic
 
-```
-[AuthService]
-   |---> [AuthHttpService] (login/refresh HTTP)
-   |---> [TokenStorageService] (съхранява токени)
-   |---> [TokenService] (декодира, валидира токени)
-   |---> [UserStateService] (държи auth state)
-```
+- Signal-based state management (`isLoggedIn`, `currentUser`)
+- Token management with automatic localStorage sync
+- JWT token parsing and user extraction
+- Login, logout, and token refresh functionality
 
-- **Login flow:**
-  1. AuthService.login() вика AuthHttpService.login()
-  2. При успех TokenStorageService.storeTokensFromResponse() съхранява токените
-  3. TokenService декодира токена и подава UserInfo
-  4. UserStateService.setAuthenticated() обновява състоянието
+### 2. `AuthHttpService` - HTTP Communication
 
-- **Refresh flow:**
-  1. AuthService.refreshToken() вика AuthHttpService.refreshToken()
-  2. TokenStorageService обновява токените
-  3. UserStateService.updateUserFromToken() обновява потребителя
+- Login and token refresh HTTP requests
+- Response header token extraction
+- Error handling and transformation
 
-- **Logout:**
-  1. AuthService.logout() чисти токените и auth state
+## Key Features
 
-## Пример за използване
+- ✅ **Modern Architecture**: Angular 17+ Signals instead of BehaviorSubjects
+- ✅ **Simplified**: Reduced from 5 services to 2
+- ✅ **Reactive**: Components automatically update when auth state changes
+- ✅ **No Subscriptions**: Signal-based reactivity eliminates manual subscription management
+- ✅ **Type Safe**: Full TypeScript support with proper typing
+- ✅ **Performance**: Computed signals only recalculate when dependencies change
+
+## Documentation Files
+
+- `AUTH_SERVICES_DOCS.md` - Comprehensive technical documentation
+- `QUICK_REFERENCE.md` - Quick usage guide and API reference  
+- `ARCHITECTURE-SUMMARY.md` - High-level architecture overview
+- `README.md` - This overview file
+
+## Usage Example
 
 ```typescript
-constructor(private authService: AuthService) {}
+// In component - automatically reactive
+isLoggedIn = this.authService.isLoggedIn;
+currentUser = this.authService.currentUser;
 
-login() {
-  this.authService.login({ username, password }).subscribe({
-    next: () => { /* успех */ },
-    error: err => { /* грешка */ }
-  });
-}
+// Login
+await firstValueFrom(this.authService.login(credentials));
 
-logout() {
-  this.authService.logout();
-}
-
-// За реактивно следене на статуса:
-this.userStateService.isAuthenticated$.subscribe(isAuth => { ... });
+// Logout  
+this.authService.logout();
 ```
 
-## Бележки
-- Всички услуги са предоставени на root ниво (singleton).
-- TokenService не прави HTTP заявки, само работи с localStorage и декодиране.
-- UserStateService е "single source of truth" за статуса на потребителя.
-- AuthService е единствената точка за auth логика в компонентите.
+## Migration Benefits
+
+**Before** (BehaviorSubject pattern):
+
+```typescript
+this.authService.isLoggedIn$.subscribe(isLoggedIn => {
+  this.showMenu = isLoggedIn;
+});
+```
+
+**After** (Signal pattern):
+
+```typescript  
+showMenu = computed(() => this.authService.isLoggedIn());
+```
+
+---
+
+For detailed technical documentation, see `AUTH_SERVICES_DOCS.md`.

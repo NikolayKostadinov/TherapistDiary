@@ -5,8 +5,10 @@ using Domain.Entities;
 using Domain.Repositories;
 using Domain.Resources;
 using Domain.Shared;
+using Infrastructure.AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Requests;
+using Responses;
 using TherapistDiary.Common.Extensions;
 using static Domain.Errors.DomainErrors;
 
@@ -28,6 +30,18 @@ public class AccountService : IAccountService
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+    }
+
+    public async Task<Result<UserResponse>> GetUserById(Guid userId )
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            var message = string.Format(ErrorMessages.USER_NOT_FOUND, userId);
+            return Result.Failure<UserResponse>(Error.Create(message));
+        }
+
+        return user.To<UserResponse>();
     }
 
     public async Task<Result> RegisterAsync(UserRegisterRequest userRegisterRequest)
@@ -102,7 +116,7 @@ public class AccountService : IAccountService
             : Result.Failure(IdentityError(result));
     }
 
-    public async Task<Result<User>> AddUserInRoleAsync(string userId, string roleName)
+   public async Task<Result<User>> AddUserInRoleAsync(string userId, string roleName)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)

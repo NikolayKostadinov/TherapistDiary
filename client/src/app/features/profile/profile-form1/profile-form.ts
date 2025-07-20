@@ -178,8 +178,8 @@ export class ProfileFormDemoComponent {
         if (this.profileForm.valid) {
             this.isSubmitting.set(true);
 
-            console.log('Form submitted with data:', this.profileForm.value);
-            console.log('Profile Picture URL:', this.profileForm.value.profilePictureUrl);
+            console.log('Формата е изпратена с данни:', this.profileForm.value);
+            console.log('URL на профилната снимка:', this.profileForm.value.profilePictureUrl);
 
             // Simulate API call
             setTimeout(() => {
