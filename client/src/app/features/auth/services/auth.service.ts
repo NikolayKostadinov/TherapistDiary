@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { AuthHttpService } from '.';
@@ -28,6 +28,25 @@ export class AuthService {
         this._accessToken()
     );
 
+    // Check if token is valid (not expired)
+    readonly isTokenValid = computed(() => {
+        const token = this._accessToken();
+        if (!token) return false;
+
+        try {
+            const payload = jwtDecode<JwtPayload>(token);
+            const currentTime = Math.floor(Date.now() / 1000);
+            return payload.exp > currentTime;
+        } catch {
+            return false;
+        }
+    });
+
+    // Check if user is authenticated with valid token
+    readonly isAuthenticated = computed(() =>
+        this.isLoggedIn() && this.isTokenValid()
+    );
+
     constructor(private readonly authHttpService: AuthHttpService) {
         this.initializeFromStorage();
         this.setupTokenSync();
@@ -40,9 +59,42 @@ export class AuthService {
         this._accessToken.set(accessToken);
         this._refreshToken.set(refreshToken);
 
-        if (accessToken) {
+        if (accessToken && refreshToken) {
+            // Check if access token is expired
+            try {
+                const payload = jwtDecode<JwtPayload>(accessToken);
+                const currentTime = Math.floor(Date.now() / 1000);
+                const isExpired = payload.exp < currentTime;
+
+                if (isExpired) {
+                    // Don't logout immediately, try to refresh first
+                    this.refreshToken().subscribe({
+                        next: (success) => {
+                            // Token refreshed successfully during initialization
+                        },
+                        error: (error) => {
+                            this.logout();
+                        }
+                    });
+                } else {
+                    // Token is valid, update user info
+                    this.updateUserFromToken(accessToken);
+                }
+            } catch (error) {
+                // Try to refresh if we have refresh token, otherwise logout
+                if (refreshToken) {
+                    this.refreshToken().subscribe({
+                        error: () => this.logout()
+                    });
+                } else {
+                    this.logout();
+                }
+            }
+        } else if (accessToken && !refreshToken) {
+            // Only access token, check if valid
             this.updateUserFromToken(accessToken);
         }
+        // If no tokens, user stays logged out (default state)
     }
 
     private setupTokenSync(): void {
@@ -85,11 +137,13 @@ export class AuthService {
 
                 this._currentUser.set(userInfo);
             } else {
-                this.logout();
+                // Token is expired, but don't logout here
+                // Let the caller decide what to do (refresh or logout)
+                this._currentUser.set(null);
             }
         } catch (error) {
-            console.error('Грешка при декодирането на JWT токен:', error);
-            this.logout();
+            this._currentUser.set(null);
+            // Don't auto-logout here, let caller handle it
         }
     }
 
@@ -136,53 +190,63 @@ export class AuthService {
      * Called during application startup
      */
     initializeAuth(): void {
-        console.log('🔐 Initializing auth state from localStorage...');
         this.initializeFromStorage();
+    }
+
+    /**
+     * Ensure we have a valid access token, refresh if needed
+     * Returns observable that resolves to true if we have valid token, false otherwise
+     */
+    ensureValidToken(): Observable<boolean> {
+        // If token is valid, return true immediately
+        if (this.isTokenValid()) {
+            return of(true);
+        }
+
+        // If no refresh token, can't refresh
+        const refreshToken = this._refreshToken();
+        if (!refreshToken) {
+            this.logout();
+            return of(false);
+        }
+
+        // Try to refresh token
+        return this.refreshToken().pipe(
+            catchError(() => {
+                this.logout();
+                return of(false);
+            })
+        );
     }
 
     refreshToken(): Observable<boolean> {
         const refreshToken = this._refreshToken();
-        console.log('AuthService.refreshToken called. RefreshToken available:', !!refreshToken);
 
         if (!refreshToken) {
-            console.log('No refresh token available');
             return throwError(() => new Error('Няма наличен токен за обновяване'));
         }
 
-        console.log('Calling authHttpService.refreshToken...');
         return this.authHttpService.refreshToken(refreshToken).pipe(
             tap((httpResponse) => {
-                console.log('Refresh token response received:', httpResponse.status);
-                console.log('Response headers:', httpResponse.headers.keys());
-
                 // Extract tokens from headers
                 const accessToken = httpResponse.headers.get(HEADER_KEYS.AUTH_HEADER_KEY)?.replace(HEADER_KEYS.BEARER_KEY, '') ||
-                    httpResponse.headers.get('X-Access-Token') ||
-                    httpResponse.headers.get('x-access-token');
+                    httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN)
 
-                const newRefreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN) ||
-                    httpResponse.headers.get('x-refresh-token');
-
-                console.log('Extracted access token:', !!accessToken);
-                console.log('Extracted refresh token:', !!newRefreshToken);
+                const newRefreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN)
 
                 if (accessToken) {
                     this._accessToken.set(accessToken);
                     this.updateUserFromToken(accessToken);
-                    console.log('Access token updated successfully');
                 }
 
                 if (newRefreshToken) {
                     this._refreshToken.set(newRefreshToken);
-                    console.log('Refresh token updated successfully');
                 }
             }),
             map(() => {
-                console.log('Token refresh completed successfully');
                 return true;
             }),
             catchError((error) => {
-                console.log('Token refresh failed:', error);
                 this.logout();
                 return throwError(() => new Error('Сесията изтече. Моля, влезте отново.'));
             })

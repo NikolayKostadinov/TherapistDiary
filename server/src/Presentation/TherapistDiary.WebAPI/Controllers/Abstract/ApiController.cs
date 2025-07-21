@@ -14,11 +14,37 @@ public abstract class ApiController : ControllerBase
         _logger = logger;
     }
 
-    protected IActionResult HandleFailure(Result result)
-    {
-        if(result.IsFailure) _logger.LogError(result.ErrorsDetails);
-        return result.IsSuccess
-            ? throw new InvalidOperationException()
-            : BadRequest(ValidationResult.WithErrors(result.Errors.ToArray()));
+
+        /// <summary>
+        /// Handles failure responses from operations and returns appropriate HTTP status codes.
+        /// </summary>
+        /// <param name="result">The failure result containing error details.</param>
+        /// <returns>An appropriate <see cref="IActionResult"/> based on the error type.</returns>
+        protected IActionResult HandleFailure(Result result)
+        {
+
+            if (result.IsSuccess)
+            {
+                throw new InvalidOperationException();
+            }
+
+            _logger.LogWarning("Operation failed with result: {result.ErrorsDetails}", result);
+
+            if (result.ToString()?.Contains("NotFound") == true)
+            {
+                return NotFound(result);
+            }
+
+            if (result.ToString()?.Contains("Unauthorized") == true)
+            {
+                return Unauthorized(result);
+            }
+
+            if (result.ToString()?.Contains("Forbidden") == true)
+            {
+                return Forbid();
+            }
+
+            return BadRequest(ValidationResult.WithErrors(result.Errors.ToArray()));
+        }
     }
-}

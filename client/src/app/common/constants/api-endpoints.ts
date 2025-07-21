@@ -6,7 +6,6 @@ export const API_ENDPOINTS = {
         REGISTER: '/api/account/register',
         REFRESH: '/api/account/refresh',
         PROFILE: '/api/account'
-
     },
 
     FIREBASE: {

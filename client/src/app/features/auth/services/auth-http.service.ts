@@ -17,7 +17,6 @@ export class AuthHttpService {
     constructor(private readonly http: HttpClient) { }
 
     login(loginData: LoginRequest): Observable<HttpResponse<AuthResponse>> {
-        console.log('Изпращане на заявка за влизане...');
         return this.http.post(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.LOGIN}`,
             loginData,
@@ -31,7 +30,6 @@ export class AuthHttpService {
     }
 
     refreshToken(refreshToken: string): Observable<HttpResponse<AuthResponse>> {
-        console.log('AuthHttpService.refreshToken called');
         return this.http.post(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REFRESH}`, {}, {
             headers: {
                 'X-Refresh-Token': refreshToken
@@ -39,7 +37,6 @@ export class AuthHttpService {
             observe: 'response'
         }).pipe(
             catchError((error: HttpErrorResponse) => {
-                console.log('Refresh token HTTP error:', error.status, error.message);
                 const errorMessage = error.status === 401 ?
                     'Сесията изтече. Моля, влезте отново.' :
                     Utils.getErrorMessage(error, 'обновяване на сесията');

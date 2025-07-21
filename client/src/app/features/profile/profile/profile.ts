@@ -2,8 +2,9 @@ import { Component, computed, effect, OnInit, Signal } from '@angular/core';
 import { ProfileServices } from '..';
 import { UserProfileModel } from '../models';
 import { ProfileFormDemoComponent } from "../profile-form1/profile-form";
-import { Spinner } from "../../../layout";
+import { Spinner, ToasterService } from "../../../layout";
 import { ScrollAnimationDirective } from '../../../common/directives';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-profile',
@@ -11,7 +12,7 @@ import { ScrollAnimationDirective } from '../../../common/directives';
     templateUrl: './profile.html',
     styleUrl: './profile.css'
 })
-export class Profile implements OnInit {
+export class Profile {
 
     userProfile: Signal<UserProfileModel | null>;
 
@@ -21,7 +22,9 @@ export class Profile implements OnInit {
     hasError: Signal<boolean>;
 
     constructor(
-        private readonly profileService: ProfileServices
+        private readonly profileService: ProfileServices,
+        private readonly toasterService: ToasterService,
+        private readonly router: Router
     ) {
         this.userProfile = this.profileService.userProfile;
         this.errorMessage = this.profileService.errorMessage;
@@ -37,16 +40,9 @@ export class Profile implements OnInit {
         });
     }
 
-    ngOnInit(): void {
-        // Component initialization complete
-    }
-
     private handleProfileError(error: string): void {
-        // Тук можеш да покажеш notification, toast, и т.н.
-        console.error('Грешка при зареждане на профила:', error);
-
-        // Примерно показване на user-friendly съобщение
-        // this.notificationService.showError(error);
+        this.toasterService.error('Грешка при зареждане на профила!');
+        console.log('Грешка при зареждане на профила:', error);
     }
 
     // Метод за retry
@@ -57,5 +53,20 @@ export class Profile implements OnInit {
     // Метод за изчистване на грешката
     onClearError(): void {
         this.profileService.clearError();
+    }
+
+    onDeleteClick(): void {
+        const userId = this.userProfile()?.id;
+        if (userId) {
+            this.profileService.deleteProfile(userId).subscribe({
+                next: () => {
+                    this.toasterService.success('Профилът беше успешно изтрит');
+                    this.router.navigate(['/']);
+                },
+                error: (error) => {
+                    this.toasterService.error('Грешка при изтриване на профила:', error);
+                }
+            });
+        }
     }
 }

@@ -1,8 +1,8 @@
 import { effect, Injectable, signal, DestroyRef, inject, computed } from '@angular/core';
-import { AuthService, UserInfo } from "../../auth";
+import { AuthService } from "../../auth";
 import { HttpClient } from '@angular/common/http';
 import { UserProfileModel } from '../models';
-import { Observable, throwError } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../../environments/environment';
@@ -40,6 +40,52 @@ export class ProfileServices {
         });
     }
 
+    public refreshProfile(): void {
+        const currentUser = this.authService.currentUser();
+        if (currentUser) {
+            this.loadUserProfile(currentUser.id);
+        }
+    }
+
+    public clearError(): void {
+        this._errorMessage.set(null);
+    }
+
+    public updateProfile(updatedProfile: UserProfileModel): Observable<UserProfileModel> {
+        return this.httpClient.put<UserProfileModel>(this.apiUrl, updatedProfile)
+            .pipe(
+                tap((profile) => {
+                    this._user.set(profile);
+                    this._errorMessage.set(null);
+                    this._isLoading.set(false);
+                }),
+                takeUntilDestroyed(this.destroyRef),
+                catchError((error) => {
+                    this._errorMessage.set('Неуспешно обновяване на профила');
+                    return throwError(() => error);
+                })
+            );
+    }
+
+
+     }
+
+    public deleteProfile(id: string): Observable<void> {
+        return this.httpClient.delete<void>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.DELETE}/${id}`)
+            .pipe(
+                tap(() => {
+                    this._user.set(null);
+                    this._errorMessage.set(null);
+                    this._isLoading.set(false);
+                    this.authService.logout();
+                }),
+                takeUntilDestroyed(this.destroyRef),
+                catchError((error) => {
+                    this._errorMessage.set('Неуспешно изтриване на профила');
+                    return throwError(() => error);
+                })
+            );
+    }
 
     private fetchUserProfile(id: string): Observable<UserProfileModel> {
         return this.httpClient.get<UserProfileModel>(`${this.apiUrl}/${id}`);
@@ -59,7 +105,6 @@ export class ProfileServices {
                     this._errorMessage.set(null);
                 },
                 error: (error) => {
-                    console.error('❌ Error fetching user profile:', error);
                     this._user.set(null);
                     this._isLoading.set(false);
 
@@ -70,14 +115,5 @@ export class ProfileServices {
             });
     }
 
-    public refreshProfile(): void {
-        const currentUser = this.authService.currentUser();
-        if (currentUser) {
-            this.loadUserProfile(currentUser.id);
-        }
-    }
 
-    public clearError(): void {
-        this._errorMessage.set(null);
-    }
 }

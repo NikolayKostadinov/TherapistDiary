@@ -109,6 +109,11 @@ body {
     color: var(--bs-secondary) !important;
 }
 
+.btn.btn-danger:hover {
+    box-shadow: inset 300px 0 0 0 var(--bs-light) !important;
+    color: var(--bs-danger) !important;
+}
+
 .btn.btn-light {
     box-shadow: inset 0 0 0 0 var(--bs-primary);
 }

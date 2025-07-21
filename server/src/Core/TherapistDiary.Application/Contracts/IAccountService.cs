@@ -14,5 +14,5 @@ public interface IAccountService
     Task<Result> UpdateAsync(UserUpdateRequest userUpdateRequest);
     Task<Result<User>> AddUserInRoleAsync(string userId, string roleName);
     Task<Result<User>> RemoveUserFromRoleAsync(string userId, string roleName);
-    Task<Result> DeleteAsync(string id);
+    Task<Result> DeleteAsync(Guid id);
 }

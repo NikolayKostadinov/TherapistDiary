@@ -145,9 +145,9 @@ public class AccountService : IAccountService
             : Result.Failure<User>(IdentityError(result));
     }
 
-    public async Task<Result> DeleteAsync(string id)
+    public async Task<Result> DeleteAsync(Guid id)
     {
-        var user = await _userManager.FindByIdAsync(id);
+        var user = await _userManager.FindByIdAsync(id.ToString());
         if (user is null)
         {
             var message = string.Format(ErrorMessages.USER_NOT_FOUND, id);

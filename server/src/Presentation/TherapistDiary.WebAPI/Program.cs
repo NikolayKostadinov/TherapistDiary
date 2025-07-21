@@ -107,24 +107,15 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference(options => { options.Title = "Therapist Diary API"; });
-    System.Console.WriteLine("Now you can see API on: https://localhost:5000/scalar/v1");
+    Console.WriteLine("Now you can see API on: https://localhost:5000/scalar/v1");
 }
 
-
-
-app.UseHttpsRedirection();
-
-// Make sure to add this before app.UseRouting() and after any other middleware
-// that might need to read the CORS headers
-app.UseCors("MyAllowedOrigins");
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-
-// In the pipeline:
-app.MapHealthChecks("/health");
+// Middleware pipeline order is important
+app.UseHttpsRedirection();         // 1. Redirect HTTP to HTTPS
+app.UseCors("MyAllowedOrigins");   // 2. Handle CORS before auth
+app.UseAuthentication();           // 3. Authentication before authorization
+app.UseAuthorization();            // 4. Authorization after authorization
+app.MapControllers();              // 5. Route to controllers
+app.MapHealthChecks("/health");    // 6. Health check endpoint
 
 app.Run();
