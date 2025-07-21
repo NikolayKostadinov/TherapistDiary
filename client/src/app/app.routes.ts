@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './features/auth/login/login.component';
+import { Login as Login } from './features/auth/login/login';
+import { Register } from './features/auth/register/register';
 import { UnauthenticatedGuard } from './guards/unauthenticated.guard';
 import { PageNotFound } from './layout/page-not-found/page-not-found';
 
@@ -18,6 +19,7 @@ export const routes: Routes = [
     { path: 'therapy-types', loadComponent: () => import('./features/therapy-types/therapy-type-board/therapy-type-board').then(c => c.TherapyTypeBoard) },
     { path: 'profile', loadComponent: () => import('./features/profile/profile/profile').then(c => c.Profile) },
     /*--------------------------End Of Lazy Loading Components-----------------------------*/
-    { path: 'login', component: LoginComponent, canActivate: [UnauthenticatedGuard] },
+    { path: 'login', component: Login, canActivate: [UnauthenticatedGuard] },
+    { path: 'register', component: Register, canActivate: [UnauthenticatedGuard] },
     { path: '**', component: PageNotFound },
 ];

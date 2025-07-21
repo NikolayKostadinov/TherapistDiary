@@ -13,7 +13,7 @@ import { Utils } from '../../../common/utils';
 })
 export class ProfileServices {
     private readonly destroyRef = inject(DestroyRef);
-    private apiUrl = `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.PROFILE}`;
+    private apiUrl = `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`;
     private _user = signal<UserProfileModel | null>(null);
     private _isLoading = signal<boolean>(false);
     private _errorMessage = signal<string | null>(null);
@@ -67,11 +67,8 @@ export class ProfileServices {
             );
     }
 
-
-     }
-
     public deleteProfile(id: string): Observable<void> {
-        return this.httpClient.delete<void>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.DELETE}/${id}`)
+        return this.httpClient.delete<void>(`${this.apiUrl}/${id}`)
             .pipe(
                 tap(() => {
                     this._user.set(null);
@@ -114,6 +111,5 @@ export class ProfileServices {
                 }
             });
     }
-
 
 }

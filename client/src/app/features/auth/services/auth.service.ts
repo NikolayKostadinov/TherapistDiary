@@ -4,7 +4,7 @@ import { map, catchError, tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { AuthHttpService } from '.';
 import { HEADER_KEYS, TOKEN_KEYS } from '../../../common/constants';
-import { JwtPayload, LoginRequest, UserInfo } from '../models';
+import { JwtPayload, LoginRequest, RegisterRequest, UserInfo } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -158,6 +158,30 @@ export class AuthService {
         return this.authHttpService.login(loginData).pipe(
             tap((httpResponse) => {
                 // Extract tokens from headers
+                const accessToken = httpResponse.headers.get(HEADER_KEYS.AUTH_HEADER_KEY)?.replace(HEADER_KEYS.BEARER_KEY, '')
+                    || httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
+                const refreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN);
+
+                if (accessToken) {
+                    this._accessToken.set(accessToken);
+                    this.updateUserFromToken(accessToken);
+                }
+
+                if (refreshToken) {
+                    this._refreshToken.set(refreshToken);
+                }
+            }),
+            map(() => void 0), // Return void
+            catchError((error) => {
+                return throwError(() => error);
+            })
+        );
+    }
+
+    register(registerData: RegisterRequest): Observable<void> {
+        return this.authHttpService.register(registerData).pipe(
+            tap((httpResponse) => {
+                // Extract tokens from headers after successful registration
                 const accessToken = httpResponse.headers.get(HEADER_KEYS.AUTH_HEADER_KEY)?.replace(HEADER_KEYS.BEARER_KEY, '')
                     || httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
                 const refreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN);

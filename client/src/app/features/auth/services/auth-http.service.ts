@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
-import { LoginRequest, AuthResponse } from '../models';
+import { LoginRequest, RegisterRequest, AuthResponse } from '../models';
 import { Utils } from '../../../common/utils';
 
 /**
@@ -40,6 +40,19 @@ export class AuthHttpService {
                 const errorMessage = error.status === 401 ?
                     'Сесията изтече. Моля, влезте отново.' :
                     Utils.getErrorMessage(error, 'обновяване на сесията');
+                return throwError(() => new Error(errorMessage));
+            })
+        );
+    }
+
+    register(registerData: RegisterRequest): Observable<HttpResponse<AuthResponse>> {
+        return this.http.post(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REGISTER}`,
+            registerData,
+            { observe: 'response' }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'регистрация');
                 return throwError(() => new Error(errorMessage));
             })
         );
