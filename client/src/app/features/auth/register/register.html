@@ -1,94 +1,98 @@
-<div class="register-container">
-    <div class="register-card">
-        <div class="register-header">
-            <h1>Регистрация</h1>
-            <p>Създайте нов профил в TherapistDiary</p>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="register-header">
+                <h1>Регистрация</h1>
+                <p>Създайте нов профил си в Хармония</p>
+            </div>
+
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+                <!-- Personal Information -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName" class="form-label">Име *</label>
+                        <input type="text" id="firstName" formControlName="firstName" class="form-control"
+                            [class.is-invalid]="getFieldError('firstName')" placeholder="Въведете вашето име">
+                        <div class="invalid-feedback">{{ getFieldError('firstName') }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="midName" class="form-label">Презиме</label>
+                        <input type="text" id="midName" formControlName="midName" class="form-control"
+                            placeholder="Въведете вашето презиме">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName" class="form-label">Фамилия *</label>
+                        <input type="text" id="lastName" formControlName="lastName" class="form-control"
+                            [class.is-invalid]="getFieldError('lastName')" placeholder="Въведете вашата фамилия">
+                        <div class="invalid-feedback">{{ getFieldError('lastName') }}</div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-group">
+                    <label for="userName" class="form-label">Потребителско име *</label>
+                    <input type="text" id="userName" formControlName="userName" class="form-control"
+                        [class.is-invalid]="getFieldError('userName')" placeholder="Въведете потребителско име">
+                    <div class="invalid-feedback">{{ getFieldError('userName') }}</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email адрес *</label>
+                    <input type="email" id="email" formControlName="email" class="form-control"
+                        [class.is-invalid]="getFieldError('email')" placeholder="example@domain.com">
+                    <div class="invalid-feedback">{{ getFieldError('email') }}</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber" class="form-label">Телефонен номер *</label>
+                    <input type="tel" id="phoneNumber" formControlName="phoneNumber" class="form-control"
+                        [class.is-invalid]="getFieldError('phoneNumber')" placeholder="+359888123456">
+                    <div class="invalid-feedback">{{ getFieldError('phoneNumber') }}</div>
+                </div>
+
+                <!-- Password Section -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password" class="form-label">Парола *</label>
+                        <input type="password" id="password" formControlName="password" class="form-control"
+                            [class.is-invalid]="getFieldError('password')" placeholder="Минимум 6 символа">
+                        <div class="invalid-feedback">{{ getFieldError('password') }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Потвърди парола *</label>
+                        <input type="password" id="confirmPassword" formControlName="confirmPassword"
+                            class="form-control" [class.is-invalid]="getFieldError('confirmPassword')"
+                            placeholder="Повторете паролата">
+                        <div class="invalid-feedback">{{ getFieldError('confirmPassword') }}</div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-register"
+                        [disabled]="isLoading() || registerForm.invalid">
+                        @if (isLoading()) {
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Регистрация...
+                        } @else {
+                        <i class="fas fa-user-plus"></i>
+                        Регистрирай се
+                        }
+                    </button>
+                </div>
+
+                <!-- Login Link -->
+                <div class="form-footer">
+                    <p>
+                        Вече имате профил?
+                        <a routerLink="/auth/login" class="login-link">Влезте тук</a>
+                    </p>
+                </div>
+            </form>
         </div>
 
-        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
-            <!-- Personal Information -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="firstName" class="form-label">Име *</label>
-                    <input type="text" id="firstName" formControlName="firstName" class="form-control"
-                        [class.is-invalid]="getFieldError('firstName')" placeholder="Въведете вашето име">
-                    <div class="invalid-feedback">{{ getFieldError('firstName') }}</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="midName" class="form-label">Презиме</label>
-                    <input type="text" id="midName" formControlName="midName" class="form-control"
-                        placeholder="Въведете вашето презиме">
-                </div>
-
-                <div class="form-group">
-                    <label for="lastName" class="form-label">Фамилия *</label>
-                    <input type="text" id="lastName" formControlName="lastName" class="form-control"
-                        [class.is-invalid]="getFieldError('lastName')" placeholder="Въведете вашата фамилия">
-                    <div class="invalid-feedback">{{ getFieldError('lastName') }}</div>
-                </div>
-            </div>
-
-            <!-- Contact Information -->
-            <div class="form-group">
-                <label for="userName" class="form-label">Потребителско име *</label>
-                <input type="text" id="userName" formControlName="userName" class="form-control"
-                    [class.is-invalid]="getFieldError('userName')" placeholder="Въведете потребителско име">
-                <div class="invalid-feedback">{{ getFieldError('userName') }}</div>
-            </div>
-
-            <div class="form-group">
-                <label for="email" class="form-label">Email адрес *</label>
-                <input type="email" id="email" formControlName="email" class="form-control"
-                    [class.is-invalid]="getFieldError('email')" placeholder="example@domain.com">
-                <div class="invalid-feedback">{{ getFieldError('email') }}</div>
-            </div>
-
-            <div class="form-group">
-                <label for="phoneNumber" class="form-label">Телефонен номер *</label>
-                <input type="tel" id="phoneNumber" formControlName="phoneNumber" class="form-control"
-                    [class.is-invalid]="getFieldError('phoneNumber')" placeholder="+359888123456">
-                <div class="invalid-feedback">{{ getFieldError('phoneNumber') }}</div>
-            </div>
-
-            <!-- Password Section -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="password" class="form-label">Парола *</label>
-                    <input type="password" id="password" formControlName="password" class="form-control"
-                        [class.is-invalid]="getFieldError('password')" placeholder="Минимум 6 символа">
-                    <div class="invalid-feedback">{{ getFieldError('password') }}</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirmPassword" class="form-label">Потвърди парола *</label>
-                    <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control"
-                        [class.is-invalid]="getFieldError('confirmPassword')" placeholder="Повторете паролата">
-                    <div class="invalid-feedback">{{ getFieldError('confirmPassword') }}</div>
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-register"
-                    [disabled]="isLoading() || registerForm.invalid">
-                    @if (isLoading()) {
-                    <i class="fas fa-spinner fa-spin"></i>
-                    Регистрация...
-                    } @else {
-                    <i class="fas fa-user-plus"></i>
-                    Регистрирай се
-                    }
-                </button>
-            </div>
-
-            <!-- Login Link -->
-            <div class="form-footer">
-                <p>
-                    Вече имате профил?
-                    <a routerLink="/auth/login" class="login-link">Влезте тук</a>
-                </p>
-            </div>
-        </form>
     </div>
 </div>
