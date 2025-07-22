@@ -2,17 +2,15 @@ import { Component, HostListener, signal, computed } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../features/auth/services/auth.service';
-import { LoginComponent } from '../../features/auth';
+import { Login } from '../../features/auth';
 
 @Component({
     selector: 'app-header',
-    imports: [CommonModule, RouterLink, RouterLinkActive, LoginComponent],
+    imports: [CommonModule, RouterLink, RouterLinkActive, Login],
     templateUrl: './header.html',
     styleUrl: './header.css'
 })
 export class Header {
-    private readonly possibleHomeUri = new Set<string>(['', '/', '/home']);
-
     // Computed signals from AuthService
     isAuthenticated = computed(() => this.authService.isLoggedIn());
     currentUser = computed(() => this.authService.currentUser());
@@ -29,6 +27,7 @@ export class Header {
 
     @HostListener('window:scroll', [])
     onWindowScroll(): void {
+        // todo: remove directly DOM references if possible
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
         this.isScrolled.set(scrollTop > 100);
     }

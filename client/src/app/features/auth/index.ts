@@ -1,7 +1,7 @@
 
 // Components
-export { Login as LoginComponent } from './login/login';
-export { Register as RegisterComponent } from './register/register';
+export * from './login/login';
+export * from './register/register';
 
 // Services
 export * from './services';

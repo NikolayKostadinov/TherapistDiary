@@ -1,6 +1,5 @@
 import { Component, computed } from '@angular/core';
 import { ToasterService } from './toaster.service';
-import { ToasterMessage } from './toaster.model';
 import { NgClass } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 

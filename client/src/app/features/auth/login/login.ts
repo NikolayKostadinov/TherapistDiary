@@ -94,9 +94,4 @@ export class Login {
     onModalContentClick(event: Event) {
         event.stopPropagation();
     }
-
-    // Затваряне на модала при клик върху backdrop-а
-    // onBackdropClick() {
-    //     this.closeModal();
-    // }
 }
