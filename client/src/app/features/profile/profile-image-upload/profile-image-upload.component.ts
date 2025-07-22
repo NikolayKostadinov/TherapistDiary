@@ -9,7 +9,7 @@ import { ToasterService } from '../../../layout';
     standalone: true,
     imports: [CommonModule],
     templateUrl: './profile-image-upload.component.html',
-    styleUrl: './profile-image-upload.component.css',
+    styleUrls: ['./profile-image-upload.component.css'],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -29,7 +29,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
     imageUrl = signal<string | null>(null);
     selectedFile = signal<File | null>(null);
     previewUrl = signal<string | null>(null);
-    disabled = signal(false);
+    isDisabled = signal(false);
 
     // ControlValueAccessor properties
     private onChange = (value: string | null) => { };
@@ -42,7 +42,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
     }
 
     onFileSelected(event: Event) {
-        if (this.disabled()) return;
+        if (this.isDisabled()) return;
 
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
@@ -72,7 +72,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
     }
 
     uploadImage() {
-        if (this.disabled()) return;
+        if (this.isDisabled()) return;
 
         const file = this.selectedFile();
 
@@ -110,7 +110,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
     }
 
     cancelUpload() {
-        if (this.disabled()) return;
+        if (this.isDisabled()) return;
 
         this.selectedFile.set(null);
         this.previewUrl.set(null);
@@ -123,7 +123,7 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
     }
 
     removeImage() {
-        if (this.disabled()) return;
+        if (this.isDisabled()) return;
 
         this.imageUrl.set(null);
         this.onChange(null);
@@ -145,6 +145,6 @@ export class ProfileImageUploadComponent implements ControlValueAccessor {
     }
 
     setDisabledState(isDisabled: boolean): void {
-        this.disabled.set(isDisabled);
+        this.isDisabled.set(isDisabled);
     }
 }
