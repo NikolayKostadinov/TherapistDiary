@@ -62,13 +62,12 @@ public class AuthTokenProcessor : IAuthTokenProcessor
         return (jwtToken, expires);
     }
 
-
-    public string GenerateRefreshToken()
+    public RefreshToken GenerateRefreshToken()
     {
         var randomNumber = new byte[64];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
+        return new RefreshToken(Convert.ToBase64String(randomNumber), _options.RefreshTokenExpirationTimeInDays);
     }
 
     public void WriteAuthTokenAsHeader(string headerName, string token, DateTime expirationDate)

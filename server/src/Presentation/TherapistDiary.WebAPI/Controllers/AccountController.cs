@@ -1,20 +1,25 @@
 namespace TherapistDiary.WebAPI.Controllers;
 
-using System.ComponentModel.DataAnnotations;
 using Abstract;
 using Application.Contracts;
 using Application.Requests;
+using Application.Users.Queries.GetAll;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 public class AccountController : ApiController
 {
     private readonly IAccountService _accountService;
+    private readonly IGetAllUsersQuery _getAllUserQuery;
 
-    public AccountController(ILogger<AccountController> logger, IAccountService accountService)
-        : base(logger)
+    public AccountController(
+        ILogger<AccountController> logger,
+        IAccountService accountService,
+        IGetAllUsersQuery getAllUserQuery
+    ) : base(logger)
     {
-        _accountService = accountService;
+        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+        _getAllUserQuery = getAllUserQuery ?? throw new ArgumentNullException(nameof(getAllUserQuery));
     }
 
     /// <summary>
@@ -28,6 +33,25 @@ public class AccountController : ApiController
     public async Task<IActionResult> GetUserById([FromRoute] Guid id)
     {
         var result = await _accountService.GetUserById(id);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : HandleFailure(result);
+    }
+
+    /// <summary>
+    /// Retrieves all users in the system.
+    /// </summary>
+    /// <param name="request">The <see cref="GetAllUsersRequest"/> containing the search criteria.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>An <see cref="IActionResult"/> containing the list of users if successful,
+    /// or the error details if the operation fails.</returns>
+    [Authorize(Roles = "Administrator")]
+    [HttpGet]
+    public async Task<IActionResult> GetAllUsers(
+        [FromQuery] GetAllUsersRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _getAllUserQuery.Handle(request, cancellationToken);
         return result.IsSuccess
             ? Ok(result.Value)
             : HandleFailure(result);
@@ -56,7 +80,7 @@ public class AccountController : ApiController
     /// Returns an empty success response if the update is successful, or error details if it fails.</returns>
     [HttpPut("{id:guid:required}")]
     [Authorize("AdminOrOwner")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UserUpdateRequest request)
+    public async Task<IActionResult> Update([FromRoute]Guid id, [FromBody] UserUpdateRequest request)
     {
         request.Id = id;
         var result = await _accountService.UpdateAsync(request);

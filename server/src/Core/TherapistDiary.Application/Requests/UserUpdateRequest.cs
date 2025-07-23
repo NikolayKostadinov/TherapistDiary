@@ -7,7 +7,6 @@ public record UserUpdateRequest
     public string? MidName { get; init; }
     public required string LastName { get; init; }
     public required string Email { get; init; }
-    public required string Password { get; init; }
     public string? PhoneNumber { get; set; }
     public string? Specialty { get; init; }
     public string? Biography { get; init; }

@@ -15,4 +15,5 @@ public interface IAccountService
     Task<Result<User>> AddUserInRoleAsync(string userId, string roleName);
     Task<Result<User>> RemoveUserFromRoleAsync(string userId, string roleName);
     Task<Result> DeleteAsync(Guid id);
+    Task<Result> ChangePassword(Guid id, string oldPassword, string newPassword);
 }

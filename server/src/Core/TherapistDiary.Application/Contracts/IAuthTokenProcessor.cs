@@ -5,6 +5,6 @@ using Domain.Entities;
 public interface IAuthTokenProcessor
 {
     Task<(string jwtToken, DateTime expiresAtUtc)> GenerateJwtToken(User user);
-    string GenerateRefreshToken();
+    RefreshToken GenerateRefreshToken();
     void WriteAuthTokenAsHeader(string headerName, string token, DateTime expirationDate);
 }

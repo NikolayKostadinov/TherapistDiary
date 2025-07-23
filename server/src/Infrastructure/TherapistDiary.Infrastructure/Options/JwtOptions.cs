@@ -8,4 +8,5 @@ public class JwtOptions
     public string Issuer { get; set; } = null!;
     public string Audience { get; set; } = null!;
     public int ExpirationTimeInMinutes { get; set; }
+    public int RefreshTokenExpirationTimeInDays { get; set; }
 }

@@ -34,7 +34,7 @@ public class AccountService : IAccountService
 
     public async Task<Result<UserResponse>> GetUserById(Guid userId )
     {
-        var user = await _userManager.FindByIdAsync(userId.ToString());
+        var user = await _userRepository.GetByIdAsync(userId);
         if (user is null)
         {
             var message = string.Format(ErrorMessages.USER_NOT_FOUND, userId);
@@ -75,6 +75,11 @@ public class AccountService : IAccountService
 
         var result = await _userManager.CreateAsync(user);
 
+        if (result.Succeeded)
+        {
+            await GenerateAndStoreTokens(user);
+        }
+
         return result.Succeeded
             ? Result.Success()
             : Result.Failure(IdentityError(result));
@@ -100,16 +105,12 @@ public class AccountService : IAccountService
             userUpdateRequest.ProfilePictureUrl
         );
 
-        var passwordValidationResult = await ValidatePasswordAsync(userUpdateRequest.Password);
-        if (!passwordValidationResult.Succeeded)
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
         {
-            return Result.Failure(IdentityError(passwordValidationResult, nameof(userUpdateRequest.Password)));
+            await GenerateAndStoreTokens(user);
         }
-
-        user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, userUpdateRequest.Password);
-
-
-        var result = await _userManager.CreateAsync(user);
 
         return result.Succeeded
             ? Result.Success()
@@ -160,6 +161,36 @@ public class AccountService : IAccountService
             : Result.Failure(IdentityError(result));
     }
 
+    public async Task<Result> ChangePassword(Guid id, string oldPassword, string newPassword)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user is null)
+        {
+            var message = string.Format(ErrorMessages.USER_NOT_FOUND, id);
+            return Result.Failure(Error.Create(message));
+        }
+
+        // Validate the new password
+        var passwordValidationResult = await ValidatePasswordAsync(newPassword);
+        if (!passwordValidationResult.Succeeded)
+        {
+            return Result.Failure(passwordValidationResult.Errors.Select(e => Error.Create("Password", e.Description)));
+        }
+
+        // Change the password using UserManager
+        var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+
+        if (result.Succeeded)
+        {
+            await GenerateAndStoreTokens(user);
+        }
+
+        return result.Succeeded
+            ? Result.Success()
+            : Result.Failure(result.Errors.Select(e => Error.Create("Password", e.Description)));
+
+    }
+
     public async Task<Result> LoginAsync(UserLoginRequest userLoginRequest)
     {
         var user = await _userManager.FindByNameAsync(userLoginRequest.UserName);
@@ -205,9 +236,9 @@ public class AccountService : IAccountService
         var refreshTokenValue = _authTokenProcessor.GenerateRefreshToken();
 
         // todo: get this from configuration
-        var refreshTokenExpirationDateInUtc = _timeProvider.GetUtcDateTime().AddDays(7);
+        var refreshTokenExpirationDateInUtc = _timeProvider.GetUtcDateTime().AddDays(refreshTokenValue.ExpirationTimeInDays);
 
-        user.RefreshToken = refreshTokenValue;
+        user.RefreshToken = refreshTokenValue.Token;
         user.RefreshTokenExpiresAtUtc = refreshTokenExpirationDateInUtc;
 
         await _userManager.UpdateAsync(user);

@@ -4,9 +4,9 @@ using AutoMapper;
 using Domain.Entities;
 using Infrastructure.AutoMapper;
 
-public class UserResponse: IMapFrom<User>, IHaveCustomMappings
+public class UserListResponse : IMapFrom<User>, IHaveCustomMappings
 {
-    public UserResponse()
+    public UserListResponse()
     {
         Roles = [];
     }
@@ -17,15 +17,12 @@ public class UserResponse: IMapFrom<User>, IHaveCustomMappings
     public required string FirstName { get; set; }
     public string? MidName { get; set; }
     public required string LastName { get; set; }
-    public required string FullName { get; set; }
     public required string PhoneNumber { get; set; }
-    public string? Specialty { get; set; }
-    public string? Biography { get; set; }
-    public string? ProfilePictureUrl { get; set; }
-    public IEnumerable<RoleResponce> Roles { get; set; }
+    public List<RoleResponce> Roles { get; set; }
+
     public void CreateMappings(IProfileExpression configuration)
     {
-        configuration.CreateMap<User, UserResponse>()
+        configuration.CreateMap<User, UserListResponse>()
             .ForMember(x => x.Roles, opt => opt.MapFrom(p => p.UserRoles.Select(ur => ur.Role.To<RoleResponce>())));
     }
 }
