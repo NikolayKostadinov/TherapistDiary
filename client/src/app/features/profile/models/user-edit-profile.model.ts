@@ -1,7 +1,6 @@
-export interface UserProfileModel {
+export interface UserEditProfileModel {
     id: string;
     email: string;
-    userName: string;
     firstName: string;
     midName: string | null;
     lastName: string;
@@ -10,5 +9,4 @@ export interface UserProfileModel {
     specialty?: string | null;
     biography: string | null;
     profilePictureUrl: string | null;
-    roles: { id: string, name: string }[];
 }

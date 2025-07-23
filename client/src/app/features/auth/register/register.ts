@@ -31,7 +31,7 @@ export class Register {
             midName: [''],
             lastName: ['', [Validators.required]],
             phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{8,14}$/)]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
+            password: ['', [Validators.required, Validators.minLength(8)]],
             confirmPassword: ['', [Validators.required]]
         }, {
             validators: this.passwordMatchValidator
@@ -75,7 +75,13 @@ export class Register {
             await firstValueFrom(this.authService.register(registerData));
 
             this.toaster.success('Регистрацията е успешна! Добре дошли!');
-            await this.router.navigate(['/home']);
+
+            // Check if user is logged in before navigating
+            if (this.authService.isLoggedIn()) {
+                await this.router.navigate(['/home']);
+            } else {
+                await this.router.navigate(['/auth/login']);
+            }
 
         } catch (error: any) {
             this.toaster.error(error.message || 'Грешка при регистрация');

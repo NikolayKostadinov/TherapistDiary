@@ -128,7 +128,7 @@ export class AuthService {
                 const userInfo: UserInfo = {
                     id: payload.sub,
                     email: payload.email,
-                    username: payload.username,
+                    userName: payload.unique_name,
                     fullName: payload.fullName,
                     profilePictureUrl: payload.profilePictureUrl,
                     roles: this.extractRoles(payload),
@@ -181,10 +181,26 @@ export class AuthService {
     register(registerData: RegisterRequest): Observable<void> {
         return this.authHttpService.register(registerData).pipe(
             tap((httpResponse) => {
-                // Extract tokens from headers after successful registration
-                const accessToken = httpResponse.headers.get(HEADER_KEYS.AUTH_HEADER_KEY)?.replace(HEADER_KEYS.BEARER_KEY, '')
-                    || httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
-                const refreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN);
+                // Check for tokens in response body first
+                const responseBody = httpResponse.body as any;
+                let accessToken: string | null = null;
+                let refreshToken: string | null = null;
+
+                // Try to get tokens from response body
+                if (responseBody) {
+                    accessToken = responseBody.accessToken || responseBody.access_token || responseBody.token;
+                    refreshToken = responseBody.refreshToken || responseBody.refresh_token;
+                }
+
+                // Fallback to headers if not found in body
+                if (!accessToken) {
+                    accessToken = httpResponse.headers.get(HEADER_KEYS.AUTH_HEADER_KEY)?.replace(HEADER_KEYS.BEARER_KEY, '')
+                        || httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
+                }
+
+                if (!refreshToken) {
+                    refreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN);
+                }
 
                 if (accessToken) {
                     this._accessToken.set(accessToken);

@@ -1,1 +1,97 @@
-<p>profile-edit works!</p>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="profile-edit-header">
+                <h1>Редактиране на профил [{{currentUser()?.userName}}]</h1>
+                <p>Актуализирайте вашата информация в Хармония</p>
+            </div>
+
+            <form [formGroup]="profileEditForm" (ngSubmit)="onSubmit()" class="profile-edit-form">
+                <div class="form-row">
+                    <div>
+                        <!-- Profile Image Upload -->
+                        <div class="form-group profile-image-section">
+                            <label class="form-label">Профилна снимка</label>
+                            <app-profile-image-upload formControlName="profilePictureUrl"
+                                [userId]="currentUser()?.id??''"
+                                [currentImageUrl]="profileEditForm.get('profilePictureUrl')?.value"
+                                >
+                            </app-profile-image-upload>
+                        </div>
+                    </div>
+                    <div class="personal-info">
+                        <div class="form-group">
+                            <label for="firstName" class="form-label">Име *</label>
+                            <input type="text" id="firstName" formControlName="firstName" class="form-control"
+                                [class.is-invalid]="getFieldError('firstName')" placeholder="Въведете вашето име">
+                            <div class="invalid-feedback">{{ getFieldError('firstName') }}</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="midName" class="form-label">Презиме</label>
+                            <input type="text" id="midName" formControlName="midName" class="form-control"
+                                placeholder="Въведете вашето презиме">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lastName" class="form-label">Фамилия *</label>
+                            <input type="text" id="lastName" formControlName="lastName" class="form-control"
+                                [class.is-invalid]="getFieldError('lastName')" placeholder="Въведете вашата фамилия">
+                            <div class="invalid-feedback">{{ getFieldError('lastName') }}</div>
+                        </div>
+                        <!-- Contact Information -->
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email адрес *</label>
+                            <input type="email" id="email" formControlName="email" class="form-control"
+                                [class.is-invalid]="getFieldError('email')" placeholder="example@domain.com">
+                            <div class="invalid-feedback">{{ getFieldError('email') }}</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneNumber" class="form-label">Телефонен номер *</label>
+                            <input type="tel" id="phoneNumber" formControlName="phoneNumber" class="form-control"
+                                [class.is-invalid]="getFieldError('phoneNumber')" placeholder="+359888123456">
+                            <div class="invalid-feedback">{{ getFieldError('phoneNumber') }}</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Professional Information -->
+                <div class="form-group">
+                    <label for="specialty" class="form-label">Специалност</label>
+                    <input type="text" id="specialty" formControlName="specialty" class="form-control"
+                        placeholder="Психолог, Психотерапевт, и т.н.">
+                </div>
+
+                <div class="form-group">
+                    <label for="biography" class="form-label">Биография</label>
+                    <textarea id="biography" formControlName="biography" class="form-control" rows="4"
+                        placeholder="Разкажете накратко за себе си и вашия опит..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="cmd-buttons">
+                    <button type="submit"
+                        class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0"
+                        [disabled]="isLoading() || profileEditForm.invalid">
+                        @if (isLoading()) {
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Запазване...
+                        } @else {
+                        <i class="fas fa-save"></i>
+                        Запази промените
+                        }
+                    </button>
+                    <button type="button"
+                        class="btn btn-danger rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0"
+                        (click)="onCancel()">
+                        <i class="fas fa-times"></i>
+                        Отказ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

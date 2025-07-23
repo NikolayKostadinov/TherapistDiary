@@ -58,7 +58,7 @@ export class Login {
                     this.isLoading.set(false);
                     this.closeModal();
                 },
-                error: (error: Error) => {
+                error: (error: Error) => {  
                     this.isLoading.set(false);
                     this.errorMessage.set(error.message);
                 }

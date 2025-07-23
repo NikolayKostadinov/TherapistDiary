@@ -30,7 +30,7 @@
 
 .register-header {
     text-align: center;
-    margin-top: 3rem;
+    margin-top: 1.75rem;
     margin-bottom: 2rem;
 }
 
@@ -106,30 +106,6 @@
     margin-top: 0.25rem;
     min-height: 1.2rem;
     animation: slideIn 0.3s ease;
-}
-
-/* Submit Button */
-.btn-register {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    background: var(--bs-primary, #0d6efd);
-    color: white;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 0.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-height: 50px;
-}
-
-.btn-register:hover:not(:disabled) {
-    background: var(--bs-primary-dark, #0b5ed7);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(13, 110, 253, 0.3);
 }
 
 .btn-register:disabled {
@@ -213,17 +189,19 @@
 }
 
 /* Validation Styles */
-.form-control:valid {
-    border-color: #28a745;
+.form-control.ng-valid,
+.form-control.ng-untouched.ng-pristine {
+    border-left: 5px solid #28a745;
 }
 
-.form-control:invalid.is-invalid {
+.form-control.is-invalid {
+    border-left: 5px solid #dc3545;
     border-color: #dc3545;
 }
 
 /* Focus styles for accessibility */
-.form-control:focus,
-.btn-register:focus {
+/* .btn-register:focus  */
+.form-control:focus {
     outline: 2px solid var(--bs-primary, #0d6efd);
     outline-offset: 2px;
 }

@@ -57,7 +57,7 @@
                     <div class="form-group">
                         <label for="password" class="form-label">Парола *</label>
                         <input type="password" id="password" formControlName="password" class="form-control"
-                            [class.is-invalid]="getFieldError('password')" placeholder="Минимум 6 символа">
+                            [class.is-invalid]="getFieldError('password')" placeholder="Минимум 8 символа">
                         <div class="invalid-feedback">{{ getFieldError('password') }}</div>
                     </div>
 
@@ -72,7 +72,8 @@
 
                 <!-- Submit Button -->
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-register"
+                    <button type="submit"
+                        class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0"
                         [disabled]="isLoading() || registerForm.invalid">
                         @if (isLoading()) {
                         <i class="fas fa-spinner fa-spin"></i>
@@ -93,6 +94,5 @@
                 </div>
             </form>
         </div>
-
     </div>
 </div>

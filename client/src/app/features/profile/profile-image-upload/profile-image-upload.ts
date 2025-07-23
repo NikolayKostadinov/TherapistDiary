@@ -8,19 +8,20 @@ import { ToasterService } from '../../../layout';
     selector: 'app-profile-image-upload',
     standalone: true,
     imports: [CommonModule],
-    templateUrl: './profile-image-upload.component.html',
-    styleUrls: ['./profile-image-upload.component.css'],
+    templateUrl: './profile-image-upload.html',
+    styleUrls: ['./profile-image-upload.css'],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => ProfileImageUploadComponent),
+            useExisting: forwardRef(() => ProfileImageUpload),
             multi: true
         }
     ]
 })
-export class ProfileImageUploadComponent implements ControlValueAccessor {
+export class ProfileImageUpload implements ControlValueAccessor {
     @Input() userId!: string;
     @Input() currentImageUrl?: string;
+    @Input() height: { [key: string]: string } = {};
 
     private firebaseService = inject(FirebaseService);
     private toasterService = inject(ToasterService);

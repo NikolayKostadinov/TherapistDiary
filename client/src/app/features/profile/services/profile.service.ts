@@ -1,7 +1,7 @@
 import { effect, Injectable, signal, DestroyRef, inject, computed } from '@angular/core';
 import { AuthService } from "../../auth";
 import { HttpClient } from '@angular/common/http';
-import { UserProfileModel } from '../models';
+import { UserEditProfileModel, UserProfileModel } from '../models';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -51,8 +51,8 @@ export class ProfileServices {
         this._errorMessage.set(null);
     }
 
-    public updateProfile(updatedProfile: UserProfileModel): Observable<UserProfileModel> {
-        return this.httpClient.put<UserProfileModel>(this.apiUrl, updatedProfile)
+    public updateProfile(updatedProfile: UserEditProfileModel): Observable<UserProfileModel> {
+        return this.httpClient.put<UserProfileModel>(`${this.apiUrl}/${updatedProfile.id}`, updatedProfile)
             .pipe(
                 tap((profile) => {
                     this._user.set(profile);

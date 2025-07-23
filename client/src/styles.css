@@ -100,17 +100,17 @@ body {
 }
 
 .btn.btn-primary:hover {
-    box-shadow: inset 300px 0 0 0 var(--bs-light) !important;
+    box-shadow: inset 1000px 0 0 0 var(--bs-light) !important;
     color: var(--bs-primary) !important;
 }
 
 .btn.btn-secondary:hover {
-    box-shadow: inset 300px 0 0 0 var(--bs-light) !important;
+    box-shadow: inset 1000px 0 0 0 var(--bs-light) !important;
     color: var(--bs-secondary) !important;
 }
 
 .btn.btn-danger:hover {
-    box-shadow: inset 300px 0 0 0 var(--bs-light) !important;
+    box-shadow: inset 1000px 0 0 0 var(--bs-light) !important;
     color: var(--bs-danger) !important;
 }
 
@@ -119,7 +119,7 @@ body {
 }
 
 .btn.btn-light:hover {
-    box-shadow: inset 300px 0 0 0 var(--bs-primary);
+    box-shadow: inset 1000px 0 0 0 var(--bs-primary);
     color: var(--bs-light) !important;
 }
 

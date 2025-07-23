@@ -1,14 +1,14 @@
-import { Component, computed, effect, OnInit, Signal } from '@angular/core';
+import { Component, computed, effect, OnInit, Signal, signal } from '@angular/core';
 import { ProfileServices } from '..';
 import { UserProfileModel } from '../models';
-import { ProfileFormDemoComponent } from "../profile-form1/profile-form";
 import { Spinner, ToasterService } from "../../../layout";
 import { ScrollAnimationDirective } from '../../../common/directives';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { ConfirmationModal } from '../../../common/components';
 
 @Component({
     selector: 'app-profile',
-    imports: [Spinner, ScrollAnimationDirective],
+    imports: [Spinner, ScrollAnimationDirective, RouterLink, ConfirmationModal],
     templateUrl: './profile.html',
     styleUrl: './profile.css'
 })
@@ -20,6 +20,9 @@ export class Profile {
     errorMessage: Signal<string | null>;
     isLoading: Signal<boolean>;
     hasError: Signal<boolean>;
+
+    // Signal за показване на модала за потвърждение
+    readonly showDeleteModal = signal(false);
 
     constructor(
         private readonly profileService: ProfileServices,
@@ -42,7 +45,6 @@ export class Profile {
 
     private handleProfileError(error: string): void {
         this.toasterService.error('Грешка при зареждане на профила!');
-        console.log('Грешка при зареждане на профила:', error);
     }
 
     // Метод за retry
@@ -56,6 +58,11 @@ export class Profile {
     }
 
     onDeleteClick(): void {
+        this.showDeleteModal.set(true);
+    }
+
+    onConfirmDelete(): void {
+        this.showDeleteModal.set(false);
         const userId = this.userProfile()?.id;
         if (userId) {
             this.profileService.deleteProfile(userId).subscribe({
@@ -68,5 +75,9 @@ export class Profile {
                 }
             });
         }
+    }
+
+    onCancelDelete(): void {
+        this.showDeleteModal.set(false);
     }
 }
