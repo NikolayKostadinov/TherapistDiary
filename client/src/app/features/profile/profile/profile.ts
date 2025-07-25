@@ -47,11 +47,6 @@ export class Profile {
         this.toasterService.error('Грешка при зареждане на профила!');
     }
 
-    // Метод за retry
-    onRetryLoadProfile(): void {
-        this.profileService.refreshProfile();
-    }
-
     // Метод за изчистване на грешката
     onClearError(): void {
         this.profileService.clearError();

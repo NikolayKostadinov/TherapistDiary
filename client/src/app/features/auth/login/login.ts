@@ -59,13 +59,13 @@ export class Login {
                     this.isLoading.set(false);
                     this.closeModal();
                 },
-                error: (error: Error) => {  
+                error: (error: Error) => {
                     this.isLoading.set(false);
                     this.errorMessage.set(error.message);
                 }
             });
         } else {
-             Utils.markFormGroupTouched(this.loginForm);
+            Utils.markFormGroupTouched(this.loginForm);
         }
     }
 
@@ -75,7 +75,7 @@ export class Login {
     }
 
     goToRegister() {
-        this.closeModal();
+        this.modalClosed.emit();
         this.router.navigate(['/register']);
     }
 

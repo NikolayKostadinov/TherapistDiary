@@ -54,8 +54,6 @@ export class ProfileEdit extends ApplicationForm implements OnInit {
     }
 
     private loadUserProfile(): void {
-        // Load profile from ProfileService instead of AuthService
-        this.profileService.refreshProfile();
         const profile = this.profileService.userProfile();
 
         if (profile) {
@@ -87,7 +85,6 @@ export class ProfileEdit extends ApplicationForm implements OnInit {
             firstName: formValue.firstName,
             midName: formValue.midName || null,
             lastName: formValue.lastName,
-            fullName: `${formValue.firstName} ${formValue.lastName}`,
             phoneNumber: formValue.phoneNumber,
             specialty: formValue.specialty || null,
             biography: formValue.biography || null,
@@ -97,7 +94,6 @@ export class ProfileEdit extends ApplicationForm implements OnInit {
         this.profileService.updateProfile(editProfile).subscribe({
             next: () => {
                 try {
-                    this.profileService.refreshProfile();
                     this.toaster.success('Профилът е обновен успешно!');
                     this.router.navigate(['/profile']);
                 } catch (error) {

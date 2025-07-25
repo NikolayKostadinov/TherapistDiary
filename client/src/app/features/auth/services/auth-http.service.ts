@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../models';
 import { Utils } from '../../../common/utils';
-import { UserEditProfileModel } from '../../profile/models';
+import { UserEditProfileModel, UserProfileModel } from '../../profile/models';
 
 /**
  * Service responsible for authentication-related HTTP requests
@@ -68,6 +68,30 @@ export class AuthHttpService {
         ).pipe(
             catchError((error: HttpErrorResponse) => {
                 const errorMessage = Utils.getErrorMessage(error, 'влизане');
+                return throwError(() => new Error(errorMessage));
+            })
+        );
+    }
+
+    deleteProfile(id: string): Observable<HttpResponse<void>> {
+        return this.http.delete<void>(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${id}`,
+            { observe: 'response' }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'изтриване на профила');
+                return throwError(() => new Error(errorMessage));
+            })
+        );
+    }
+
+    getUserProfile(id: string): Observable<HttpResponse<UserProfileModel>> {
+        return this.http.get<UserProfileModel>(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${id}`,
+            { observe: 'response' }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'профилните данни');
                 return throwError(() => new Error(errorMessage));
             })
         );

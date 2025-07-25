@@ -12,10 +12,7 @@
         <h3>Възникна грешка</h3>
         <p>{{ errorMessage() }}</p>
         <div class="error-actions">
-            <button class="retry-btn" (click)="onRetryLoadProfile()">
-                Опитай отново
-            </button>
-            <button class="clear-btn" (click)="onClearError()">
+            <button class="clear-btn" (click)="onClearError()" routerLink="/home">
                 Затвори
             </button>
         </div>
@@ -160,13 +157,13 @@
 </div>
 }
 
-<!-- Fallback - ако няма профил, няма loading и няма error -->
+<!-- Fallback - ако няма профил, няма loading и няма error
 @if (!userProfile() && !isLoading() && !hasError()) {
 <div class="no-profile">
     <p>Няма данни за профила.</p>
     <button (click)="onRetryLoadProfile()">Зареди профила</button>
 </div>
-}
+} -->
 
 <!-- Модал за потвърждение на изтриване -->
 <app-confirmation-modal [isVisible]="showDeleteModal()" title="Изтриване на профил"
