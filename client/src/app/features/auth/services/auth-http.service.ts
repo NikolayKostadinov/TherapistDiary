@@ -6,6 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../models';
 import { Utils } from '../../../common/utils';
+import { UserEditProfileModel } from '../../profile/models';
 
 /**
  * Service responsible for authentication-related HTTP requests
@@ -14,12 +15,13 @@ import { Utils } from '../../../common/utils';
     providedIn: 'root'
 })
 export class AuthHttpService {
+
     constructor(private readonly http: HttpClient) { }
 
-    login(loginData: LoginRequest): Observable<HttpResponse<AuthResponse>> {
+    login(loginRequest: LoginRequest): Observable<HttpResponse<AuthResponse>> {
         return this.http.post(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.LOGIN}`,
-            loginData,
+            loginRequest,
             { observe: 'response' }
         ).pipe(
             catchError((error: HttpErrorResponse) => {
@@ -52,7 +54,20 @@ export class AuthHttpService {
             { observe: 'response' }
         ).pipe(
             catchError((error: HttpErrorResponse) => {
-                const errorMessage = Utils.getErrorMessage(error, 'регистрация');
+                // Return the original HTTP error response instead of creating a new Error
+                return throwError(() => error);
+            })
+        );
+    }
+
+    updateProfile(updateUserRequest: UserEditProfileModel): Observable<HttpResponse<AuthResponse>> {
+        return this.http.put(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${updateUserRequest.id}`,
+            updateUserRequest,
+            { observe: 'response' }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'влизане');
                 return throwError(() => new Error(errorMessage));
             })
         );

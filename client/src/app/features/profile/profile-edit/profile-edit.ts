@@ -1,13 +1,16 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
 import { ProfileServices } from '../services/profile.service';
-import { UserEditProfileModel, UserProfileModel } from '../models';
+import { UserEditProfileModel } from '../models';
 import { ProfileImageUpload } from '../profile-image-upload/profile-image-upload';
 import { ToasterService } from '../../../layout/toaster';
 import { AuthService } from '../../auth/services';
+import { Utils } from '../../../common/utils';
+import { ApiError } from '../../../common/models';
+import { ApplicationForm } from '../../../common';
+import { AuthResponse, UserInfo } from '../../auth';
 
 @Component({
     selector: 'app-profile-edit',
@@ -15,22 +18,20 @@ import { AuthService } from '../../auth/services';
     templateUrl: './profile-edit.html',
     styleUrl: './profile-edit.css'
 })
-export class ProfileEdit implements OnInit {
+export class ProfileEdit extends ApplicationForm implements OnInit {
     readonly isLoading = signal(false);
-    readonly currentUser;
-
-    profileEditForm: FormGroup;
+    readonly currentUser: Signal<UserInfo | null>;
 
     constructor(
-        private readonly fb: FormBuilder,
+        private readonly _fb: FormBuilder,
+        private readonly authService: AuthService,
         private readonly profileService: ProfileServices,
-        private readonly toasterService: ToasterService,
         private readonly router: Router,
-        private readonly authService: AuthService
+        private readonly _toaster: ToasterService
     ) {
-
+        super(_fb, _toaster);
         this.currentUser = this.authService.currentUser;
-        this.profileEditForm = this.fb.group({
+        this.form = this.fb.group({
             firstName: ['', [Validators.required]],
             midName: [''],
             lastName: ['', [Validators.required]],
@@ -40,19 +41,25 @@ export class ProfileEdit implements OnInit {
             biography: [''],
             profilePictureUrl: ['']
         });
+
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+    }
+
+    get profilePictureUrl(): string {
+        return this.form.get('profilePictureUrl')?.value ?? ''
     }
 
     ngOnInit(): void {
         this.loadUserProfile();
     }
 
-    private async loadUserProfile(): Promise<void> {
+    private loadUserProfile(): void {
         // Load profile from ProfileService instead of AuthService
         this.profileService.refreshProfile();
         const profile = this.profileService.userProfile();
 
         if (profile) {
-            this.profileEditForm.patchValue({
+            this.form.patchValue({
                 firstName: profile.firstName,
                 midName: profile.midName,
                 lastName: profile.lastName,
@@ -65,82 +72,50 @@ export class ProfileEdit implements OnInit {
         }
     }
 
-    async onSubmit(): Promise<void> {
-        if (this.profileEditForm.invalid) {
-            this.markFormGroupTouched();
+    onSubmit(): void {
+        if (this.form.invalid) {
+            Utils.markFormGroupTouched(this.form);
             return;
         }
 
-        try {
-            const formValue = this.profileEditForm.value;
-            const editProfile: UserEditProfileModel = {
-                id: this.currentUser()?.id || '',
-                email: formValue.email,
-                firstName: formValue.firstName,
-                midName: formValue.midName || null,
-                lastName: formValue.lastName,
-                fullName: `${formValue.firstName} ${formValue.lastName}`,
-                phoneNumber: formValue.phoneNumber,
-                specialty: formValue.specialty || null,
-                biography: formValue.biography || null,
-                profilePictureUrl: formValue.profilePictureUrl || null
-            };
+        this.isLoading.set(true);
 
-            await firstValueFrom(this.profileService.updateProfile(editProfile));
+        const formValue = this.form.value;
+        const editProfile: UserEditProfileModel = {
+            id: this.currentUser()?.id || '',
+            email: formValue.email,
+            firstName: formValue.firstName,
+            midName: formValue.midName || null,
+            lastName: formValue.lastName,
+            fullName: `${formValue.firstName} ${formValue.lastName}`,
+            phoneNumber: formValue.phoneNumber,
+            specialty: formValue.specialty || null,
+            biography: formValue.biography || null,
+            profilePictureUrl: formValue.profilePictureUrl || null
+        };
 
-            this.authService.logout();
-            this.router.navigate(['/login']);
-            this.toasterService.success('Профилът е обновен успешно!\n\nВлезте отново, за да видите промените.');
-
-        } catch (error) {
-            this.toasterService.error('Грешка при обновяване на профила. Опитайте отново.');
-        } finally {
-            this.isLoading.set(false);
-        }
+        this.profileService.updateProfile(editProfile).subscribe({
+            next: () => {
+                try {
+                    this.profileService.refreshProfile();
+                    this.toaster.success('Профилът е обновен успешно!');
+                    this.router.navigate(['/profile']);
+                } catch (error) {
+                    this.toaster.error('Възникна грешка при обновяване на профила. Моля, опитайте отново.');
+                    this.authService.logout();
+                    this.router.navigate(['/login']);
+                }
+            },
+            error: (error: ApiError) => {
+                this.processApiErrorResponse(error);
+            },
+            complete: () => {
+                this.isLoading.set(false);
+            }
+        });
     }
 
     onCancel(): void {
         this.router.navigate(['/profile']);
-    }
-
-    private markFormGroupTouched(): void {
-        Object.keys(this.profileEditForm.controls).forEach(key => {
-            const control = this.profileEditForm.get(key);
-            control?.markAsTouched();
-        });
-    }
-
-    getFieldError(fieldName: string): string | null {
-        const field = this.profileEditForm.get(fieldName);
-
-        if (field?.errors && field.touched) {
-            if (field.errors['required']) {
-                return `${this.getFieldDisplayName(fieldName)} е задължително поле`;
-            }
-            if (field.errors['email']) {
-                return 'Въведете валиден email адрес';
-            }
-            if (field.errors['minlength']) {
-                return `${this.getFieldDisplayName(fieldName)} трябва да бъде поне ${field.errors['minlength'].requiredLength} символа`;
-            }
-            if (field.errors['pattern']) {
-                if (fieldName === 'phoneNumber') {
-                    return 'Въведете валиден телефонен номер';
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private getFieldDisplayName(fieldName: string): string {
-        const displayNames: Record<string, string> = {
-            firstName: 'Име',
-            lastName: 'Фамилия',
-            userName: 'Потребителско име',
-            email: 'Email адрес',
-            phoneNumber: 'Телефонен номер'
-        };
-        return displayNames[fieldName] || fieldName;
     }
 }

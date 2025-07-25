@@ -6,16 +6,22 @@
                 <p>Актуализирайте вашата информация в Хармония</p>
             </div>
 
-            <form [formGroup]="profileEditForm" (ngSubmit)="onSubmit()" class="profile-edit-form">
+            <!-- General Error Message -->
+            @if (generalError()) {
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ generalError() }}
+            </div>
+            }
+
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="profile-edit-form">
                 <div class="form-row">
                     <div>
                         <!-- Profile Image Upload -->
                         <div class="form-group profile-image-section">
                             <label class="form-label">Профилна снимка</label>
                             <app-profile-image-upload formControlName="profilePictureUrl"
-                                [userId]="currentUser()?.id??''"
-                                [currentImageUrl]="profileEditForm.get('profilePictureUrl')?.value"
-                                >
+                                [userId]="currentUser()?.id??''" [currentImageUrl]="profilePictureUrl">
                             </app-profile-image-upload>
                         </div>
                     </div>
@@ -75,7 +81,7 @@
                 <div class="cmd-buttons">
                     <button type="submit"
                         class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0"
-                        [disabled]="isLoading() || profileEditForm.invalid">
+                        [disabled]="isLoading() || form.invalid">
                         @if (isLoading()) {
                         <i class="fas fa-spinner fa-spin"></i>
                         Запазване...

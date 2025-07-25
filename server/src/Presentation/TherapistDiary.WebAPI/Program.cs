@@ -1,7 +1,9 @@
 using System.Text;
+using System.Globalization;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using TherapistDiary.Domain.Entities;
@@ -21,6 +23,26 @@ builder.Services
     .AddOutputCache()
     .AddDistributedMemoryCache();
 
+// Add localization services
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+// Set current culture and UI culture to Bulgarian globally
+CultureInfo.CurrentCulture = new CultureInfo("bg-BG");
+CultureInfo.CurrentUICulture = new CultureInfo("bg-BG");
+
+// Set default culture to Bulgarian
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { new CultureInfo("bg-BG") };
+
+    options.DefaultRequestCulture = new RequestCulture("bg-BG");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+
+    // Force culture in requests
+    options.ApplyCurrentCultureToResponseHeaders = true;
+});
+
 builder.Services.AddOpenApi();
 
 builder.Services.Configure<JwtOptions>(
@@ -36,12 +58,16 @@ builder.Services.AddIdentity<User, Role>(options =>
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedPhoneNumber = false;
     options.User.RequireUniqueEmail = true;
-}).AddEntityFrameworkStores<ApplicationDbContext>();
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddErrorDescriber<TherapistDiary.WebAPI.Infrastructure.Identity.BulgarianIdentityErrorDescriber>();
 
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new ModelStateErrorFilter());
-});
+})
+.AddDataAnnotationsLocalization() // Add localization for data annotations
+.AddViewLocalization(); // Add localization for views
 
 builder.Services.AddHealthChecks();
 
@@ -111,11 +137,12 @@ if (app.Environment.IsDevelopment())
 }
 
 // Middleware pipeline order is important
-app.UseHttpsRedirection();         // 1. Redirect HTTP to HTTPS
-app.UseCors("MyAllowedOrigins");   // 2. Handle CORS before auth
-app.UseAuthentication();           // 3. Authentication before authorization
-app.UseAuthorization();            // 4. Authorization after authorization
-app.MapControllers();              // 5. Route to controllers
-app.MapHealthChecks("/health");    // 6. Health check endpoint
+app.UseRequestLocalization();      // 1. Set localization as early as possible in the pipeline
+app.UseHttpsRedirection();         // 2. Redirect HTTP to HTTPS
+app.UseCors("MyAllowedOrigins");   // 3. Handle CORS before auth
+app.UseAuthentication();           // 4. Authentication before authorization
+app.UseAuthorization();            // 5. Authorization after authorization
+app.MapControllers();              // 6. Route to controllers
+app.MapHealthChecks("/health");    // 7. Health check endpoint
 
 app.Run();

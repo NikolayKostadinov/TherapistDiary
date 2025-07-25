@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PasswordRequiresDigit" xml:space="preserve">
+    <value>Паролата трябва да съдържа поне една цифра ('0'-'9').</value>
+  </data>
+  <data name="PasswordRequiresLower" xml:space="preserve">
+    <value>Паролата трябва да съдържа поне една малка буква ('a'-'z').</value>
+  </data>
+  <data name="PasswordRequiresUpper" xml:space="preserve">
+    <value>Паролата трябва да съдържа поне една главна буква ('A'-'Z').</value>
+  </data>
+  <data name="PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Паролата трябва да съдържа поне един специален символ.</value>
+  </data>
+  <data name="PasswordTooShort" xml:space="preserve">
+    <value>Паролата трябва да бъде поне {0} символа.</value>
+  </data>
+  <data name="DuplicateUserName" xml:space="preserve">
+    <value>Потребителското име '{0}' вече е заето.</value>
+  </data>
+  <data name="DuplicateEmail" xml:space="preserve">
+    <value>Имейлът '{0}' вече е регистриран.</value>
+  </data>
+  <data name="InvalidUserName" xml:space="preserve">
+    <value>Потребителското име '{0}' е невалидно, може да съдържа само букви и цифри.</value>
+  </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>Имейлът '{0}' е невалиден.</value>
+  </data>
+  <data name="PasswordMismatch" xml:space="preserve">
+    <value>Грешна парола.</value>
+  </data>
+  <data name="PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Паролата трябва да съдържа поне {0} различни символа.</value>
+  </data>
+  <data name="InvalidToken" xml:space="preserve">
+    <value>Невалиден токен.</value>
+  </data>
+  <data name="LoginAlreadyAssociated" xml:space="preserve">
+    <value>Потребител с този вход вече съществува.</value>
+  </data>
+</root>

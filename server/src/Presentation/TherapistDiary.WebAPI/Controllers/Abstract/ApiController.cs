@@ -1,5 +1,7 @@
 ﻿namespace TherapistDiary.WebAPI.Controllers.Abstract;
 
+using System.Globalization;
+using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Domain.Shared;
 
@@ -22,13 +24,16 @@ public abstract class ApiController : ControllerBase
         /// <returns>An appropriate <see cref="IActionResult"/> based on the error type.</returns>
         protected IActionResult HandleFailure(Result result)
         {
-
             if (result.IsSuccess)
             {
                 throw new InvalidOperationException();
             }
 
             _logger.LogWarning("Operation failed with result: {result.ErrorsDetails}", result);
+
+            // Ensure the current thread is using the Bulgarian culture for error responses
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("bg-BG");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("bg-BG");
 
             if (result.ToString()?.Contains("NotFound") == true)
             {

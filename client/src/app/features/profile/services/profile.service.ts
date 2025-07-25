@@ -1,12 +1,13 @@
 import { effect, Injectable, signal, DestroyRef, inject, computed } from '@angular/core';
-import { AuthService } from "../../auth";
+import { AuthHttpService, AuthResponse, AuthService } from "../../auth";
 import { HttpClient } from '@angular/common/http';
 import { UserEditProfileModel, UserProfileModel } from '../models';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../../environments/environment';
 import { Utils } from '../../../common/utils';
+import { HEADER_KEYS, TOKEN_KEYS } from '../../../common';
 
 @Injectable({
     providedIn: 'root'
@@ -25,6 +26,7 @@ export class ProfileServices {
 
     constructor(
         private readonly httpClient: HttpClient,
+        private readonly authHttpService: AuthHttpService,
         private readonly authService: AuthService,
     ) {
         effect(() => {
@@ -51,20 +53,19 @@ export class ProfileServices {
         this._errorMessage.set(null);
     }
 
-    public updateProfile(updatedProfile: UserEditProfileModel): Observable<UserProfileModel> {
-        return this.httpClient.put<UserProfileModel>(`${this.apiUrl}/${updatedProfile.id}`, updatedProfile)
-            .pipe(
-                tap((profile) => {
-                    this._user.set(profile);
-                    this._errorMessage.set(null);
-                    this._isLoading.set(false);
-                }),
-                takeUntilDestroyed(this.destroyRef),
-                catchError((error) => {
-                    this._errorMessage.set('Неуспешно обновяване на профила');
-                    return throwError(() => error);
-                })
-            );
+    public updateProfile(updatedProfile: UserEditProfileModel): Observable<void> {
+        return this.authHttpService.updateProfile(updatedProfile).pipe(
+                    tap(
+                        (httpResponse) => {
+                        this.authService.updateTokensFromResponse(httpResponse);
+                    }),
+                    map(() => void 0), // Return void
+                    catchError((error) => {
+                        return throwError(() => error);
+                    })
+                );
+        
+       
     }
 
     public deleteProfile(id: string): Observable<void> {

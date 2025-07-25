@@ -4,12 +4,14 @@ import { map, catchError, tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { AuthHttpService } from '.';
 import { HEADER_KEYS, TOKEN_KEYS } from '../../../common/constants';
-import { JwtPayload, LoginRequest, RegisterRequest, UserInfo } from '../models';
+import { AuthResponse, JwtPayload, LoginRequest, RegisterRequest, UserInfo } from '../models';
+import { HttpResponse } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
+
     // Private signals for internal state
     private _accessToken = signal<string | null>(null);
     private _refreshToken = signal<string | null>(null);
@@ -291,5 +293,42 @@ export class AuthService {
                 return throwError(() => new Error('Сесията изтече. Моля, влезте отново.'));
             })
         );
+    }
+
+    /**
+     * Processes authentication response and updates tokens from headers or body
+     */
+    processAuthResponse(response: AuthResponse): void {
+        let accessToken: string | null = null;
+        let refreshToken: string | null = null;
+
+        // Fallback to headers if not found in body
+        if (!accessToken && response.headers) {
+            accessToken = response.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
+            refreshToken = response.headers.get(TOKEN_KEYS.REFRESH_TOKEN);
+        }
+
+        // Update tokens if found
+        if (accessToken) {
+            this._accessToken.set(accessToken);
+            this.updateUserFromToken(accessToken);
+        }
+        if (refreshToken) {
+            this._refreshToken.set(refreshToken);
+        }
+    }
+
+    updateTokensFromResponse(httpResponse: HttpResponse<AuthResponse>) {
+        const accessToken = httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
+        const refreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN);
+
+        if (accessToken) {
+            this._accessToken.set(accessToken);
+            this.updateUserFromToken(accessToken);
+        }
+
+        if (refreshToken) {
+            this._refreshToken.set(refreshToken);
+        }
     }
 }

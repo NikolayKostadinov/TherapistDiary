@@ -174,7 +174,7 @@ public class AccountService : IAccountService
         var passwordValidationResult = await ValidatePasswordAsync(newPassword);
         if (!passwordValidationResult.Succeeded)
         {
-            return Result.Failure(passwordValidationResult.Errors.Select(e => Error.Create("Password", e.Description)));
+            return Result.Failure(IdentityError(passwordValidationResult, "Password"));
         }
 
         // Change the password using UserManager
@@ -187,7 +187,7 @@ public class AccountService : IAccountService
 
         return result.Succeeded
             ? Result.Success()
-            : Result.Failure(result.Errors.Select(e => Error.Create("Password", e.Description)));
+            : Result.Failure(IdentityError(result, "Password"));
 
     }
 

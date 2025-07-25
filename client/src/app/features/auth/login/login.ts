@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { LoginRequest } from '../models';
+import { Utils } from '../../../common/utils';
 
 @Component({
     selector: 'app-login',
@@ -64,15 +65,8 @@ export class Login {
                 }
             });
         } else {
-            this.markFormGroupTouched();
+             Utils.markFormGroupTouched(this.loginForm);
         }
-    }
-
-    private markFormGroupTouched() {
-        Object.keys(this.loginForm.controls).forEach(key => {
-            const control = this.loginForm.get(key);
-            control?.markAsTouched();
-        });
     }
 
     closeModal() {
