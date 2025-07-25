@@ -1,20 +1,18 @@
-import { signal } from "@angular/core";
+import { inject, signal } from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ApiError, ApiErrorResponse, ValidationError } from "./models";
 import { Utils } from "./utils";
 import { ToasterService } from "../layout";
 
 export abstract class ApplicationForm {
-    protected form: FormGroup;
     protected serverErrors = signal<ValidationError[]>([]);
     protected generalError = signal<string>('');
-    protected readonly fb: FormBuilder;
-    protected readonly toaster: ToasterService;
+    protected readonly fb: FormBuilder = inject(FormBuilder);
+    protected readonly toaster: ToasterService = inject(ToasterService);
+    protected form: FormGroup = this.fb.group({});
+    protected readonly isLoading = signal(false);
 
-    constructor(fb: FormBuilder, toaster: ToasterService) {
-        this.fb = fb;
-        this.toaster = toaster;
-        this.form = this.fb.group({});
+    constructor() {
     }
 
     protected clearErrors(): void {
@@ -27,6 +25,7 @@ export abstract class ApplicationForm {
     }
 
     protected processApiErrorResponse(error: ApiError): void {
+        this.isLoading.set(false);
         const convertedError = error as ApiErrorResponse;
         if (convertedError) {
             const { serverErrors, generalError } = Utils.handleError(convertedError, this.form);
@@ -38,3 +37,4 @@ export abstract class ApplicationForm {
         }
     }
 }
+git

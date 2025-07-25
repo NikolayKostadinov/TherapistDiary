@@ -175,6 +175,7 @@ export class AuthService {
             }),
             map(() => void 0), // Return void
             catchError((error) => {
+                debugger;
                 return throwError(() => error);
             })
         );

@@ -7,6 +7,7 @@ import { RegisterRequest } from '../models';
 import { ToasterService } from '../../../layout/toaster';
 import { ApiErrorResponse, ValidationError } from '../../../common/models';
 import { Utils } from '../../../common/utils';
+import { ApplicationForm } from '../../../common';
 
 @Component({
     selector: 'app-register',
@@ -14,21 +15,12 @@ import { Utils } from '../../../common/utils';
     templateUrl: './register.html',
     styleUrl: './register.css'
 })
-export class Register {
-
-
-    readonly isLoading = signal(false);
-    readonly serverErrors = signal<ValidationError[]>([]);
-    readonly generalError = signal<string>('');
-
-    form: FormGroup;
-
-    constructor(
-        private readonly fb: FormBuilder,
+export class Register extends ApplicationForm {
+    constructor(      
         private readonly authService: AuthService,
         private readonly router: Router,
-        private readonly toaster: ToasterService) {
-
+       ) {
+        super();
         this.form = this.fb.group({
             userName: ['', [Validators.required, Validators.minLength(3)]],
             email: ['', [Validators.required, Validators.email]],
@@ -44,8 +36,6 @@ export class Register {
 
         Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
     }
-
-
 
     onSubmit(): void {
         if (this.form.invalid) {
@@ -95,10 +85,7 @@ export class Register {
             }
         });
     }
-
-    getFieldError(fieldName: string): string {
-        return Utils.getFieldError(fieldName, this.form, this.serverErrors());
-    }
+   
 
     private passwordMatchValidator(form: FormGroup) {
         const password = form.get('password');
@@ -112,12 +99,6 @@ export class Register {
         confirmPassword?.setErrors(null);
         return null;
     }
-
-    private clearErrors(): void {
-        this.serverErrors.set([]);
-        this.generalError.set('');
-    }
-
 }
 
 

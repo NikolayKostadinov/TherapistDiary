@@ -1,16 +1,15 @@
-import { Component, signal, OnInit, Signal } from '@angular/core';
+import { Component, OnInit, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProfileServices } from '../services/profile.service';
 import { UserEditProfileModel } from '../models';
 import { ProfileImageUpload } from '../profile-image-upload/profile-image-upload';
-import { ToasterService } from '../../../layout/toaster';
 import { AuthService } from '../../auth/services';
 import { Utils } from '../../../common/utils';
 import { ApiError } from '../../../common/models';
 import { ApplicationForm } from '../../../common';
-import { AuthResponse, UserInfo } from '../../auth';
+import { UserInfo } from '../../auth';
 
 @Component({
     selector: 'app-profile-edit',
@@ -19,17 +18,15 @@ import { AuthResponse, UserInfo } from '../../auth';
     styleUrl: './profile-edit.css'
 })
 export class ProfileEdit extends ApplicationForm implements OnInit {
-    readonly isLoading = signal(false);
+
     readonly currentUser: Signal<UserInfo | null>;
 
     constructor(
-        private readonly _fb: FormBuilder,
         private readonly authService: AuthService,
         private readonly profileService: ProfileServices,
-        private readonly router: Router,
-        private readonly _toaster: ToasterService
+        private readonly router: Router
     ) {
-        super(_fb, _toaster);
+        super();
         this.currentUser = this.authService.currentUser;
         this.form = this.fb.group({
             firstName: ['', [Validators.required]],
@@ -95,9 +92,11 @@ export class ProfileEdit extends ApplicationForm implements OnInit {
             next: () => {
                 try {
                     this.toaster.success('Профилът е обновен успешно!');
+                    this.isLoading.set(false);
                     this.router.navigate(['/profile']);
                 } catch (error) {
                     this.toaster.error('Възникна грешка при обновяване на профила. Моля, опитайте отново.');
+                    this.isLoading.set(false);
                     this.authService.logout();
                     this.router.navigate(['/login']);
                 }

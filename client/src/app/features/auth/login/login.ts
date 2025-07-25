@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { LoginRequest } from '../models';
 import { Utils } from '../../../common/utils';
+import { ApplicationForm } from '../../../common';
 
 @Component({
     selector: 'app-login',
@@ -13,19 +14,18 @@ import { Utils } from '../../../common/utils';
     templateUrl: './login.html',
     styleUrl: './login.css'
 })
-export class Login {
+export class Login extends ApplicationForm {
     @Output() modalClosed = new EventEmitter<void>();
 
     loginForm: FormGroup;
-    isLoading = signal(false);
     errorMessage = signal('');
     showPassword = signal(false);
 
     constructor(
-        private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly authService: AuthService
     ) {
+        super();
         this.loginForm = this.fb.group({
             username: ['', [Validators.required, Validators.minLength(3)]],
             password: ['', [Validators.required, Validators.minLength(6)]]
@@ -59,9 +59,10 @@ export class Login {
                     this.isLoading.set(false);
                     this.closeModal();
                 },
-                error: (error: Error) => {
+                error: (error) => {
+                    debugger;
                     this.isLoading.set(false);
-                    this.errorMessage.set(error.message);
+                    this.processApiErrorResponse(error);
                 }
             });
         } else {

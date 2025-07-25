@@ -26,7 +26,7 @@ export class AuthHttpService {
         ).pipe(
             catchError((error: HttpErrorResponse) => {
                 const errorMessage = Utils.getErrorMessage(error, 'влизане');
-                return throwError(() => new Error(errorMessage));
+                return throwError(() => ({ ...error, message: errorMessage }));
             })
         );
     }
