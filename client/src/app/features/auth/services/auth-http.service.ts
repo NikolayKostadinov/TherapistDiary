@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../models';
 import { Utils } from '../../../common/utils';
-import { UserEditProfileModel, UserProfileModel } from '../../profile/models';
+import { ChangePasswordModel, UserEditProfileModel, UserProfileModel } from '../../profile/models';
 
 /**
  * Service responsible for authentication-related HTTP requests
@@ -93,6 +93,19 @@ export class AuthHttpService {
             catchError((error: HttpErrorResponse) => {
                 const errorMessage = Utils.getErrorMessage(error, 'профилните данни');
                 return throwError(() => new Error(errorMessage));
+            })
+        );
+    }
+
+    changePassword(userId: string, changePasswordRequest: ChangePasswordModel): Observable<HttpResponse<void>> {
+        return this.http.patch<void>(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.CHANGE_PASSWORD}/${userId}`,
+            changePasswordRequest,
+            { observe: 'response' }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'смяна на паролата');
+                return throwError(() => ({ ...error, message: errorMessage }));
             })
         );
     }

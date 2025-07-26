@@ -87,6 +87,17 @@ public class AccountController : ApiController
         return result.IsSuccess ? Ok() : HandleFailure(result);
     }
 
+
+
+    [HttpPatch("change-password/{id:guid:required}")]
+    [Authorize("AdminOrOwner")]
+    public async Task<IActionResult> ChangePassword([FromRoute]Guid id, [FromBody] ChangePasswordRequest request)
+    {
+        var result = await _accountService.ChangePassword(id, request);
+        return result.IsSuccess ? Ok() : HandleFailure(result);
+    }
+
+
     /// <summary>
     /// Deletes a user account based on the unique identifier (GUID).
     /// </summary>

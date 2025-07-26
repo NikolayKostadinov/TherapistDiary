@@ -1,13 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services';
 import { RegisterRequest } from '../models';
-import { ToasterService } from '../../../layout/toaster';
-import { ApiErrorResponse, ValidationError } from '../../../common/models';
+import { ApiErrorResponse } from '../../../common/models';
 import { Utils } from '../../../common/utils';
-import { ApplicationForm } from '../../../common';
+import { ApplicationForm, VALIDATION_PATTERNS } from '../../../common';
 
 @Component({
     selector: 'app-register',
@@ -27,7 +26,7 @@ export class Register extends ApplicationForm {
             firstName: ['', [Validators.required]],
             midName: [''],
             lastName: ['', [Validators.required]],
-            phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{8,14}$/)]],
+            phoneNumber: ['', [Validators.required, Validators.pattern(VALIDATION_PATTERNS.PHONE_NUMBER)]],
             password: ['', [Validators.required, Validators.minLength(8)]],
             confirmPassword: ['', [Validators.required]]
         }, {

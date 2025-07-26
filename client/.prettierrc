@@ -15,27 +15,27 @@
     {
       "files": "*.html",
       "options": {
-        "printWidth": 200,
+        "printWidth": 300,
         "tabWidth": 4,
         "parser": "angular",
         "htmlWhitespaceSensitivity": "ignore",
         "bracketSameLine": true,
-        "singleAttributePerLine": false,
+        "singleAttributePerLine": true,
         "insertPragma": false,
-        "proseWrap": "preserve"
+        "proseWrap": "never"
       }
     },
     {
       "files": "*.component.html",
       "options": {
-        "printWidth": 200,
+        "printWidth": 300,
         "tabWidth": 4,
         "parser": "angular",
         "htmlWhitespaceSensitivity": "ignore",
         "bracketSameLine": true,
         "singleAttributePerLine": false,
         "insertPragma": false,
-        "proseWrap": "preserve"
+        "proseWrap": "never"
       }
     }
   ]

@@ -4,22 +4,22 @@
         <div class="row gx-0 align-items-center" style="height: 45px;">
             <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                 <div class="d-flex flex-wrap">
-                    <a href="#" class="text-light me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+359 888 123
-                        456</a>
-                    <a href="#" class="text-light me-0"><i
-                            class="fas fa-envelope text-primary me-2"></i>{{'info@harmonia.bg'}}</a>
+                    <a class="text-light me-4" routerLink="/home">
+                        <i class="fas fa-phone-alt text-primary me-2"></i>+359 888 123 456</a>
+                    <a class="text-light me-0" routerLink="/home"><i
+                           class="fas fa-envelope text-primary me-2"></i>{{'info@harmonia.bg'}}</a>
                 </div>
             </div>
             <div class="col-lg-4 text-center text-lg-end">
                 <div class="d-flex align-items-center justify-content-end">
-                    <a href="#" class="btn btn-light btn-square border rounded-circle nav-fill me-3"><i
-                            class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="btn btn-light btn-square border rounded-circle nav-fill me-3"><i
-                            class="fab fa-youtube"></i></a>
-                    <a href="#" class="btn btn-light btn-square border rounded-circle nav-fill me-3"><i
-                            class="fab fa-instagram"></i></a>
-                    <a href="#" class="btn btn-light btn-square border rounded-circle nav-fill me-0"><i
-                            class="fab fa-linkedin-in"></i></a>
+                    <a class="btn btn-light btn-square border rounded-circle nav-fill me-3" routerLink="/home">
+                        <i class="fab fa-facebook-f"></i></a>
+                    <a class="btn btn-light btn-square border rounded-circle nav-fill me-3" routerLink="/home">
+                        <i class="fab fa-youtube"></i></a>
+                    <a class="btn btn-light btn-square border rounded-circle nav-fill me-3" routerLink="/home">
+                        <i class="fab fa-instagram"></i></a>
+                    <a class="btn btn-light btn-square border rounded-circle nav-fill me-0" routerLink="/home">
+                        <i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
         </div>
@@ -30,7 +30,7 @@
     <!-- Navbar & Hero Start -->
     <div class="container-fluid position-relative p-0">
         <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-3 py-lg-0"
-            [class.scrolled]="isScrolled()">
+             [class.scrolled]="isScrolled()">
             <a routerLink="/home" class="navbar-brand p-0">
                 <h1 class="text-primary m-0"><i class="fas fa-dove"></i> Хармония</h1>
             </a>
@@ -53,7 +53,7 @@
                 }
                 <div class="navbar-nav ms-auto py-0">
                     <a routerLink="" class="nav-item nav-link" routerLinkActive="active"
-                        [routerLinkActiveOptions]="{ exact: true }">Начало</a>
+                       [routerLinkActiveOptions]="{ exact: true }">Начало</a>
                     <a routerLink="/therapists" class="nav-item nav-link" routerLinkActive="active">Терапевти</a>
                     <a routerLink="/therapy-types" class="nav-item nav-link" routerLinkActive="active">Терапии</a>
                     <a routerLink="/about" class="nav-item nav-link" routerLinkActive="active">За нас</a>
@@ -65,7 +65,7 @@
                     }
                 </div>
                 <a href="#"
-                    class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0">Запазете
+                   class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0">Запазете
                     час</a>
             </div>
         </nav>

@@ -8,7 +8,7 @@ import { ProfileImageUpload } from '../profile-image-upload/profile-image-upload
 import { AuthService } from '../../auth/services';
 import { Utils } from '../../../common/utils';
 import { ApiError } from '../../../common/models';
-import { ApplicationForm } from '../../../common';
+import { ApplicationForm, VALIDATION_PATTERNS } from '../../../common';
 import { UserInfo } from '../../auth';
 
 @Component({
@@ -29,11 +29,11 @@ export class ProfileEdit extends ApplicationForm implements OnInit {
         super();
         this.currentUser = this.authService.currentUser;
         this.form = this.fb.group({
-            firstName: ['', [Validators.required]],
+            firstName: ['', [Validators.required, Validators.minLength(2)]],
             midName: [''],
-            lastName: ['', [Validators.required]],
+            lastName: ['', [Validators.required, Validators.minLength(2)]],
             email: ['', [Validators.required, Validators.email]],
-            phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{8,14}$/)]],
+            phoneNumber: ['', [Validators.required, Validators.pattern(VALIDATION_PATTERNS.PHONE_NUMBER)]],
             specialty: [''],
             biography: [''],
             profilePictureUrl: ['']

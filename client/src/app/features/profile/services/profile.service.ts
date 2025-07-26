@@ -1,6 +1,6 @@
 import { effect, Injectable, signal, DestroyRef, inject, computed } from '@angular/core';
-import { AuthHttpService, AuthResponse, AuthService } from "../../auth";
-import { UserEditProfileModel, UserProfileModel } from '../models';
+import { AuthHttpService, AuthService } from "../../auth";
+import { ChangePasswordModel, UserEditProfileModel, UserProfileModel } from '../models';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Utils } from '../../../common/utils';
@@ -85,7 +85,7 @@ export class ProfileServices {
                 catchError((error) => {
                     return throwError(() => error);
                 })
-            )            
+            )
             .subscribe({
                 next: (profile: UserProfileModel) => {
                     this._user.set(profile);
@@ -101,6 +101,29 @@ export class ProfileServices {
                     this._errorMessage.set(errorMsg);
                 }
             });
+    }
+
+    public changePassword(currentPassword: string, newPassword: string): Observable<void> {
+        const currentUser = this.authService.currentUser();
+        if (!currentUser) {
+            const errorMessage = 'Потребителят не е автентифициран';
+            this._errorMessage.set(errorMessage);
+            return throwError(() => new Error(errorMessage));
+        }
+
+        const changePasswordRequest: ChangePasswordModel = {
+            currentPassword,
+            newPassword
+        };
+
+        return this.authHttpService.changePassword(currentUser.id, changePasswordRequest).pipe(
+            map(() => void 0), // Return void
+            catchError((error) => {
+                const errorMessage = Utils.getErrorMessage(error, 'смяна на паролата');
+                this._errorMessage.set(errorMessage);
+                return throwError(() => new Error(errorMessage));
+            })
+        );
     }
 
 }

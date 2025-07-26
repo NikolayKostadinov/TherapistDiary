@@ -7,7 +7,8 @@ export const API_ENDPOINTS = {
         REGISTER: '/api/account',
         REFRESH: '/api/account/refresh',
         PROFILE: '/api/account',
-        DELETE: '/api/account/delete'
+        DELETE: '/api/account/delete',
+        CHANGE_PASSWORD: '/api/account/change-password'
     },
 
     FIREBASE: {

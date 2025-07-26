@@ -22,6 +22,7 @@ export const routes: Routes = [
         path: 'profile', children: [
             { path: '', loadComponent: () => import('./features/profile/profile/profile').then(c => c.Profile), canActivate: [AuthenticatedGuard] },
             { path: 'edit', loadComponent: () => import('./features/profile/profile-edit/profile-edit').then(c => c.ProfileEdit), canActivate: [AuthenticatedGuard] },
+            { path: 'change-password', loadComponent: () => import('./features/profile/profile-change-password/profile-change-password').then(c => c.ProfileChangePassword), canActivate: [AuthenticatedGuard] }
         ]
     },
     /*--------------------------End Of Lazy Loading Components-----------------------------*/

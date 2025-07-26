@@ -161,7 +161,7 @@ public class AccountService : IAccountService
             : Result.Failure(IdentityError(result));
     }
 
-    public async Task<Result> ChangePassword(Guid id, string oldPassword, string newPassword)
+    public async Task<Result> ChangePassword(Guid id, ChangePasswordRequest request)
     {
         var user = await _userRepository.GetByIdAsync(id);
         if (user is null)
@@ -171,14 +171,14 @@ public class AccountService : IAccountService
         }
 
         // Validate the new password
-        var passwordValidationResult = await ValidatePasswordAsync(newPassword);
+        var passwordValidationResult = await ValidatePasswordAsync(request.NewPassword);
         if (!passwordValidationResult.Succeeded)
         {
             return Result.Failure(IdentityError(passwordValidationResult, "Password"));
         }
 
         // Change the password using UserManager
-        var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+        var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
 
         if (result.Succeeded)
         {

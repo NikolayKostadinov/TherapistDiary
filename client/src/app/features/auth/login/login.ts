@@ -18,7 +18,6 @@ export class Login extends ApplicationForm {
     @Output() modalClosed = new EventEmitter<void>();
 
     loginForm: FormGroup;
-    errorMessage = signal('');
     showPassword = signal(false);
 
     constructor(
@@ -47,7 +46,7 @@ export class Login extends ApplicationForm {
     onSubmit() {
         if (this.loginForm.valid) {
             this.isLoading.set(true);
-            this.errorMessage.set('');
+            this.generalError.set('');
 
             const loginData: LoginRequest = {
                 username: this.loginForm.value.username,
@@ -60,7 +59,6 @@ export class Login extends ApplicationForm {
                     this.closeModal();
                 },
                 error: (error) => {
-                    debugger;
                     this.isLoading.set(false);
                     this.processApiErrorResponse(error);
                 }

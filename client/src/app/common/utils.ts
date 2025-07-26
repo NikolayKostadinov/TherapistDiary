@@ -157,7 +157,9 @@ export abstract class Utils {
         let generalError = '';
 
         if (apiErrors.length > 0) {
-            const { serverErrors, generalErrorsDescription } = Utils.processValidationErrors(apiErrors, form, 'Невалидни данни');
+            let { serverErrors, generalErrorsDescription } = Utils.processValidationErrors(apiErrors, form, 'Невалидни данни');
+            serverErrors = [...serverErrors]
+            generalError = generalErrorsDescription;
         } else {
             generalError = Utils.getGeneralErrorMessage(errors);
         }

@@ -37,4 +37,3 @@ export abstract class ApplicationForm {
         }
     }
 }
-git
