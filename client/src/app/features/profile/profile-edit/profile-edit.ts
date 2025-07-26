@@ -1,9 +1,9 @@
-import { Component, OnInit, Signal } from '@angular/core';
+import { Component, OnInit, Signal, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProfileServices } from '../services/profile.service';
-import { UserEditProfileModel } from '../models';
+import { UserEditProfileModel, UserProfileModel } from '../models';
 import { ProfileImageUpload } from '../profile-image-upload/profile-image-upload';
 import { AuthService } from '../../auth/services';
 import { Utils } from '../../../common/utils';
@@ -20,6 +20,7 @@ import { UserInfo } from '../../auth';
 export class ProfileEdit extends ApplicationForm implements OnInit {
 
     readonly currentUser: Signal<UserInfo | null>;
+    private formInitialized = signal(false);
 
     constructor(
         private readonly authService: AuthService,
@@ -40,30 +41,56 @@ export class ProfileEdit extends ApplicationForm implements OnInit {
         });
 
         Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+
+        effect(() => {
+            const profile = this.profileService.userProfile();
+            const isLoading = this.profileService.isLoading();
+
+            if (profile && !isLoading && !this.formInitialized()) {
+                this.loadUserProfile(profile);
+                this.formInitialized.set(true);
+            }
+        });
     }
 
     get profilePictureUrl(): string {
         return this.form.get('profilePictureUrl')?.value ?? ''
     }
 
-    ngOnInit(): void {
-        this.loadUserProfile();
+    get isTherapist(): boolean {
+        const user = this.currentUser();
+        return user?.roles?.includes('Therapist') ?? false;
     }
 
-    private loadUserProfile(): void {
-        const profile = this.profileService.userProfile();
+    ngOnInit(): void {
 
+        console.log('ProfileEdit component initialized OnInit'); // Debug log
+
+        const profile = this.profileService.userProfile();
+        const isLoading = this.profileService.isLoading();
+
+        if (profile && !isLoading && !this.formInitialized()) {
+            this.loadUserProfile(profile);
+            this.formInitialized.set(true);
+        }
+    }
+
+    private loadUserProfile(profile: UserProfileModel): void {
         if (profile) {
+            console.log('Loading profile data into form:', profile); // Debug log
+
             this.form.patchValue({
-                firstName: profile.firstName,
-                midName: profile.midName,
-                lastName: profile.lastName,
-                email: profile.email,
-                phoneNumber: profile.phoneNumber,
-                specialty: profile.specialty,
-                biography: profile.biography,
-                profilePictureUrl: profile.profilePictureUrl
+                firstName: profile.firstName || '',
+                midName: profile.midName || '',
+                lastName: profile.lastName || '',
+                email: profile.email || '',
+                phoneNumber: profile.phoneNumber || '',
+                specialty: profile.specialty || '',
+                biography: profile.biography || '',
+                profilePictureUrl: profile.profilePictureUrl || ''
             });
+
+            console.log('Form values after patch:', this.form.value); // Debug log
         }
     }
 
@@ -83,8 +110,8 @@ export class ProfileEdit extends ApplicationForm implements OnInit {
             midName: formValue.midName || null,
             lastName: formValue.lastName,
             phoneNumber: formValue.phoneNumber,
-            specialty: formValue.specialty || null,
-            biography: formValue.biography || null,
+            specialty: this.isTherapist ? (formValue.specialty || null) : null,
+            biography: this.isTherapist ? (formValue.biography || null) : null,
             profilePictureUrl: formValue.profilePictureUrl || null
         };
 

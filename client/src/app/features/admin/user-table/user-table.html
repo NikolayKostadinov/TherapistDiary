@@ -1,0 +1,103 @@
+<div class="container-fluid mt-4 mb-3 mx-auto">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="common-container">
+                <div class="common-header">
+                    <h1>Администриране на потребители</h1>
+                    <p>Управление на потребителски профили и роли</p>
+                </div>
+                @if (isLoading()) {
+                <div
+                     class="loading-container d-flex justify-content-center align-self-center">
+                    <app-spinner />
+                </div>
+                }
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Име</th>
+                            <th scope="col">Презиме</th>
+                            <th scope="col">Фамилия</th>
+                            <th scope="col">Роли</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (usersPagedList()?.items &&
+                        usersPagedList()!.items.length > 0) {
+                        @for (user of usersPagedList()!.items; track user.id) {
+                        <tr app-user-table-row
+                            [index]="$index"
+                            [user]="user"
+                            (delete)="onDeleteClick(user)"></tr>
+                        }
+                        } @else {
+                        <tr>
+                            <td colspan="6"
+                                class="text-center">
+                                @if (usersPagedList() === null) {
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Зареждане...
+                                } @else {
+                                Няма намерени потребители
+                                }
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="pager">
+                    <nav aria-label="...">
+                        <ul class="pagination">
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    << </span>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="#">1</a>
+                            </li>
+                            <li class="page-item active">
+                                <span class="page-link">2
+                                    <span class="sr-only">(current)</span>
+                                </span>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="#">3</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="#">>></a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="page-size">
+                        <label for="page-size"
+                               class="form-label">Размер на
+                            страницата</label>
+                        <select class="form-select"
+                                name="page-size"
+                                id="page-size"
+                                aria-readonly="false">
+                            @for (pageSize of pageSizes; track pageSize) {
+                            <option [value]="pageSize">{{ pageSize }} </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<app-confirmation-modal [isVisible]="showDeleteModal()"
+                        title="Изтриване на потребител"
+                        message="Сигурни ли сте, че искате да изтриете профила на '{{clickedUser()?.fullName}}'?"
+                        warningText="Това действие е необратимо! Всички ваши данни ще бъдат изтрити завинаги."
+                        confirmText="Изтрий профила"
+                        cancelText="Отказ"
+                        (confirm)="onConfirmDelete()"
+                        (cancel)="onCancelDelete()">
+</app-confirmation-modal>

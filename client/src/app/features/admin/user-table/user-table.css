@@ -1,0 +1,62 @@
+.common-container {
+    max-width: 95%;
+    min-height: 400px;
+}
+
+.list-unstyled li {
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.pager {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.pager .page-size {
+    min-width: 300px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pager .page-size label {
+    margin-bottom: 0;
+}
+
+.pager .page-size select,
+.pager .page-size .form-select {
+    padding: 0.5rem;
+    max-width: 100px;
+    border-radius: 0.25rem;
+    border: 1px solid #ced4da;
+    background-color: #fff !important;
+    height: 38px;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.pager .page-size select:not([readonly]):not([disabled]),
+.pager .page-size .form-select:not([readonly]):not([disabled]) {
+    background-color: #fff !important;
+}
+
+ul.pagination {
+    margin-bottom: 0;
+}
+
+.loading-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

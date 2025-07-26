@@ -1,0 +1,46 @@
+/* Hover dropdown стилове */
+.dropdown {
+    display: inline-block;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block !important;
+}
+
+.dropdown-menu {
+    display: none;
+    min-width: 200px;
+    margin-top: 0.125rem;
+}
+
+/* Плавен преход при показване на менюто */
+.dropdown:hover .dropdown-menu {
+    animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Задържане на менюто видимо когато мишката е върху него */
+.dropdown-menu:hover {
+    display: block !important;
+}
+
+/* Подобрен стил на бутоните */
+.btn-sm {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-sm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

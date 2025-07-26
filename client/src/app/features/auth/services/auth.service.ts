@@ -115,7 +115,7 @@ export class AuthService {
             if (refreshToken) {
                 localStorage.setItem(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
             } else {
-                localStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);
+                localStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);  
             }
         });
     }
@@ -150,8 +150,12 @@ export class AuthService {
     }
 
     private extractRoles(payload: JwtPayload): string[] {
-        if (payload.roles && Array.isArray(payload.roles)) {
-            return payload.roles;
+        if (payload.roles) {
+            if (Array.isArray(payload.roles)) {
+                return payload.roles;
+            } else if (typeof payload.roles === 'string') {
+                return [payload.roles];
+            }
         }
         return [];
     }

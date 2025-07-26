@@ -3,6 +3,8 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
+    position: relative;
+    z-index: -1;
 }
 
 .footer .footer-item a {

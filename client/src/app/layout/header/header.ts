@@ -15,6 +15,7 @@ export class Header {
     isAuthenticated = computed(() => this.authService.isLoggedIn());
     currentUser = computed(() => this.authService.currentUser());
     userName = computed(() => this.authService.currentUser()?.userName || '');
+    isAdministrator = computed(() => this.authService.currentUser()?.roles?.includes('Administrator') ?? false);
 
     // Local signals
     isScrolled = signal(false);

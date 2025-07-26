@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../models';
 import { Utils } from '../../../common/utils';
 import { ChangePasswordModel, UserEditProfileModel, UserProfileModel } from '../../profile/models';
+import { PagedResult } from '../../../common/models/paged-result.model';
 
 /**
  * Service responsible for authentication-related HTTP requests
@@ -95,6 +96,41 @@ export class AuthHttpService {
                 return throwError(() => new Error(errorMessage));
             })
         );
+    }
+
+    getAllUsers(pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<UserProfileModel>>> {
+        let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
+
+        return this.http.get<PagedResult<UserProfileModel>>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`,
+            {
+                params: params,
+                observe: 'response'
+            }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'профилните данни');
+                return throwError(() => new Error(errorMessage));
+            })
+        );
+    }
+
+    private initializeQueryParams(pageNumber: number, pageSize: number, searchTerm: string | null, sortBy: string | null, sortDescending: string | null) {
+        let params = new HttpParams()
+            .set('pageNumber', pageNumber.toString())
+            .set('pageSize', pageSize.toString());
+
+        if (searchTerm) {
+            params = params.set('searchTerm', searchTerm);
+        }
+
+        if (sortBy) {
+            params = params.set('sortBy', sortBy);
+        }
+
+        if (sortDescending !== null) {
+            params = params.set('sortDescending', sortDescending);
+        }
+        return params;
     }
 
     changePassword(userId: string, changePasswordRequest: ChangePasswordModel): Observable<HttpResponse<void>> {

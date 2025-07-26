@@ -3,7 +3,7 @@ import { Login as Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
 import { UnauthenticatedGuard } from './guards/unauthenticated.guard';
 import { PageNotFound } from './layout/page-not-found/page-not-found';
-import { AuthenticatedGuard } from './guards';
+import { AuthenticatedGuard, AdminGuard } from './guards';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -23,6 +23,11 @@ export const routes: Routes = [
             { path: '', loadComponent: () => import('./features/profile/profile/profile').then(c => c.Profile), canActivate: [AuthenticatedGuard] },
             { path: 'edit', loadComponent: () => import('./features/profile/profile-edit/profile-edit').then(c => c.ProfileEdit), canActivate: [AuthenticatedGuard] },
             { path: 'change-password', loadComponent: () => import('./features/profile/profile-change-password/profile-change-password').then(c => c.ProfileChangePassword), canActivate: [AuthenticatedGuard] }
+        ]
+    },
+    {
+        path: 'administration', children: [
+            { path: 'users', loadComponent: () => import('./features/admin/user-table/user-table').then(c => c.UserTable), canActivate: [AdminGuard] }
         ]
     },
     /*--------------------------End Of Lazy Loading Components-----------------------------*/

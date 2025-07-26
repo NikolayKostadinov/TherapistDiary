@@ -1,0 +1,29 @@
+<td>{{ index + 1 }}</td>
+<td>{{ user.firstName }}</td>
+<td>{{ user.midName || '-' }}</td>
+<td>{{ user.lastName }}</td>
+<td>{{user.rolesView }} </td>
+<td>
+    <div class="dropdown">
+        <button class="btn btn-sm btn-light text-primary me-1"
+                type="button"
+                title="Редактирай потребител">
+            <i class="fas fa-edit"></i>
+        </button>
+        <div class="dropdown-menu">
+            <a href="#"
+               class="dropdown-item">Редактирай профил</a>
+            <a href="#"
+               class="dropdown-item">Промени роли</a>
+            <a href="#"
+               class="dropdown-item">Блокирай потребител</a>
+            <a href="#"
+               class="dropdown-item">Активирай потребител</a>
+        </div>
+    </div>
+    <button class="btn btn-sm btn-light text-danger"
+            title="Изтрий потребител"
+            (click)="onDeleteClick()">
+        <i class="fas fa-trash"></i>
+    </button>
+</td>

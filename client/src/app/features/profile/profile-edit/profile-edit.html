@@ -1,8 +1,8 @@
-<div class="container register-container mt-4">
+<div class="container profile-edit-container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="profile-edit-header">
-                <h1>Редактиране на профил [{{currentUser()?.userName}}]</h1>
+                <h1>Редактиране на профил</h1>
                 <p>Актуализирайте вашата информация в Хармония</p>
             </div>
 
@@ -63,9 +63,8 @@
                     </div>
                 </div>
 
-
-
-                <!-- Professional Information -->
+                <!-- Professional Information - Only for Therapists -->
+                @if (isTherapist) {
                 <div class="form-group">
                     <label for="specialty" class="form-label">Специалност</label>
                     <input type="text" id="specialty" formControlName="specialty" class="form-control"
@@ -77,6 +76,7 @@
                     <textarea id="biography" formControlName="biography" class="form-control" rows="4"
                               placeholder="Разкажете накратко за себе си и вашия опит..."></textarea>
                 </div>
+                }
 
                 <!-- Submit Button -->
                 <div class="cmd-buttons">

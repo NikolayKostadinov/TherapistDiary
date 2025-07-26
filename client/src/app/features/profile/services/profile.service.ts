@@ -51,8 +51,6 @@ export class ProfileServices {
                 return throwError(() => error);
             })
         );
-
-
     }
 
     public deleteProfile(id: string): Observable<void> {

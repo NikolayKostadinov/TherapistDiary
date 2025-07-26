@@ -22,8 +22,8 @@
 
 <!-- Success състояние - профилът е зареден -->
 @if (userProfile() && !isLoading() && !hasError()) {
-<div class="container-fluid service">
-    <div class="container py-5">
+<div class="profile-container service">
+    <div class="container py-4 px-4">
         <div class="section-title mb-5" appScrollAnimation animationType="fadeInDown" [animationDelay]="200">
             <div class="sub-style">
                 <h4 class="sub-title px-3 mb-0">Потребителски профил</h4>
@@ -146,13 +146,13 @@
             </div>
             <div class="command-buttons">
                 <button class="btn btn-primary rounded-pill text-white py-2 px-4" routerLink="edit"><i
-                        class="fas fa-edit"></i>
+                       class="fas fa-edit"></i>
                     Редакция</button>
                 <button class="btn btn-secondary rounded-pill text-white py-2 px-4" routerLink="change-password"><i
-                        class="fas fa-lock"></i>
+                       class="fas fa-lock"></i>
                     Смяна на парола</button>
                 <button class="btn btn-danger rounded-pill text-white py-2 px-4" (click)="onDeleteClick()"><i
-                        class="far fa-trash-alt"></i>
+                       class="far fa-trash-alt"></i>
                     Изтриване</button>
             </div>
         </div>
@@ -170,7 +170,8 @@
 
 <!-- Модал за потвърждение на изтриване -->
 <app-confirmation-modal [isVisible]="showDeleteModal()" title="Изтриване на профил"
-    message="Сигурни ли сте, че искате да изтриете профила си?"
-    warningText="Това действие е необратимо! Всички ваши данни ще бъдат изтрити завинаги." confirmText="Изтрий профила"
-    cancelText="Отказ" (confirm)="onConfirmDelete()" (cancel)="onCancelDelete()">
+                        message="Сигурни ли сте, че искате да изтриете профила си?"
+                        warningText="Това действие е необратимо! Всички ваши данни ще бъдат изтрити завинаги."
+                        confirmText="Изтрий профила" cancelText="Отказ" (confirm)="onConfirmDelete()"
+                        (cancel)="onCancelDelete()">
 </app-confirmation-modal>

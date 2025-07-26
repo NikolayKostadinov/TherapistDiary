@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FirebaseService } from '../../../common/firebase/firebase.service';
 import { ToasterService } from '../../../layout';
+const SHOW_RESTRICTIONS = 'Покажи ограниченията';
+const HIDE_RESTRICTIONS = 'Скрий ограниченията';
 
 @Component({
     selector: 'app-profile-image-upload',
@@ -30,6 +32,8 @@ export class ProfileImageUpload implements ControlValueAccessor {
     imageUrl = signal<string | null>(null);
     selectedFile = signal<File | null>(null);
     previewUrl = signal<string | null>(null);
+    showRestrictions = signal(false);
+    restrictionText = signal<string>(SHOW_RESTRICTIONS);
     isDisabled = signal(false);
 
     // ControlValueAccessor properties
@@ -147,5 +151,10 @@ export class ProfileImageUpload implements ControlValueAccessor {
 
     setDisabledState(isDisabled: boolean): void {
         this.isDisabled.set(isDisabled);
+    }
+
+    onRestrictionsClick() {
+        this.showRestrictions.set(!this.showRestrictions());
+        this.restrictionText.set(this.showRestrictions() ? HIDE_RESTRICTIONS : SHOW_RESTRICTIONS);
     }
 }

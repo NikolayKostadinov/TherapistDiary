@@ -57,6 +57,10 @@
                     <a routerLink="/therapists" class="nav-item nav-link" routerLinkActive="active">Терапевти</a>
                     <a routerLink="/therapy-types" class="nav-item nav-link" routerLinkActive="active">Терапии</a>
                     <a routerLink="/about" class="nav-item nav-link" routerLinkActive="active">За нас</a>
+                    @if(isAdministrator()){
+                    <a routerLink="/administration/users" class="nav-item nav-link"
+                       routerLinkActive="active">Администриране</a>
+                    }
                     @if(isAuthenticated()){
                     <a (click)="logout()" class="nav-item nav-link" style="cursor: pointer;">Изход</a>
                     }@else {

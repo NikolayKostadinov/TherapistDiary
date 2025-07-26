@@ -20,7 +20,7 @@
         "parser": "angular",
         "htmlWhitespaceSensitivity": "ignore",
         "bracketSameLine": true,
-        "singleAttributePerLine": true,
+        "singleAttributePerLine": false,
         "insertPragma": false,
         "proseWrap": "never"
       }

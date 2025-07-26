@@ -66,7 +66,9 @@
         }
 
         <!-- Upload Instructions -->
-        @if (!previewUrl()) {
+
+        <div class="info-btn" (click)="onRestrictionsClick()">{{restrictionText()}}</div>
+        @if (showRestrictions()) {
         <div class="upload-instructions mt-3">
             <div class="instructions-card">
                 <i class="fas fa-info-circle text-primary me-2"></i>
@@ -80,6 +82,6 @@
                 </div>
             </div>
         </div>
-        }
+        } 
     </div>
 </div>

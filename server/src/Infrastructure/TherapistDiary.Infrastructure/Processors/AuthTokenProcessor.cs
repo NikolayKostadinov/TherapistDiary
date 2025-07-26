@@ -4,6 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Application.Contracts;
 using Common.Extensions;
 using Domain.Entities;
@@ -46,8 +48,8 @@ public class AuthTokenProcessor : IAuthTokenProcessor
         };
 
         var userRoles = await _userManager.GetRolesAsync(user);
-        claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
+        claims.AddRange(userRoles.Select(role => new Claim("roles", role)));
         var expires = _timeProvider.GetUtcDateTime().AddMinutes(_options.ExpirationTimeInMinutes);
 
         var token = new JwtSecurityToken(
