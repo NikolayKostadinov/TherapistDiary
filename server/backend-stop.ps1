@@ -1,73 +1,77 @@
-# Backend Stop Script - Backup Database and Stop Containers
+# Backend Demo Script - Stop Demo Environment
 param(
-    [string]$BackupName = "therapist-diary-backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+    [switch]$RemoveVolumes = $false,
+    [switch]$RemoveImages = $false,
+    [switch]$Force = $false
 )
 
-Write-Host "🛑 Stopping backend services and creating database backup..." -ForegroundColor Yellow
+Write-Host "🛑 Stopping demo backend services..." -ForegroundColor Yellow
 
-# Check if containers are running
-$runningContainers = docker ps --filter "name=server-" --format "{{.Names}}"
+# Stop and remove containers using demo compose file
+Write-Host "🐳 Stopping Demo Docker Compose services..." -ForegroundColor Cyan
 
-if (-not $runningContainers) {
-    Write-Host "⚠️ No backend containers are running." -ForegroundColor Yellow
-    exit 0
-}
-
-Write-Host "📋 Found running containers: $($runningContainers -join ', ')" -ForegroundColor Green
-
-# Create backups directory if it doesn't exist
-$backupsDir = Join-Path $PSScriptRoot "backups"
-if (-not (Test-Path $backupsDir)) {
-    New-Item -ItemType Directory -Path $backupsDir -Force | Out-Null
-    Write-Host "📁 Created backups directory: $backupsDir" -ForegroundColor Green
-}
-
-# Check if SQL Server container is running
-$sqlContainer = docker ps --filter "name=server-sql-server-1" --format "{{.Names}}"
-
-if ($sqlContainer) {
-    Write-Host "💾 Creating database backup..." -ForegroundColor Cyan
-    
-    # Set up backup directory with proper permissions
-    Write-Host "🔧 Setting up backup directory permissions..." -ForegroundColor Yellow
-    docker exec server-sql-server-1 bash -c "mkdir -p /var/opt/mssql/backup && chown mssql:mssql /var/opt/mssql/backup && chmod 755 /var/opt/mssql/backup"
-    
-    # Create backup inside the container (which is now mounted to host ./backups directory)
-    $backupPath = "/var/opt/mssql/backup/$BackupName.bak"
-    $backupCommand = "BACKUP DATABASE [TherapistDiaryDb] TO DISK = '$backupPath' WITH FORMAT, INIT, NAME = 'TherapistDiary Full Backup', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
-    
-    try {
-        # Execute backup command
-        $backupResult = docker exec server-sql-server-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "P@ssw0rd" -Q "$backupCommand" -C
-        
-        if ($LASTEXITCODE -eq 0) {
-            # Backup is automatically available in host ./backups directory due to volume mount
-            $hostBackupPath = Join-Path $backupsDir "$BackupName.bak"
-            Write-Host "✅ Database backup created successfully: $hostBackupPath" -ForegroundColor Green
-        } else {
-            Write-Host "❌ Failed to create database backup" -ForegroundColor Red
+if ($RemoveVolumes) {
+    Write-Host "⚠️ This will also remove volumes (database data will be lost)..." -ForegroundColor Red
+    if (-not $Force) {
+        $confirmation = Read-Host "Are you sure you want to remove volumes? Type 'yes' to confirm"
+        if ($confirmation -ne 'yes') {
+            Write-Host "❌ Operation cancelled" -ForegroundColor Red
+            exit 1
         }
     }
-    catch {
-        Write-Host "❌ Error during backup process: $($_.Exception.Message)" -ForegroundColor Red
-    }
+    docker compose -f docker-compose.demo.yml down -v
 } else {
-    Write-Host "⚠️ SQL Server container not found - skipping backup" -ForegroundColor Yellow
+    docker compose -f docker-compose.demo.yml down
 }
 
-# Stop all containers
-Write-Host "🛑 Stopping Docker Compose services..." -ForegroundColor Cyan
-docker compose down
-
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "✅ Backend services stopped successfully" -ForegroundColor Green
-    
-    # Clean up unused volumes (optional)
-    Write-Host "🧹 Cleaning up unused Docker resources..." -ForegroundColor Cyan
-    docker system prune -f --volumes
-    
-    Write-Host "🎉 Backend shutdown completed!" -ForegroundColor Green
-} else {
-    Write-Host "❌ Failed to stop some services" -ForegroundColor Red
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Failed to stop Docker services" -ForegroundColor Red
     exit 1
 }
+
+Write-Host "✅ Demo containers stopped successfully!" -ForegroundColor Green
+
+# Remove images if requested
+if ($RemoveImages) {
+    Write-Host "🗑️ Removing Docker images..." -ForegroundColor Cyan
+    
+    # Remove the therapist diary images
+    docker image rm nikihattan/therapist-diary-be:latest 2>$null
+    
+    if ($Force) {
+        # Force remove SQL Server image as well
+        docker image rm mcr.microsoft.com/mssql/server:2022-latest 2>$null
+        Write-Host "✅ All images removed (forced)" -ForegroundColor Green
+    } else {
+        Write-Host "✅ Demo application images removed" -ForegroundColor Green
+        Write-Host "💡 SQL Server image kept for faster future startups" -ForegroundColor Gray
+    }
+}
+
+# Show remaining containers
+$remainingContainers = docker ps -a --filter "name=server-" --format "{{.Names}}"
+if ($remainingContainers) {
+    Write-Host "⚠️ Some containers still exist (stopped):" -ForegroundColor Yellow
+    docker ps -a --filter "name=server-" --format "table {{.Names}}\t{{.Status}}"
+    
+    if ($Force) {
+        Write-Host "🗑️ Force removing all related containers..." -ForegroundColor Red
+        docker ps -a --filter "name=server-" -q | ForEach-Object { docker rm $_ }
+        Write-Host "✅ All containers removed" -ForegroundColor Green
+    }
+} else {
+    Write-Host "✅ No remaining containers" -ForegroundColor Green
+}
+
+# Show Docker system status
+Write-Host "`n📊 Docker system overview:" -ForegroundColor Cyan
+docker system df
+
+Write-Host "`n🎉 Demo backend shutdown completed!" -ForegroundColor Green
+Write-Host "💡 Next time you can start quickly with 'backend-start-demo.ps1'" -ForegroundColor Cyan
+
+Write-Host "`n💡 Shutdown Options Available:" -ForegroundColor Cyan
+Write-Host "  • Normal stop: ./backend-stop-demo.ps1" -ForegroundColor Gray
+Write-Host "  • Remove volumes: ./backend-stop-demo.ps1 -RemoveVolumes" -ForegroundColor Gray
+Write-Host "  • Remove images: ./backend-stop-demo.ps1 -RemoveImages" -ForegroundColor Gray
+Write-Host "  • Force cleanup: ./backend-stop-demo.ps1 -Force -RemoveVolumes -RemoveImages" -ForegroundColor Gray

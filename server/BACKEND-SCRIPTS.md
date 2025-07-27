@@ -41,7 +41,7 @@ Gracefully stops all backend services and creates an automatic database backup.
 
 ### Features
 
-- ✅ Automatic timestamped database backup
+- ✅ Uses docker-compose.demo.yml configuration
 - ✅ Copies backup from container to host
 - ✅ Graceful container shutdown
 - ✅ Docker cleanup (removes unused volumes)

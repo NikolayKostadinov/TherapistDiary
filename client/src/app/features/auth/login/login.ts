@@ -17,7 +17,6 @@ import { ApplicationForm } from '../../../common';
 export class Login extends ApplicationForm {
     @Output() modalClosed = new EventEmitter<void>();
 
-    loginForm: FormGroup;
     showPassword = signal(false);
 
     constructor(
@@ -25,21 +24,19 @@ export class Login extends ApplicationForm {
         private readonly authService: AuthService
     ) {
         super();
-        this.loginForm = this.fb.group({
+        this.form = this.fb.group({
             username: ['', [Validators.required, Validators.minLength(3)]],
-            password: ['', [Validators.required, Validators.minLength(6)]]
+            password: ['', [Validators.required, Validators.minLength(8)]]
         });
-
-        // Setup automatic clearing of server errors when user starts typing
-        Utils.setupClearServerErrorsOnValueChange(this.loginForm, this.serverErrors);
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
     }
 
     get username() {
-        return this.loginForm.get('username');
+        return this.form.get('username');
     }
 
     get password() {
-        return this.loginForm.get('password');
+        return this.form.get('password');
     }
 
     togglePasswordVisibility() {
@@ -47,13 +44,13 @@ export class Login extends ApplicationForm {
     }
 
     onSubmit() {
-        if (this.loginForm.valid) {
+        if (this.form.valid) {
             this.isLoading.set(true);
             this.generalError.set('');
 
             const loginData: LoginRequest = {
-                username: this.loginForm.value.username,
-                password: this.loginForm.value.password
+                username: this.form.value.username,
+                password: this.form.value.password
             };
 
             this.authService.login(loginData).subscribe({
@@ -67,7 +64,7 @@ export class Login extends ApplicationForm {
                 }
             });
         } else {
-            Utils.markFormGroupTouched(this.loginForm);
+            Utils.markFormGroupTouched(this.form);
         }
     }
 

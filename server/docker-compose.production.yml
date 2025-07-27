@@ -1,0 +1,48 @@
+services:
+    sql-server:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        environment:
+            SA_PASSWORD: "P@ssw0rd"
+            ACCEPT_EULA: "Y"
+        ports:
+            - "1433:1433"
+        volumes:
+            - sql-server-data:/var/opt/mssql
+            - ./backups:/var/opt/mssql/backup
+        networks:
+            - therapist-diary-network
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P P@ssw0rd -Q 'SELECT 1' -C"]
+            interval: 10s
+            timeout: 10s
+            retries: 5
+            start_period: 10s
+
+    therapist-diary-api:
+        image: nikihattan/therapist-diary-be:latest
+        ports:
+            - "5000:5000"
+            - "5001:5001"
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Demo
+            - ASPNETCORE_URLS=https://+:5000;http://+:5001
+            - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+            - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+            - DB_CONNECTION_STRING=Server=sql-server;Database=TherapistDiaryDb;User Id=sa;Password=P@ssw0rd;MultipleActiveResultSets=true;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30
+        volumes:
+            - ${USERPROFILE}\.aspnet\https:/https:ro
+            - ${USERPROFILE}\.microsoft\usersecrets:/root/.microsoft/usersecrets:ro
+        depends_on:
+            sql-server:
+                condition: service_healthy
+        networks:
+            - therapist-diary-network
+        restart: unless-stopped
+
+volumes:
+    sql-server-data:
+
+networks:
+    therapist-diary-network:
+        driver: bridge
