@@ -21,7 +21,10 @@ public static class DomainErrors
         return new(field, reason,
             string.Join(", ",
                 result.Errors
-                    .Select(e => e.Description)));
+                    .Select(e => e.Code == "PasswordMismatch" ?
+                            "Невалидни данни" :
+                         e.Description
+                    )));
     }
 }
 

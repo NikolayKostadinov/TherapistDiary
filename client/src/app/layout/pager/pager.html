@@ -1,0 +1,40 @@
+<div class="pager">
+    <nav aria-label="...">
+        <ul class="pagination">
+            <li class="page-item" [ngClass]="{'disabled': !hasPreviousPage}">
+                <button class="page-link"
+                        (click)="onPreviousPageClick()">
+                    << </button>
+            </li>
+            @for (pageNum of pages(); track $index) {
+            <li class="page-item"
+                [ngClass]="{'active': pageNum === page}">
+                <button class="page-link"
+                        (click)="onPageClick(pageNum)">{{pageNum}}</button>
+            </li>
+            }
+            <li class="page-item" [ngClass]="{'disabled': !hasNextPage}">
+                <button class="page-link"
+                        
+                        (click)="onNextPageClick()"> >> </button>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="page-size">
+        <label for="page-size"
+               class="form-label">Размер на
+            страницата</label>
+        <select class="form-select"
+                name="page-size"
+                id="page-size"
+                [value]="pageSize"
+                aria-readonly="false"
+                (change)="onPageSizeChange($event)">
+            @for (size of pageSizes(); track size) {
+            <option [value]="size"
+                    [selected]="size === pageSize">{{ size }}</option>
+            }
+        </select>
+    </div>
+</div>

@@ -15,10 +15,10 @@ import { ApplicationForm, VALIDATION_PATTERNS } from '../../../common';
     styleUrl: './register.css'
 })
 export class Register extends ApplicationForm {
-    constructor(      
+    constructor(
         private readonly authService: AuthService,
         private readonly router: Router,
-       ) {
+    ) {
         super();
         this.form = this.fb.group({
             userName: ['', [Validators.required, Validators.minLength(3)]],
@@ -34,6 +34,7 @@ export class Register extends ApplicationForm {
         });
 
         Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+        Utils.setupClearPasswordMismatchError(this.form);
     }
 
     onSubmit(): void {
@@ -67,24 +68,16 @@ export class Register extends ApplicationForm {
                 } else {
                     this.router.navigate(['/auth/login']);
                 }
+
+                this.isLoading.set(false);
             },
             error: (error) => {
-                const convertedError = error as ApiErrorResponse;
-                if (convertedError) {
-                    const { serverErrors, generalError } = Utils.handleError(convertedError, this.form);
-                    this.serverErrors.set(serverErrors);
-                    this.generalError.set(generalError);
-                } else {
-                    this.toaster.error('Възникна грешка при регистрацията. Моля, опитайте отново.');
-                    console.error('Registration error:', error);
-                }
-            },
-            complete: () => {
                 this.isLoading.set(false);
+                this.processApiErrorResponse(error);
             }
         });
     }
-   
+
 
     private passwordMatchValidator(form: FormGroup) {
         const password = form.get('password');

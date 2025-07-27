@@ -1,6 +1,6 @@
 import { Component, signal, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { LoginRequest } from '../models';
@@ -29,6 +29,9 @@ export class Login extends ApplicationForm {
             username: ['', [Validators.required, Validators.minLength(3)]],
             password: ['', [Validators.required, Validators.minLength(6)]]
         });
+
+        // Setup automatic clearing of server errors when user starts typing
+        Utils.setupClearServerErrorsOnValueChange(this.loginForm, this.serverErrors);
     }
 
     get username() {

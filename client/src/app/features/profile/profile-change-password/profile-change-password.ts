@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ApplicationForm } from '../../../common';
+import { ApplicationForm, Utils } from '../../../common';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileServices } from '../services/profile.service';
 import { Router } from '@angular/router';
 
@@ -29,25 +29,29 @@ export class ProfileChangePassword extends ApplicationForm implements OnInit {
 
     private initializeForm(): void {
         this.form = this.fb.group({
-            currentPassword: ['', [Validators.required, Validators.minLength(6)]],
-            newPassword: ['', [Validators.required, Validators.minLength(6)]],
+            currentPassword: ['', [Validators.required, Validators.minLength(8)]],
+            newPassword: ['', [Validators.required, Validators.minLength(8)]],
             confirmPassword: ['', [Validators.required]]
         }, { validators: this.passwordMatchValidator });
+
+        // Setup automatic clearing of server errors when user starts typing
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+
+        // Clear password mismatch errors when user starts typing
+        Utils.setupClearPasswordMismatchError(this.form, 'newPassword', 'confirmPassword');
     }
 
-    private passwordMatchValidator(form: any) {
+    private passwordMatchValidator(form: FormGroup) {
         const newPassword = form.get('newPassword');
         const confirmPassword = form.get('confirmPassword');
 
         if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
-            confirmPassword.setErrors({ passwordMismatch: true });
-            return { passwordMismatch: true };
+            const passwordMatchError = { mismatch: true };
+            confirmPassword.setErrors(passwordMatchError);
+            return passwordMatchError;
         }
 
-        if (confirmPassword?.hasError('passwordMismatch')) {
-            confirmPassword.setErrors(null);
-        }
-
+        confirmPassword?.setErrors(null);
         return null;
     }
 
@@ -92,34 +96,5 @@ export class ProfileChangePassword extends ApplicationForm implements OnInit {
 
     onCancel(): void {
         this.router.navigate(['/profile']);
-    }
-
-    // Helper methods for template
-    override getFieldError(fieldName: string): string {
-        const field = this.form.get(fieldName);
-        if (field?.errors && field.touched) {
-            if (field.errors['required']) {
-                return `${this.getFieldDisplayName(fieldName)} е задължително поле`;
-            }
-            if (field.errors['minlength']) {
-                return `${this.getFieldDisplayName(fieldName)} трябва да е поне ${field.errors['minlength'].requiredLength} символа`;
-            }
-            if (field.errors['passwordMismatch']) {
-                return 'Паролите не съвпадат';
-            }
-        }
-        return '';
-    } private getFieldDisplayName(fieldName: string): string {
-        const displayNames: { [key: string]: string } = {
-            currentPassword: 'Текущата парола',
-            newPassword: 'Новата парола',
-            confirmPassword: 'Потвърждението на паролата'
-        };
-        return displayNames[fieldName] || fieldName;
-    }
-
-    hasFieldError(fieldName: string): boolean {
-        const field = this.form.get(fieldName);
-        return !!(field?.errors && field.touched);
     }
 }

@@ -1,9 +1,12 @@
-export interface PagedResult<T> {
+export interface PagedResult<T> extends PagerModel {
     items: T[],
-    TotalCount: number
-    Page: number;
-    PageSize: number;
-    TotalPages: number;
-    HasNextPage: boolean;
-    HasPreviousPage: boolean;
+}
+
+export interface PagerModel {
+    totalCount: number
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
 }

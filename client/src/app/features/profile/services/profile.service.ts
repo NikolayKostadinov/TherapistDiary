@@ -117,9 +117,7 @@ export class ProfileServices {
         return this.authHttpService.changePassword(currentUser.id, changePasswordRequest).pipe(
             map(() => void 0), // Return void
             catchError((error) => {
-                const errorMessage = Utils.getErrorMessage(error, 'смяна на паролата');
-                this._errorMessage.set(errorMessage);
-                return throwError(() => new Error(errorMessage));
+                return throwError(() => error);
             })
         );
     }

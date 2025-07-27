@@ -55,6 +55,17 @@ export abstract class Utils {
         return `Възникна неочаквана грешка при зареждане на ${context}.`;
     }
 
+    static handleError(errors: ApiErrorResponse, form: FormGroup): { serverErrors: ValidationError[], generalError: string } {
+
+        const apiErrors = Utils.extractApiErrors(errors);
+        if (apiErrors.length > 0) {
+            return Utils.processValidationErrors(apiErrors, form, 'Невалидни данни');
+        } else {
+            let generalError = Utils.getGeneralErrorMessage(errors);
+            return { serverErrors: [], generalError };
+        }
+    }
+
     static setupClearServerErrorsOnValueChange(
         form: FormGroup,
         serverErrors: WritableSignal<ValidationError[]>,
@@ -74,7 +85,40 @@ export abstract class Utils {
         });
     }
 
-    static isKnownFormField(fieldName: string, form: FormGroup): boolean {
+    static setupClearPasswordMismatchError(form: FormGroup, passwordField: string = 'password', confirmPasswordField: string = 'confirmPassword'): void {
+        const passwordControl = form.get(passwordField);
+        const confirmPasswordControl = form.get(confirmPasswordField);
+
+        if (!passwordControl || !confirmPasswordControl) {
+            return;
+        }
+
+        // Clear mismatch error when user types in password field
+        passwordControl.valueChanges.subscribe(() => {
+            if (confirmPasswordControl.hasError('mismatch')) {
+                const currentErrors = confirmPasswordControl.errors;
+                if (currentErrors) {
+                    delete currentErrors['mismatch'];
+                    const hasOtherErrors = Object.keys(currentErrors).length > 0;
+                    confirmPasswordControl.setErrors(hasOtherErrors ? currentErrors : null);
+                }
+            }
+        });
+
+        // Clear mismatch error when user types in confirmPassword field
+        confirmPasswordControl.valueChanges.subscribe(() => {
+            if (confirmPasswordControl.hasError('mismatch')) {
+                const currentErrors = confirmPasswordControl.errors;
+                if (currentErrors) {
+                    delete currentErrors['mismatch'];
+                    const hasOtherErrors = Object.keys(currentErrors).length > 0;
+                    confirmPasswordControl.setErrors(hasOtherErrors ? currentErrors : null);
+                }
+            }
+        });
+    }
+
+    private static isKnownFormField(fieldName: string, form: FormGroup): boolean {
         const formFields = Object.keys(form.controls) || [];
         const fieldNameLower = fieldName.toLowerCase();
 
@@ -122,10 +166,9 @@ export abstract class Utils {
         return [];
     }
 
-    static processValidationErrors(apiErrors: ValidationError[], form: FormGroup, genericMessage: string = 'Възникна грешка'): { serverErrors: ValidationError[], generalErrorsDescription: string } {
+    private static processValidationErrors(apiErrors: ValidationError[], form: FormGroup, genericMessage: string = 'Възникна грешка'): { serverErrors: ValidationError[], generalError: string } {
         const serverErrors: ValidationError[] = [];
         const generalErrors: ValidationError[] = [];
-
         apiErrors.forEach(err => {
             if (Utils.isKnownFormField(err.field, form)) {
                 serverErrors.push(err);
@@ -134,11 +177,11 @@ export abstract class Utils {
             }
         });
 
-        const generalErrorsDescription = generalErrors.length > 0
+        const generalError = generalErrors.length > 0
             ? generalErrors.map(e => e.message).join('; ')
             : genericMessage;
 
-        return { serverErrors, generalErrorsDescription };
+        return { serverErrors, generalError };
     }
 
     static getGeneralErrorMessage(error: ApiError): string {
@@ -151,19 +194,5 @@ export abstract class Utils {
         }
     }
 
-    static handleError(errors: ApiErrorResponse, form: FormGroup): { serverErrors: ValidationError[], generalError: string } {
-        const apiErrors = Utils.extractApiErrors(errors);
-        let serverErrors: ValidationError[] = [];
-        let generalError = '';
 
-        if (apiErrors.length > 0) {
-            let { serverErrors, generalErrorsDescription } = Utils.processValidationErrors(apiErrors, form, 'Невалидни данни');
-            serverErrors = [...serverErrors]
-            generalError = generalErrorsDescription;
-        } else {
-            generalError = Utils.getGeneralErrorMessage(errors);
-        }
-
-        return { serverErrors, generalError };
-    }
 }

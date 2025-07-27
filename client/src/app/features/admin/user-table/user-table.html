@@ -28,7 +28,7 @@
                         usersPagedList()!.items.length > 0) {
                         @for (user of usersPagedList()!.items; track user.id) {
                         <tr app-user-table-row
-                            [index]="$index"
+                            [index]="pageOffset() + $index  + 1"
                             [user]="user"
                             (delete)="onDeleteClick(user)"></tr>
                         }
@@ -47,47 +47,10 @@
                         }
                     </tbody>
                 </table>
-                <div class="pager">
-                    <nav aria-label="...">
-                        <ul class="pagination">
-                            <li class="page-item disabled">
-                                <span class="page-link">
-                                    << </span>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="#">1</a>
-                            </li>
-                            <li class="page-item active">
-                                <span class="page-link">2
-                                    <span class="sr-only">(current)</span>
-                                </span>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="#">3</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="#">>></a>
-                            </li>
-                        </ul>
-                    </nav>
-
-                    <div class="page-size">
-                        <label for="page-size"
-                               class="form-label">Размер на
-                            страницата</label>
-                        <select class="form-select"
-                                name="page-size"
-                                id="page-size"
-                                aria-readonly="false">
-                            @for (pageSize of pageSizes; track pageSize) {
-                            <option [value]="pageSize">{{ pageSize }} </option>
-                            }
-                        </select>
-                    </div>
-                </div>
+                <app-pager [pager]="usersPager()"
+                           [pageSizes]="pageSizes"
+                           (pageSizeChange)="onPageSizeChange($event)"
+                           (pageChange)="onPageChange($event)" />
             </div>
         </div>
     </div>

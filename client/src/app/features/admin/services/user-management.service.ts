@@ -29,13 +29,13 @@ export class UserManagementService {
         return this._isLoading.asReadonly();
     }
 
-    public loadUsers(): void {
+    public loadUsers(pageNumber: number = 1, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): void {
         this._isLoading.set(true);
-        this.authHttpService.getAllUsers(1, 100)
+        this.authHttpService.getAllUsers(pageNumber, pageSize, searchTerm, sortBy, sortDescending)
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
-                map(response => {
-                    return response ? <PagedResult<UserListModel> | null>{
+                map(response => response
+                    ? <PagedResult<UserListModel> | null>{
                         ...response.body!,
                         items: response.body!.items.map(user => {
                             return ({
@@ -45,8 +45,8 @@ export class UserManagementService {
                                     : '-'
                             }) as UserListModel;
                         })
-                    } : null;
-                }),
+                    }
+                    : null),
                 catchError((error) => {
                     return throwError(() => error);
                 })
