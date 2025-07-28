@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Appointments\Commands\" />
       <Folder Include="Infrastructure\" />
     </ItemGroup>
 

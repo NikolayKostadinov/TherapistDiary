@@ -11,6 +11,7 @@ namespace TherapistDiary.Domain.Shared;
 using System.Text.RegularExpressions;
 using Common.Extensions;
 using static Common.Constants.GlobalConstants;
+using TherapistDiary.Common.Extensions;
 
 public static class Validator
 {
@@ -242,6 +243,5 @@ public static class Validator
     {
         return () => value.CompareTo(limit) <= 0  ;
     }
-
 
 }

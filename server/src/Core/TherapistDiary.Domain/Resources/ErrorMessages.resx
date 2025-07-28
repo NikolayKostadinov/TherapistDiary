@@ -57,4 +57,10 @@
     <data name="USER_NOT_FOUND" xml:space="preserve">
         <value>User with Id: '{0}' not found!</value>
     </data>
+    <data name="DATE_MUST_BE_TODAY_OR_LATER" xml:space="preserve">
+        <value>The date must be today or later.</value>
+    </data>
+    <data name="BEGIN_MUST_BE_BEFORE_START" xml:space="preserve">
+        <value>The start time must be before the end time.</value>
+    </data>
 </root>

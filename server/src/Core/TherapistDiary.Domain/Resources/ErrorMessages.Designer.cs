@@ -60,6 +60,24 @@ namespace TherapistDiary.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The start time must be before the end time..
+        /// </summary>
+        public static string BEGIN_MUST_BE_BEFORE_START {
+            get {
+                return ResourceManager.GetString("BEGIN_MUST_BE_BEFORE_START", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The date must be today or later..
+        /// </summary>
+        public static string DATE_MUST_BE_TODAY_OR_LATER {
+            get {
+                return ResourceManager.GetString("DATE_MUST_BE_TODAY_OR_LATER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The phone number you have entered {0} was invalid!.
         /// </summary>
         public static string INVALID_BULGARIAN_PHONE {
