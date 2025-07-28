@@ -114,6 +114,31 @@ export class AuthHttpService {
         );
     }
 
+
+    addRoleToUser(id: string, role: string) {
+        return this.http.patch<void>(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.ADD_TO_ROLE}/${id}/${role}`,
+            { observe: 'response' }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'добавяне на роля');
+                return throwError(() => new Error(errorMessage));
+            })
+        );
+    }
+    removeRoleFromUser(id: string, role: string) {
+        return this.http.patch<void>(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REMOVE_FROM_ROLE}/${id}/${role}`,
+            { observe: 'response' }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'премахване на роля');
+                return throwError(() => new Error(errorMessage));
+            })
+        );
+    }
+
+
     private initializeQueryParams(pageNumber: number, pageSize: number, searchTerm: string | null, sortBy: string | null, sortDescending: string | null) {
         let params = new HttpParams()
             .set('pageNumber', pageNumber.toString())

@@ -37,17 +37,17 @@ public class UserRepository : IUserRepository
             .Include(x=>x.UserRoles)
             .ThenInclude(r=>r.Role)
             .AsQueryable();
-        var totalCount = query.Count();
-        var totalPages = totalCount / parameters.PageSize + (totalCount % parameters.PageSize > 0 ? 1 : 0);
 
         // Apply filtering
         if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
         {
             var searchTermLower = parameters.SearchTerm.ToLower();
             query = query.Where(p =>
+                EF.Functions.Like(p.UserName, $"%{parameters.SearchTerm}%") ||
                 EF.Functions.Like(p.FirstName, $"%{parameters.SearchTerm}%") ||
                 EF.Functions.Like(p.MidName ?? "", $"%{parameters.SearchTerm}%") ||
                 EF.Functions.Like(p.LastName, $"%{parameters.SearchTerm}%") ||
+                EF.Functions.Like(p.Email, $"%{parameters.SearchTerm}%") ||
                 EF.Functions.Like(p.PhoneNumber, $"%{parameters.SearchTerm}%"));
         }
 
@@ -59,6 +59,10 @@ public class UserRepository : IUserRepository
                 "firstname" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.FirstName)
                     : query.OrderBy(p => p.FirstName),
+
+                "midname" => parameters.SortDescending ?? false
+                    ? query.OrderByDescending(p => p.MidName)
+                    : query.OrderBy(p => p.MidName),
 
                 "lastname" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.LastName)
@@ -73,6 +77,8 @@ public class UserRepository : IUserRepository
         }
 
         // Apply pagination
+        var totalCount = query.Count();
+        var totalPages = totalCount / parameters.PageSize + (totalCount % parameters.PageSize > 0 ? 1 : 0);
 
         return (await query.AsQueryable()
             .Skip((parameters.PageNumber - 1) * parameters.PageSize)

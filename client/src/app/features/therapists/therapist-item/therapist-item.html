@@ -1,6 +1,6 @@
 <div class="therapists-item rounded" [routerLink]="['/therapists', 'details', therapist.id]">
     <div class="therapists-img rounded-top h-100">
-        <img [src]="therapist.profilePictureUrl" class="img-fluid rounded-top w-100" alt="">
+        <img [src]="therapist.profilePictureUrl ? therapist.profilePictureUrl : 'img/no-profile.jpg'" class="img-fluid rounded-top w-100" alt="">
         <div class="therapists-icon d-flex justify-content-center">
             <a class="btn btn-primary rounded-pill text-white" href=""><i class="fa fa-calendar"></i>
                 Запазете час</a>

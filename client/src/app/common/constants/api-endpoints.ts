@@ -8,7 +8,9 @@ export const API_ENDPOINTS = {
         REFRESH: '/api/account/refresh',
         PROFILE: '/api/account',
         DELETE: '/api/account/delete',
-        CHANGE_PASSWORD: '/api/account/change-password'
+        CHANGE_PASSWORD: '/api/account/change-password',
+        ADD_TO_ROLE: '/api/Account/add-role',
+        REMOVE_FROM_ROLE: '/api/Account/remove-role',
     },
 
     FIREBASE: {

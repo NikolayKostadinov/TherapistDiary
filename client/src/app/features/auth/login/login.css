@@ -163,3 +163,21 @@
 .error-mesage {
     text-align: center;
 }
+
+.show-hide-password-btn {
+    color: var(--bs-disabled);
+    z-index: 10;
+    top: -10px
+}
+
+.show-hide-password-btn:focus,
+.show-hide-password-btn:hover {
+    outline: none;
+    background-color: transparent;
+    box-shadow: none;
+    color: var(--bs-disabled) !important;
+}
+
+.is-invalid .show-hide-password-btn {
+    transform: translateY(-100%) !important;
+}

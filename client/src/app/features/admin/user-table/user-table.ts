@@ -1,28 +1,37 @@
 import { AfterViewInit, Component, OnInit, signal, Signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { UserManagementService } from '../services/user-management.service';
 import { ApiError, ConfirmationModal, PagedResult, PagerModel, Utils } from '../../../common';
 import { UserListModel } from '../../profile/models/user-list.model';
-import { ToasterService, Spinner } from '../../../layout';
+import { ToasterService } from '../../../layout';
 import { UserTableRow } from "../user-table-row/user-table-row";
 import { Pager } from '../../../layout/pager/pager';
+import { ToggleRoleModel } from '../models/toggle-role.model';
 
 @Component({
     selector: 'app-user-table',
-    imports: [ReactiveFormsModule, CommonModule, ConfirmationModal, Spinner, UserTableRow, Pager],
+    imports: [CommonModule, ConfirmationModal, UserTableRow, Pager],
     templateUrl: './user-table.html',
     styleUrl: './user-table.css'
 })
 export class UserTable implements OnInit, AfterViewInit {
-    protected pageSizes = [2, 10, 50, 100];
-    protected pageSize = 2;
+
+    protected pageSizes = [10, 50, 100];
+    protected pageSize = 10;
     protected usersPagedList: Signal<PagedResult<UserListModel> | null>;
     protected usersPager: Signal<PagerModel | null>;
     protected clickedUser = signal<UserListModel | null>(null);
     protected showDeleteModal = signal(false);
     protected isLoading: Signal<boolean>;
     protected pageOffset: Signal<number>;
+
+    // Search functionality  
+    protected searchTerm = signal<string>('');
+    private searchTimeout: any = null;
+
+    // Sorting functionality
+    protected sortBy = signal<string | null>(null);
+    protected sortDescending = signal<boolean>(false);
 
     constructor(
         private readonly userManagementServise: UserManagementService,
@@ -31,7 +40,6 @@ export class UserTable implements OnInit, AfterViewInit {
         this.usersPagedList = this.userManagementServise.usersPagedList;
         this.usersPager = computed(() => {
             const pagedList = this.usersPagedList();
-            console.log('Computing usersPager with pagedList:', pagedList);
 
             if (!pagedList) return null;
 
@@ -44,7 +52,6 @@ export class UserTable implements OnInit, AfterViewInit {
                 hasPreviousPage: pagedList.hasPreviousPage
             } as PagerModel;
 
-            console.log('Computed pagerModel:', pagerModel);
             return pagerModel;
         });
         this.pageOffset = computed(() => {
@@ -63,7 +70,38 @@ export class UserTable implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        this.userManagementServise.loadUsers(1, 2); // Променям от 2 на 10
+        this.userManagementServise.loadUsers(1, this.pageSize); // Променям от 2 на 10
+    }
+
+    onSortColumn(column: string): void {
+        if (this.sortBy() === column) {
+            if (!this.sortDescending()) {
+                // First click: ascending -> descending
+                this.sortDescending.set(true);
+            } else {
+                // Second click: descending -> no sorting
+                this.sortBy.set(null);
+                this.sortDescending.set(false);
+            }
+        } else {
+            // New column: start with ascending
+            this.sortBy.set(column);
+            this.sortDescending.set(false);
+        }
+
+        // Apply the sort
+        this.performSort();
+    }
+
+    private performSort(): void {
+        const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
+        this.userManagementServise.loadUsers(
+            1, // Reset to first page when sorting
+            currentPageSize,
+            this.searchTerm(),
+            this.sortBy(),
+            this.sortBy() ? (this.sortDescending() ? 'true' : 'false') : null
+        );
     }
 
     onDeleteClick(user: UserListModel): void {
@@ -92,15 +130,67 @@ export class UserTable implements OnInit, AfterViewInit {
     }
 
     onPageSizeChange(pageSize: number): void {
-        console.log("onPageSizeChange: ", pageSize);
         // Зареждаме първата страница с новия размер
-        this.userManagementServise.loadUsers(1, pageSize);
+        this.userManagementServise.loadUsers(1, pageSize, this.searchTerm(), this.sortBy(), this.sortBy() ? (this.sortDescending() ? 'true' : 'false') : null);
     }
 
     onPageChange(page: number): void {
         console.log("onPageChange: ", page);
         // Зареждаме новата страница със същия размер
         const currentPageSize = this.usersPagedList()?.pageSize ?? 10;
-        this.userManagementServise.loadUsers(page, currentPageSize);
+        this.userManagementServise.loadUsers(page, currentPageSize, this.searchTerm(), this.sortBy(), this.sortBy() ? (this.sortDescending() ? 'true' : 'false') : null);
+    }
+
+
+    onClearSearch(): void {
+        this.searchTerm.set('');
+        const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
+        this.userManagementServise.loadUsers(1, currentPageSize, null, this.sortBy(), this.sortBy() ? (this.sortDescending() ? 'true' : 'false') : null);
+    }
+
+    onSearchInput(event: Event): void {
+        const target = event.target as HTMLInputElement;
+        const value = target.value;
+
+        // Clear previous timeout
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+        }
+
+        // Set new timeout for debounced search
+        this.searchTimeout = setTimeout(() => {
+            this.searchTerm.set(value);
+            this.performSearch();
+        }, 300);
+    }
+
+
+    onToggleRole($event: ToggleRoleModel): void {
+        this.userManagementServise.toggleUserRole($event.user.id, $event.role).subscribe({
+            next: () => {
+                this.toaster.success(`Ролята на потребителя '${$event.user.fullName}' беше успешно променена на '${$event.role}'`);
+            },
+            error: (error: ApiError) => {
+                const errorDescription = Utils.getGeneralErrorMessage(error);
+                this.toaster.error(errorDescription);
+            }
+        });
+    }
+    private performSearch(): void {
+        // Reset to first page when searching
+        const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
+        this.userManagementServise.loadUsers(1, currentPageSize, this.searchTerm(), this.sortBy(), this.sortBy() ? (this.sortDescending() ? 'true' : 'false') : null);
+    }
+
+    getSortIcon(column: string): string {
+        if (this.sortBy() !== column) {
+            return '';
+        }
+        return this.sortDescending() ? 'fas fa-arrow-up text-primary' : 'fas fa-arrow-down text-primary';
+    }
+
+    isSortable(column: string): boolean {
+        const sortableColumns = ['firstName', 'midName', 'lastName', 'phoneNumber'];
+        return sortableColumns.includes(column);
     }
 }

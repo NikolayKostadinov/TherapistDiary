@@ -1,14 +1,10 @@
 <!-- Modal Backdrop -->
 <div class="modal-backdrop">
     <!-- Modal Dialog -->
-    <div class="modal-dialog"
-         (click)="onModalContentClick($event)">
+    <div class="modal-dialog" (click)="onModalContentClick($event)">
         <div class="card shadow-lg border-0 rounded-4 modal-content">
             <!-- Close Button -->
-            <button type="button"
-                    class="btn-close position-absolute"
-                    (click)="closeModal()"
-                    aria-label="Затвори">
+            <button type="button" class="btn-close position-absolute" (click)="closeModal()" aria-label="Затвори">
                 <i class="fas fa-times"></i>
             </button>
 
@@ -16,8 +12,7 @@
                 <!-- Header -->
                 <div class="text-center mb-4">
                     <div class="mb-3">
-                        <i class="fas fa-dove text-primary"
-                           style="font-size: 3rem;"></i>
+                        <i class="fas fa-dove text-primary" style="font-size: 3rem;"></i>
                     </div>
                     <h2 class="card-title fw-bold text-primary mb-1">Добре дошли
                         отново</h2>
@@ -26,29 +21,21 @@
 
                 <!-- Error Message -->
                 @if (generalError()) {
-                <div class="alert alert-danger d-flex align-items-center mb-4"
-                     role="alert">
+                <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     <div class="error-mesage">{{ generalError()}}</div>
                 </div>
                 }
 
                 <!-- Login Form -->
-                <form [formGroup]="form"
-                      (ngSubmit)="onSubmit()"
-                      novalidate>
+                <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
                     <!-- Username Field -->
                     <div class="mb-3">
-                        <label for="username"
-                               class="form-label fw-semibold">
-                            <i
-                               class="fas fa-user me-2 text-primary"></i>Потребителско
+                        <label for="username" class="form-label fw-semibold">
+                            <i class="fas fa-user me-2 text-primary"></i>Потребителско
                             име
                         </label>
-                        <input type="text"
-                               class="form-control form-control-lg"
-                               id="username"
-                               formControlName="username"
+                        <input type="text" class="form-control form-control-lg" id="username" formControlName="username"
                                placeholder="Въведете вашето потребителско име"
                                [class.is-invalid]="getFieldError('username')">
                         <div class="invalid-feedback">{{
@@ -57,25 +44,20 @@
 
                     <!-- Password Field -->
                     <div class="mb-3">
-                        <label for="password"
-                               class="form-label fw-semibold">
+                        <label for="password" class="form-label fw-semibold">
                             <i class="fas fa-lock me-2 text-primary"></i>Парола
                         </label>
                         <div class="position-relative">
                             <input [type]="showPassword() ? 'text' : 'password'"
-                                   class="form-control form-control-lg pe-5"
-                                   id="password"
-                                   formControlName="password"
-                                   placeholder="Въведете вашата парола"
-                                   [class.is-invalid]="getFieldError('password')">
+                                   class="form-control form-control-lg pe-5" id="password" formControlName="password"
+                                   placeholder="Въведете вашата парола" [class.is-invalid]="getFieldError('password')">
                             <div class="invalid-feedback">{{
                                 getFieldError('password') }}</div>
                             <button type="button"
-                                    class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
-                                    (click)="togglePasswordVisibility()"
-                                    style="border: none; background: none;">
-                                <i [class]="showPassword() ? 'fas fa-eye-slash' : 'fas fa-eye'"
-                                   class="text-muted"></i>
+                                    class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-3 p-0 show-hide-password-btn"
+                                    (click)="togglePasswordVisibility()" style="border: none; background: none;"
+                                    tabindex="-1">
+                                <i [class]="showPassword() ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-muted"></i>
                             </button>
                         </div>
 
@@ -88,9 +70,7 @@
                                 class="btn btn-primary w-75 mx-auto my-3 mx-auto rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0 align-self-center"
                                 [disabled]="isLoading()">
                             @if (isLoading()) {
-                            <span class="spinner-border spinner-border-sm me-2"
-                                  role="status"
-                                  aria-hidden="true"></span>
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                             Влизане...
                             } @else {
                             <i class="fas fa-sign-in-alt me-2"></i>
@@ -105,8 +85,7 @@
                 <div class="text-center">
                     <p class="text-muted mb-0">
                         Нямате профил?
-                        <a class="text-primary text-decoration-none fw-semibold"
-                           (click)="goToRegister()"> Регистрирайте
+                        <a class="text-primary text-decoration-none fw-semibold" (click)="goToRegister()"> Регистрирайте
                             се </a>
                     </p>
                 </div>

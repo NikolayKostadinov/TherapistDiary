@@ -6,19 +6,70 @@
                     <h1>Администриране на потребители</h1>
                     <p>Управление на потребителски профили и роли</p>
                 </div>
-                @if (isLoading()) {
-                <div
-                     class="loading-container d-flex justify-content-center align-self-center">
-                    <app-spinner />
+
+                <!-- Search Section -->
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-6 search-wrapper">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control search-input" [value]="searchTerm()"
+                                   (input)="onSearchInput($event)" placeholder="Търсене по име, email, телефон..."
+                                   aria-label="Търсене на потребители">
+                            @if (searchTerm()) {
+                            <button type="button" class="btn btn-outline-danger btn-clear" (click)="onClearSearch()"
+                                    title="Изчисти търсенето">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        @if (searchTerm()) {
+                        <small class="text-muted">
+                            Търсене за: "<strong>{{ searchTerm() }}</strong>"
+                        </small>
+                        }
+                    </div>
                 </div>
-                }
+
+                <!-- Table Section -->
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Име</th>
-                            <th scope="col">Презиме</th>
-                            <th scope="col">Фамилия</th>
+                            <th scope="col">Снимка</th>
+                            <th scope="col">Потребител</th>
+                            <th scope="col">Email</th>
+                            <th scope="col" class="sortable-header" (click)="onSortColumn('firstName')"
+                                [class.cursor-pointer]="isSortable('firstName')">
+                                Име
+                                @if (getSortIcon('firstName')) {
+                                <i [class]="getSortIcon('firstName')"></i>
+                                }
+                            </th>
+                            <th scope="col" class="sortable-header" (click)="onSortColumn('midName')"
+                                [class.cursor-pointer]="isSortable('midName')">
+                                Презиме
+                                @if (getSortIcon('midName')) {
+                                <i [class]="getSortIcon('midName')"></i>
+                                }
+                            </th>
+                            <th scope="col" class="sortable-header" (click)="onSortColumn('lastName')"
+                                [class.cursor-pointer]="isSortable('lastName')">
+                                Фамилия
+                                @if (getSortIcon('lastName')) {
+                                <i [class]="getSortIcon('lastName')"></i>
+                                }
+                            </th>
+                            <th scope="col" class="sortable-header" (click)="onSortColumn('phoneNumber')"
+                                [class.cursor-pointer]="isSortable('phoneNumber')">
+                                Телефон
+                                @if (getSortIcon('phoneNumber')) {
+                                <i [class]="getSortIcon('phoneNumber')"></i>
+                                }
+                            </th>
                             <th scope="col">Роли</th>
                             <th></th>
                         </tr>
@@ -27,16 +78,13 @@
                         @if (usersPagedList()?.items &&
                         usersPagedList()!.items.length > 0) {
                         @for (user of usersPagedList()!.items; track user.id) {
-                        <tr app-user-table-row
-                            [index]="pageOffset() + $index  + 1"
-                            [user]="user"
-                            (delete)="onDeleteClick(user)"></tr>
+                        <tr app-user-table-row [index]="pageOffset() + $index  + 1" [user]="user"
+                            (delete)="onDeleteClick(user)" (toggleRole)="onToggleRole($event)"></tr>
                         }
                         } @else {
                         <tr>
-                            <td colspan="6"
-                                class="text-center">
-                                @if (usersPagedList() === null) {
+                            <td colspan="6" class="text-center">
+                                @if (isLoading()) {
                                 <i class="fas fa-spinner fa-spin"></i>
                                 Зареждане...
                                 } @else {
@@ -47,20 +95,15 @@
                         }
                     </tbody>
                 </table>
-                <app-pager [pager]="usersPager()"
-                           [pageSizes]="pageSizes"
-                           (pageSizeChange)="onPageSizeChange($event)"
+                <app-pager [pager]="usersPager()" [pageSizes]="pageSizes" (pageSizeChange)="onPageSizeChange($event)"
                            (pageChange)="onPageChange($event)" />
             </div>
         </div>
     </div>
 </div>
-<app-confirmation-modal [isVisible]="showDeleteModal()"
-                        title="Изтриване на потребител"
+<app-confirmation-modal [isVisible]="showDeleteModal()" title="Изтриване на потребител"
                         message="Сигурни ли сте, че искате да изтриете профила на '{{clickedUser()?.fullName}}'?"
                         warningText="Това действие е необратимо! Всички ваши данни ще бъдат изтрити завинаги."
-                        confirmText="Изтрий профила"
-                        cancelText="Отказ"
-                        (confirm)="onConfirmDelete()"
+                        confirmText="Изтрий профила" cancelText="Отказ" (confirm)="onConfirmDelete()"
                         (cancel)="onCancelDelete()">
 </app-confirmation-modal>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, input, Output, signal, computed, effect } from '@angular/core';
+import { Component, EventEmitter, input, Output, computed } from '@angular/core';
 import { PagerModel } from '../../common';
 
 @Component({
@@ -22,23 +22,10 @@ export class Pager {
         const totalPages = pagerData.totalPages || 1;
         const pageArray = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-        console.log('Pager pages computed:', {
-            pagerData,
-            totalPages,
-            pageArray
-        });
-
         return pageArray;
     });
 
-    constructor() {
-        effect(() => {
-            console.log('Pager effect triggered:', {
-                pager: this.pager(),
-                pages: this.pages()
-            });
-        });
-    }
+    constructor() { }
 
     get totalCount(): number {
         return this.pager()?.totalCount ?? 0;
@@ -49,10 +36,7 @@ export class Pager {
     }
 
     get pageSize(): number {
-        console.log('Getting page size:', {
-            pager: this.pager(),
-            defaultPageSize: this.pageSizes()?.[0]
-        });
+
         return this.pager()?.pageSize ?? this.pageSizes()?.[0];
     }
 
@@ -69,12 +53,10 @@ export class Pager {
     onPageSizeChange(event: Event) {
         const select = event.target as HTMLSelectElement;
         const newPageSize = parseInt(select.value);
-        console.log('Page size changing to:', newPageSize);
         this.pageSizeChange.emit(newPageSize);
     }
 
     onPageClick(pageNumber: number) {
-        console.log('Page changing to:', pageNumber);
         this.pageChange.emit(pageNumber);
     }
 

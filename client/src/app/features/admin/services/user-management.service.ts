@@ -11,7 +11,6 @@ import { AuthHttpService } from '../../auth';
 })
 export class UserManagementService {
 
-
     private _usersPagedList = signal<PagedResult<UserListModel> | null>(null);
     private _isLoading = signal<boolean>(false);
 
@@ -75,5 +74,42 @@ export class UserManagementService {
                     return throwError(() => error);
                 })
             );
+    }
+
+    toggleUserRole(id: string, role: string) {
+        const user = this.usersPagedList()?.items.find(u => u.id === id);
+        if (user) {
+            if (this.userInRole(user, role)) {
+                return this.authHttpService.removeRoleFromUser(id, role)
+                    .pipe(
+                        tap(() => {
+                            this.loadUsers();
+                        }),
+                        map(() => void 0), // Return void
+                        takeUntilDestroyed(this.destroyRef),
+                        catchError((error) => {
+                            return throwError(() => error);
+                        })
+                    );
+
+            } else {
+                return this.authHttpService.addRoleToUser(id, role)
+                    .pipe(
+                        tap(() => {
+                            this.loadUsers();
+                        }), map(() => void 0), // Return void
+                        takeUntilDestroyed(this.destroyRef),
+                        catchError((error) => {
+                            return throwError(() => error);
+                        })
+                    );
+            }
+        } else {
+            return throwError(() => new Error('Потребителят не е намерен'));
+        }
+    }
+
+    private userInRole(user: UserListModel, role: string) {
+        return user.roles.some(r => r.name === role);
     }
 }

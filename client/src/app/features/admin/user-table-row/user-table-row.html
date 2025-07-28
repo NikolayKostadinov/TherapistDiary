@@ -1,29 +1,38 @@
 <td>{{ index }}</td>
+<td class="image-container"><img [src]="user.profilePictureUrl ? user.profilePictureUrl : 'img/no-profile.jpg'"
+         alt="{{ user.firstName }}" class="user-image" /></td>
+<td>{{ user.userName }}</td>
+<td>{{ user.email }}</td>
 <td>{{ user.firstName }}</td>
 <td>{{ user.midName || '-' }}</td>
 <td>{{ user.lastName }}</td>
+<td>{{ user.phoneNumber || '-' }}</td>
 <td>{{user.rolesView }} </td>
 <td>
     <div class="dropdown">
-        <button class="btn btn-sm btn-light text-primary me-1"
-                type="button"
-                title="Редактирай потребител">
+        <button class="btn btn-sm btn-light text-primary me-1" type="button" title="Редактирай потребител">
             <i class="fas fa-edit"></i>
         </button>
         <div class="dropdown-menu">
-            <a href="#"
-               class="dropdown-item">Редактирай профил</a>
-            <a href="#"
-               class="dropdown-item">Промени роли</a>
-            <a href="#"
-               class="dropdown-item">Блокирай потребител</a>
-            <a href="#"
-               class="dropdown-item">Активирай потребител</a>
+
+            @if(isTherapist) {
+            <button class="dropdown-item" (click)="onToggleRole('Therapist')"><i
+                   class="fas fa-user-slash text-secondary"></i> Премахни терапевт</button>
+            }@else {
+            <button class="dropdown-item" (click)="onToggleRole('Therapist')"><i
+                   class="fas fa-user-nurse text-primary"></i> Назначи терапевт</button>
+            }
+
+            @if(isAdministrator){
+            <button class="dropdown-item" (click)="onToggleRole('Administrator')"><i
+                   class="fas fa-user-slash text-secondary"></i> Премахни администратор</button>
+            }@else {
+            <button class="dropdown-item" (click)="onToggleRole('Administrator')"><i
+                   class="fas fa-user-tie text-primary"></i> Назначи администратор</button>
+            }
         </div>
     </div>
-    <button class="btn btn-sm btn-light text-danger"
-            title="Изтрий потребител"
-            (click)="onDeleteClick()">
+    <button class="btn btn-sm btn-light text-danger" title="Изтрий потребител" (click)="onDeleteClick()">
         <i class="fas fa-trash"></i>
     </button>
 </td>

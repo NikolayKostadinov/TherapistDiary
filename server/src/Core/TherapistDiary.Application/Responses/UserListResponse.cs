@@ -19,6 +19,7 @@ public class UserListResponse : IMapFrom<User>, IHaveCustomMappings
     public string FullName { get; set; }
     public required string LastName { get; set; }
     public required string PhoneNumber { get; set; }
+    public string? ProfilePictureUrl { get; set; }
     public List<RoleResponce> Roles { get; set; }
 
     public void CreateMappings(IProfileExpression configuration)
