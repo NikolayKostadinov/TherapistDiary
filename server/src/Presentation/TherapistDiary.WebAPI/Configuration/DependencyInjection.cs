@@ -1,7 +1,6 @@
-﻿namespace TherapistDiary.WebAPI;
+﻿namespace TherapistDiary.WebAPI.Configuration;
 
 using System.Reflection;
-using Configuration;
 
 public static class DependencyInjection
 {

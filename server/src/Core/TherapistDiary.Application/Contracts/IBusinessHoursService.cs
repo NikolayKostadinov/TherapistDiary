@@ -1,6 +1,6 @@
-namespace TherapistDiary.Domain.Interfaces;
+namespace TherapistDiary.Application.Contracts;
 
-using Dtos;
+using Domain.Dtos;
 
 public interface IBusinessHoursService
 {

@@ -1,6 +1,7 @@
 ﻿namespace TherapistDiary.Application.Responses;
 
 using Domain.Dtos;
+using Domain.Repositories.Automapper;
 using Infrastructure.AutoMapper;
 
 public class TherapistDetailsResponse : IMapFrom<TherapistDetailsDto>

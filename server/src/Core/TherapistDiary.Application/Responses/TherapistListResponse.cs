@@ -2,6 +2,7 @@
 
 using Domain.Dtos;
 using Domain.Entities;
+using Domain.Repositories.Automapper;
 using Infrastructure.AutoMapper;
 
 public class TherapistListResponse: IMapFrom<TherapistListDto>

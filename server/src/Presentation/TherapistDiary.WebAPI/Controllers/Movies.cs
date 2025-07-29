@@ -1,11 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
+namespace TherapistDiary.WebAPI.Controllers;
 
-namespace TherapistDiary.WebAPI.Controllers.Abstract;
-
+using Abstract;
+using Application.Appointments.Queries.GetAvailableAppointments;
+using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 public class MoviesController : ApiController
 {
+
     // GET
     public MoviesController(ILogger<MoviesController> logger) : base(logger)
     {

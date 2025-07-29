@@ -1,9 +1,9 @@
 namespace TherapistDiary.Application.Responses;
 
-using Domain.Entities;
-using Infrastructure.AutoMapper;
+using Domain.Dtos;
+using Domain.Repositories.Automapper;
 
-public class AvailableAppointmentResponse: IMapFrom<Appointment>
+public class AvailableAppointmentResponse: IMapFrom<BusinessHour>
 {
     public AvailableAppointmentResponse(TimeOnly start, TimeOnly end)
     {

@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Domain.Entities;
+using Domain.Repositories.Automapper;
 using Infrastructure.AutoMapper;
 
 public class UserListResponse : IMapFrom<User>, IHaveCustomMappings

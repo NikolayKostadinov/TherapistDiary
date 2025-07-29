@@ -1,5 +1,6 @@
 namespace TherapistDiary.Application.Responses;
 
+using Domain.Repositories.Automapper;
 using Domain.Shared;
 using Infrastructure.AutoMapper;
 

@@ -10,6 +10,7 @@ using TherapistDiary.Domain.Entities;
 using TherapistDiary.Infrastructure.Options;
 using TherapistDiary.Persistence;
 using TherapistDiary.WebAPI;
+using TherapistDiary.WebAPI.Configuration;
 using TherapistDiary.WebAPI.Infrastructure.ApplicationBuilderExtension;
 using TherapistDiary.WebAPI.Infrastructure.Filters;
 

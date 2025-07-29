@@ -1,7 +1,7 @@
 namespace TherapistDiary.Application.Services;
 
+using Contracts;
 using Domain.Dtos;
-using Domain.Interfaces;
 using Microsoft.Extensions.Options;
 
 public class BusinessHourService : IBusinessHoursService
