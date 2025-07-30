@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { Login as Login } from './features/auth/login/login';
+import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
+import { AdminGuard, AuthenticatedGuard } from './guards';
 import { UnauthenticatedGuard } from './guards/unauthenticated.guard';
 import { PageNotFound } from './layout/page-not-found/page-not-found';
-import { AuthenticatedGuard, AdminGuard } from './guards';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -30,6 +30,9 @@ export const routes: Routes = [
             { path: 'users', loadComponent: () => import('./features/admin/user-table/user-table').then(c => c.UserTable), canActivate: [AdminGuard] }
         ]
     },
+    { path: 'appointment', children: [
+        { path: 'create', loadComponent: () => import('./features/appointment/appointment-create/appointment-create').then(c => c.AppointmentCreate), canActivate: [AuthenticatedGuard] }
+    ] },
     /*--------------------------End Of Lazy Loading Components-----------------------------*/
     { path: 'login', component: Login, canActivate: [UnauthenticatedGuard] },
     { path: 'register', component: Register, canActivate: [UnauthenticatedGuard] },

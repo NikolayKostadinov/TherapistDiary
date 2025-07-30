@@ -1,18 +1,5 @@
-import {
-  AnimationBuilder,
-  AnimationFactory,
-  AnimationPlayer,
-  animate,
-  style,
-} from "@angular/animations";
-import {
-  Directive,
-  ElementRef,
-  Input,
-  OnDestroy,
-  OnInit,
-  inject,
-} from "@angular/core";
+import { AnimationBuilder, AnimationFactory, AnimationPlayer, animate, style, } from "@angular/animations";
+import { Directive, ElementRef, Input, OnDestroy, OnInit, inject } from "@angular/core";
 
 @Directive({
   selector: "[appScrollAnimation]",
@@ -22,12 +9,7 @@ export class ScrollAnimationDirective implements OnInit, OnDestroy {
   private el = inject(ElementRef);
   private animationBuilder = inject(AnimationBuilder);
 
-  @Input() animationType:
-    | "fadeInUp"
-    | "fadeInDown"
-    | "fadeInLeft"
-    | "fadeInRight"
-    | "fadeIn" = "fadeInUp";
+  @Input() animationType: "fadeInUp" | "fadeInDown" | "fadeInLeft" | "fadeInRight" | "fadeIn" = "fadeInUp";
   @Input() animationDelay: number = 0;
   @Input() animationDuration: number = 600;
 

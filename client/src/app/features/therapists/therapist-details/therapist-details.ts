@@ -1,51 +1,49 @@
-import { Component, OnInit, DestroyRef, signal, inject } from '@angular/core';
-import { TherapistsService } from '../services/therapists.service';
-import { ToasterService } from '../../../layout';
-import { ActivatedRoute } from '@angular/router';
-import { Location } from '@angular/common';
-import { TherapistDetailsModel } from '../models/therapist.details.model';
-import { ScrollAnimationDirective } from '../../../common/directives';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Location } from "@angular/common";
+import { Component, DestroyRef, inject, OnInit, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ActivatedRoute } from "@angular/router";
+import { ScrollAnimationDirective } from "../../../common/directives";
+import { ToasterService } from "../../../layout";
+import { TherapistDetailsModel } from "../models/therapist.details.model";
+import { TherapistsService } from "../services/therapists.service";
 
 @Component({
-    selector: 'app-therapist-details',
-    imports: [ScrollAnimationDirective],
-    templateUrl: './therapist-details.html',
-    styleUrl: './therapist-details.css'
+  selector: "app-therapist-details",
+  imports: [ScrollAnimationDirective],
+  templateUrl: "./therapist-details.html",
+  styleUrl: "./therapist-details.css",
 })
 export class TherapistDetails implements OnInit {
-    private readonly therapistsService = inject(TherapistsService);
-    private readonly toasterService = inject(ToasterService);
-    private readonly route = inject(ActivatedRoute);
-    private readonly DestroyRef = inject(DestroyRef);
-    private readonly location = inject(Location);
+  private readonly therapistsService = inject(TherapistsService);
+  private readonly toasterService = inject(ToasterService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly DestroyRef = inject(DestroyRef);
+  private readonly location = inject(Location);
 
+  therapistId!: string;
 
-    therapistId!: string;
+  therapistDetails = signal<TherapistDetailsModel>({} as TherapistDetailsModel);
 
-    therapistDetails = signal<TherapistDetailsModel>({} as TherapistDetailsModel);
+  constructor() {}
 
-    constructor() { }
+  ngOnInit(): void {
+    this.therapistId = this.route.snapshot.params["id"];
+    this.therapistsService
+      .getTherapist(this.therapistId)
+      .pipe(takeUntilDestroyed(this.DestroyRef))
+      .subscribe({
+        next: (therapist) => {
+          this.therapistDetails.set(therapist);
+        },
+        error: (error) => {
+          this.toasterService.error(
+            "Неуспешно зареждане на детайлите за терапевта. Моля, опитайте отново."
+          );
+        },
+      });
+  }
 
-
-    ngOnInit(): void {
-        this.therapistId = this.route.snapshot.params['id'];
-        this.therapistsService.getTherapist(this.therapistId)
-            .pipe(takeUntilDestroyed(this.DestroyRef))
-            .subscribe({
-                next: (therapist) => {
-                    console.log(therapist);
-                    this.therapistDetails.set(therapist);
-                },
-                error: (error) => {
-                    this.toasterService.error('Неуспешно зареждане на детайлите за терапевта. Моля, опитайте отново.');
-                    console.log(error);
-                }
-            })
-    }
-
-    goBack(): void {
-        this.location.back();
-    }
-
+  goBack(): void {
+    this.location.back();
+  }
 }

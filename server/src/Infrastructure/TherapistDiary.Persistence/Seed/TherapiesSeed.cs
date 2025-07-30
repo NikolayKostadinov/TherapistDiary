@@ -26,10 +26,14 @@ public class TherapiesSeed : ISeeder
             var therapyType4 = TherapyType.Create("Възрастни","https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-4.jpg?alt=media&token=9c1248bc-4f55-47c7-84e2-9da09598e18c").Value;
 
             therapyType1.Therapies.AddRange([
-                Therapy.Create("Фамилна терапия").Value,
-                Therapy.Create("Терапия на брачни двойки").Value,
-                Therapy.Create("Терапия на двойки").Value,
-                Therapy.Create("Трежовност").Value
+                Therapy.Create("Психодиагностика").Value,
+                Therapy.Create("Психотерапия").Value,
+                Therapy.Create("Работа с емоциите").Value,
+                Therapy.Create("Куклотерапия").Value,
+                Therapy.Create("Приказкотерапия").Value,
+                Therapy.Create("Семейна среща").Value,
+                Therapy.Create("Хомеопатия").Value,
+
             ]);
 
             therapyType2.Therapies.AddRange([
