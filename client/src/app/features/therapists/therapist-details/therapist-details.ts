@@ -1,4 +1,4 @@
-import { Component, OnInit, DestroyRef, signal } from '@angular/core';
+import { Component, OnInit, DestroyRef, signal, inject } from '@angular/core';
 import { TherapistsService } from '../services/therapists.service';
 import { ToasterService } from '../../../layout';
 import { ActivatedRoute } from '@angular/router';
@@ -14,18 +14,18 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     styleUrl: './therapist-details.css'
 })
 export class TherapistDetails implements OnInit {
+    private readonly therapistsService = inject(TherapistsService);
+    private readonly toasterService = inject(ToasterService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly DestroyRef = inject(DestroyRef);
+    private readonly location = inject(Location);
+
 
     therapistId!: string;
 
     therapistDetails = signal<TherapistDetailsModel>({} as TherapistDetailsModel);
 
-    constructor(
-        private readonly therapistsService: TherapistsService,
-        private readonly toasterService: ToasterService,
-        private readonly route: ActivatedRoute,
-        private readonly DestroyRef: DestroyRef,
-        private readonly location: Location
-    ) { }
+    constructor() { }
 
 
     ngOnInit(): void {

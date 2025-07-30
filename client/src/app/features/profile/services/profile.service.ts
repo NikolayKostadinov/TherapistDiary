@@ -9,6 +9,9 @@ import { Utils } from '../../../common/utils';
     providedIn: 'root'
 })
 export class ProfileServices {
+    private readonly authHttpService = inject(AuthHttpService);
+    private readonly authService = inject(AuthService);
+
     private readonly destroyRef = inject(DestroyRef);
     private _user = signal<UserProfileModel | null>(null);
     private _isLoading = signal<boolean>(false);
@@ -19,10 +22,7 @@ export class ProfileServices {
     public readonly errorMessage = computed(() => this._errorMessage());
     public readonly hasError = computed(() => !!this._errorMessage());
 
-    constructor(
-        private readonly authHttpService: AuthHttpService,
-        private readonly authService: AuthService,
-    ) {
+    constructor() {
         effect(() => {
             const currentUser = this.authService.currentUser();
 

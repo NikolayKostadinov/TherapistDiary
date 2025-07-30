@@ -1,4 +1,4 @@
-import { Component, DestroyRef, Input, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, signal, inject } from '@angular/core';
 import { TherapistsService } from '../services/therapists.service';
 import { TherapistListModel } from '../models/therapist.list.model';
 import { CommonModule } from '@angular/common';
@@ -16,15 +16,15 @@ import { ScrollAnimationDirective } from '../../../common/directives';
 })
 
 export class TherapistBoard implements OnInit {
+    private readonly therapistsService = inject(TherapistsService);
+    private readonly destroyref = inject(DestroyRef);
+    private toasterService = inject(ToasterService);
+
 
     @Input('is-home') isHome: boolean = false;
     therapists = signal<TherapistListModel[]>([]);
 
-    constructor(
-        private readonly therapistsService: TherapistsService,
-        private readonly destroyref: DestroyRef,
-        private toasterService: ToasterService
-    ) { }
+    constructor() { }
 
     ngOnInit(): void {
         this.therapistsService.getAllTherapists()

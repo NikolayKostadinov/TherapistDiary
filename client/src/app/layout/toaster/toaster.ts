@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ToasterService } from './toaster.service';
 import { NgClass } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
@@ -32,9 +32,11 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     ]
 })
 export class Toaster {
+    private toasterService = inject(ToasterService);
+
     messages = computed(() => this.toasterService.toasterMessages());
 
-    constructor(private toasterService: ToasterService) { }
+    constructor() { }
 
     onClose(id: string): void {
         this.toasterService.startRemove(id);

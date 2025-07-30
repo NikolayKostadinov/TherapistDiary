@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { Observable, throwError, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
@@ -11,6 +11,8 @@ import { HttpResponse } from '@angular/common/http';
     providedIn: 'root'
 })
 export class AuthService {
+    private readonly authHttpService = inject(AuthHttpService);
+
 
     // Private signals for internal state
     private _accessToken = signal<string | null>(null);
@@ -49,7 +51,7 @@ export class AuthService {
         this.isLoggedIn() && this.isTokenValid()
     );
 
-    constructor(private readonly authHttpService: AuthHttpService) {
+    constructor() {
         this.initializeFromStorage();
         this.setupTokenSync();
     }

@@ -1,4 +1,4 @@
-import { Component, signal, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, signal, Output, EventEmitter, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,14 +15,14 @@ import { ApplicationForm } from '../../../common';
     styleUrl: './login.css'
 })
 export class Login extends ApplicationForm {
+    private readonly router = inject(Router);
+    private readonly authService = inject(AuthService);
+
     @Output() modalClosed = new EventEmitter<void>();
 
     showPassword = signal(false);
 
-    constructor(
-        private readonly router: Router,
-        private readonly authService: AuthService
-    ) {
+    constructor() {
         super();
         this.form = this.fb.group({
             username: ['', [Validators.required, Validators.minLength(3)]],

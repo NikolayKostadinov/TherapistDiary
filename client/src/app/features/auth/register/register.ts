@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services';
 import { RegisterRequest } from '../models';
-import { ApiErrorResponse } from '../../../common/models';
 import { Utils } from '../../../common/utils';
 import { ApplicationForm, VALIDATION_PATTERNS } from '../../../common';
 
@@ -15,10 +14,10 @@ import { ApplicationForm, VALIDATION_PATTERNS } from '../../../common';
     styleUrl: './register.css'
 })
 export class Register extends ApplicationForm {
-    constructor(
-        private readonly authService: AuthService,
-        private readonly router: Router,
-    ) {
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+
+    constructor() {
         super();
         this.form = this.fb.group({
             userName: ['', [Validators.required, Validators.minLength(3)]],

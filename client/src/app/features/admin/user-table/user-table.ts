@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, signal, Signal, computed } from '@angular/core';
+import { AfterViewInit, Component, OnInit, signal, Signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserManagementService } from '../services/user-management.service';
 import { ApiError, ConfirmationModal, PagedResult, PagerModel, Utils } from '../../../common';
@@ -15,6 +15,9 @@ import { ToggleRoleModel } from '../models/toggle-role.model';
     styleUrl: './user-table.css'
 })
 export class UserTable implements OnInit, AfterViewInit {
+    private readonly userManagementServise = inject(UserManagementService);
+    private readonly toaster = inject(ToasterService);
+
 
     protected pageSizes = [10, 50, 100];
     protected pageSize = 10;
@@ -33,10 +36,7 @@ export class UserTable implements OnInit, AfterViewInit {
     protected sortBy = signal<string | null>(null);
     protected sortDescending = signal<boolean>(false);
 
-    constructor(
-        private readonly userManagementServise: UserManagementService,
-        private readonly toaster: ToasterService
-    ) {
+    constructor() {
         this.usersPagedList = this.userManagementServise.usersPagedList;
         this.usersPager = computed(() => {
             const pagedList = this.usersPagedList();

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TherapistDetailsModel, TherapistListModel } from '../models';
@@ -9,10 +9,12 @@ import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
     providedIn: 'root'
 })
 export class TherapistsService {
+    private readonly httpClient = inject(HttpClient);
+
 
     private apiUrl = `${environment.baseUrl}${API_ENDPOINTS.THERAPISTS}`;
 
-    constructor(private readonly httpClient: HttpClient) { }
+    constructor() { }
 
     getAllTherapists(): Observable<TherapistListModel[]> {
         return this.httpClient.get<TherapistListModel[]>(this.apiUrl);

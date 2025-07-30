@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -16,8 +16,9 @@ import { PagedResult } from '../../../common/models/paged-result.model';
     providedIn: 'root'
 })
 export class AuthHttpService {
+    private readonly http = inject(HttpClient);
 
-    constructor(private readonly http: HttpClient) { }
+      constructor() { }
 
     login(loginRequest: LoginRequest): Observable<HttpResponse<AuthResponse>> {
         return this.http.post(

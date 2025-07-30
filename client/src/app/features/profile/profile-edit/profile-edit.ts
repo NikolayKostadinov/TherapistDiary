@@ -1,4 +1,4 @@
-import { Component, OnInit, Signal, effect, signal } from '@angular/core';
+import { Component, OnInit, Signal, effect, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,15 +18,15 @@ import { UserInfo } from '../../auth';
     styleUrl: './profile-edit.css'
 })
 export class ProfileEdit extends ApplicationForm implements OnInit {
+    private readonly authService = inject(AuthService);
+    private readonly profileService = inject(ProfileServices);
+    private readonly router = inject(Router);
+
 
     readonly currentUser: Signal<UserInfo | null>;
     private formInitialized = signal(false);
 
-    constructor(
-        private readonly authService: AuthService,
-        private readonly profileService: ProfileServices,
-        private readonly router: Router
-    ) {
+    constructor() {
         super();
         this.currentUser = this.authService.currentUser;
         this.form = this.fb.group({

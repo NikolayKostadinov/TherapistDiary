@@ -1,4 +1,4 @@
-import { Injectable, DestroyRef, signal } from '@angular/core';
+import { Injectable, DestroyRef, signal, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, map, tap, throwError } from 'rxjs';
 import { UserListModel } from '../../profile/models/user-list.model';
@@ -10,15 +10,15 @@ import { AuthHttpService } from '../../auth';
     providedIn: 'root'
 })
 export class UserManagementService {
+    private readonly authHttpService = inject(AuthHttpService);
+    private readonly destroyRef = inject(DestroyRef);
+
 
     private _usersPagedList = signal<PagedResult<UserListModel> | null>(null);
     private _isLoading = signal<boolean>(false);
 
 
-    constructor(
-        private readonly authHttpService: AuthHttpService,
-        private readonly destroyRef: DestroyRef
-    ) { }
+    constructor() { }
 
     public get usersPagedList() {
         return this._usersPagedList.asReadonly();

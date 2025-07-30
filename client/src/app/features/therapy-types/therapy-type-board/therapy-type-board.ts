@@ -1,4 +1,4 @@
-import { Component, DestroyRef, Input, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, signal, inject } from '@angular/core';
 import { TherapyTypeService } from '../services/therapytype.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TherapyTypeListModel } from '../models';
@@ -14,14 +14,14 @@ import { ScrollAnimationDirective } from '../../../common/directives';
     styleUrl: './therapy-type-board.css'
 })
 export class TherapyTypeBoard implements OnInit {
+    private readonly therapyTypesService = inject(TherapyTypeService);
+    private destroyref = inject(DestroyRef);
+    private toasterService = inject(ToasterService);
+
     therapyTypes = signal<TherapyTypeListModel[]>([]);
     @Input('is-home') isHome: boolean = false;
 
-    constructor(
-        private readonly therapyTypesService: TherapyTypeService,
-        private destroyref: DestroyRef,
-        private toasterService: ToasterService
-    ) { }
+    constructor() { }
 
     ngOnInit(): void {
         this.therapyTypesService.getTherapyTypes()

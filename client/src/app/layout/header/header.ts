@@ -1,4 +1,4 @@
-import { Component, HostListener, signal, computed } from '@angular/core';
+import { Component, HostListener, signal, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../features/auth/services/auth.service';
@@ -11,6 +11,9 @@ import { Login } from '../../features/auth';
     styleUrl: './header.css'
 })
 export class Header {
+    private readonly router = inject(Router);
+    private readonly authService = inject(AuthService);
+
     // Computed signals from AuthService
     isAuthenticated = computed(() => this.authService.isLoggedIn());
     currentUser = computed(() => this.authService.currentUser());
@@ -21,14 +24,10 @@ export class Header {
     isScrolled = signal(false);
     showLoginModal = signal(false);
 
-    constructor(
-        private readonly router: Router,
-        private readonly authService: AuthService
-    ) { }
+    constructor() { }
 
     @HostListener('window:scroll', [])
     onWindowScroll(): void {
-        // todo: remove directly DOM references if possible
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
         this.isScrolled.set(scrollTop > 100);
     }

@@ -1,4 +1,4 @@
-import { Component, computed, effect, OnInit, Signal, signal } from '@angular/core';
+import { Component, computed, effect, OnInit, Signal, signal, inject } from '@angular/core';
 import { ProfileServices } from '..';
 import { UserProfileModel } from '../models';
 import { Spinner, ToasterService } from "../../../layout";
@@ -13,6 +13,10 @@ import { ConfirmationModal } from '../../../common/components';
     styleUrl: './profile.css'
 })
 export class Profile {
+    private readonly profileService = inject(ProfileServices);
+    private readonly toasterService = inject(ToasterService);
+    private readonly router = inject(Router);
+
 
     userProfile: Signal<UserProfileModel | null>;
 
@@ -24,11 +28,7 @@ export class Profile {
     // Signal за показване на модала за потвърждение
     readonly showDeleteModal = signal(false);
 
-    constructor(
-        private readonly profileService: ProfileServices,
-        private readonly toasterService: ToasterService,
-        private readonly router: Router
-    ) {
+    constructor() {
         this.userProfile = this.profileService.userProfile;
         this.errorMessage = this.profileService.errorMessage;
         this.isLoading = this.profileService.isLoading;
