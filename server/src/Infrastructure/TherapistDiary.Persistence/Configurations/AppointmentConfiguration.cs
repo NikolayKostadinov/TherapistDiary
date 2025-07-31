@@ -17,9 +17,9 @@ public class AppointmentConfiguration: IEntityTypeConfiguration<Appointment>
             .IsRequired();
 
         builder
-            .HasOne(a => a.TherapyType)
+            .HasOne(a => a.Therapy)
             .WithMany()
-            .HasForeignKey(a=>a.TherapyTypeId)
+            .HasForeignKey(a=>a.TherapyId)
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
 

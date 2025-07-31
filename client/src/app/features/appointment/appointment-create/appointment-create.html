@@ -67,7 +67,7 @@
                                     class="form-select"
                                     [class.is-invalid]="getFieldError('therapy')">
                                     <option value="" disabled selected hidden>
-                                        @if (!isSelectedTherapyType()) {
+                                        @if (!isTherapyTypeSelected()) {
                                         Първо изберете тип терапия...
                                         } @else {
                                         Изберете терапия...
@@ -114,38 +114,47 @@
 
                         <div class="form-row mb-3">
                             <div class="form-group">
-                                <label for="appointmentDate"
+                                <label for="date"
                                     class="form-label">Дата *</label>
                                 <input type="date"
-                                    id="appointmentDate"
-                                    formControlName="appointmentDate"
+                                    id="date"
+                                    formControlName="date"
                                     class="form-control"
-                                    [class.is-invalid]="getFieldError('appointmentDate')"
+                                    [class.is-invalid]="getFieldError('date')"
                                     placeholder="Изберете дата" />
 
                                 <div class="invalid-feedback">
-                                    {{ getFieldError('appointmentDate') }}
+                                    {{ getFieldError('date') }}
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="appointmentTime"
+                                <label for="time"
                                     class="form-label">Час *</label>
                                 <select type="text"
-                                    id="appointmentTime"
-                                    formControlName="appointmentTime"
+                                    id="time"
+                                    formControlName="time"
                                     class="form-select"
-                                    [class.is-invalid]="getFieldError('appointmentTime')">
+                                    [class.is-invalid]="getFieldError('time')">
+                                    @if (!isDateSelected()) {
+                                    Първо изберете data...
+                                    } @else {
+                                    
+                                    Изберете час...
+                                    }
                                     <option ngValue="" disabled selected hidden>Изберете час...</option>
+                                    @for (time of availableAppointments(); track $index) {
+                                        <option [value]="time.start">{{time | appointmentTime}}</option>
+                                    }
 
                                 </select>
 
                                 <div class="invalid-feedback">
-                                    {{ getFieldError('appointmentTime') }}
+                                    {{ getFieldError('time') }}
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
-                            <label for="appointmentTime"
+                            <label for="time"
                                 class="form-label">Коментар</label>
                             <textarea
                                 id="comment"
@@ -160,7 +169,17 @@
 
                         <div class="row gy-3 gx-4">
                             <div class="col-12">
-                                <button type="button" class="btn btn-primary text-white w-100 py-3 px-5">Запис</button>
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-primary text-white w-100 py-3 px-5"
+                                    [disabled]="form.invalid || isSubmitting()">
+                                    @if (isSubmitting()) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Записване...
+                                    } @else {
+                                        Запази час
+                                    }
+                                </button>
                             </div>
                         </div>
                     </form>

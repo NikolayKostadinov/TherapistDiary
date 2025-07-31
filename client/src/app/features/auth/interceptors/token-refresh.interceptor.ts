@@ -53,8 +53,18 @@ function handle401Error(request: HttpRequest<unknown>, next: HttpHandlerFn, auth
             catchError((err) => {
                 isRefreshing.set(false);
                 refreshTokenSubject.next(false);
-                // Refresh failed, logout user
-                authService.logout();
+                
+                // Only logout if this is actually an authentication error
+                // Don't logout for general server errors or network issues
+                if (err?.status === 401 || err?.status === 403 || 
+                    (err?.message && err.message.includes('token')) ||
+                    (err?.error && typeof err.error === 'string' && err.error.includes('token'))) {
+                    console.log('🚪 Authentication error detected, logging out:', err.status, err.message);
+                    authService.logout();
+                } else {
+                    console.log('⚠️ Server error during refresh, but not logging out:', err.status, err.message);
+                }
+                
                 return throwError(() => err);
             })
         );

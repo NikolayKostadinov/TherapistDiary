@@ -24,4 +24,8 @@ public class AppointmentRepository:IAppointmentRepository
             .ToListAsync();
     }
 
+    public async Task AddAsync(Appointment appointment, CancellationToken cancellationToken)
+    {
+        await _context.Set<Appointment>().AddAsync(appointment, cancellationToken);
+    }
 }

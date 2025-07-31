@@ -60,6 +60,12 @@ export class AuthService {
         const accessToken = localStorage.getItem(TOKEN_KEYS.ACCESS_TOKEN);
         const refreshToken = localStorage.getItem(TOKEN_KEYS.REFRESH_TOKEN);
 
+        console.log('🔍 Auth initialization:', { 
+            hasAccessToken: !!accessToken, 
+            hasRefreshToken: !!refreshToken,
+            accessTokenLength: accessToken?.length || 0
+        });
+
         this._accessToken.set(accessToken);
         this._refreshToken.set(refreshToken);
 
@@ -70,33 +76,50 @@ export class AuthService {
                 const currentTime = Math.floor(Date.now() / 1000);
                 const isExpired = payload.exp < currentTime;
 
+                console.log('📝 Token check:', { 
+                    expiration: new Date(payload.exp * 1000),
+                    currentTime: new Date(currentTime * 1000),
+                    isExpired 
+                });
+
                 if (isExpired) {
+                    console.log('🔄 Token expired, attempting refresh...');
                     // Don't logout immediately, try to refresh first
                     this.refreshToken().subscribe({
                         next: (success) => {
-                            // Token refreshed successfully during initialization
+                            console.log('✅ Token refreshed successfully during initialization');
                         },
                         error: (error) => {
+                            console.log('❌ Token refresh failed during initialization:', error);
                             this.logout();
                         }
                     });
                 } else {
+                    console.log('✅ Token is valid, updating user info');
                     // Token is valid, update user info
                     this.updateUserFromToken(accessToken);
                 }
             } catch (error) {
+                console.log('❌ Token decode error:', error);
                 // Try to refresh if we have refresh token, otherwise logout
                 if (refreshToken) {
                     this.refreshToken().subscribe({
-                        error: () => this.logout()
+                        error: () => {
+                            console.log('❌ Refresh failed, logging out');
+                            this.logout();
+                        }
                     });
                 } else {
+                    console.log('❌ No refresh token, logging out');
                     this.logout();
                 }
             }
         } else if (accessToken && !refreshToken) {
+            console.log('⚠️ Only access token available, checking validity');
             // Only access token, check if valid
             this.updateUserFromToken(accessToken);
+        } else {
+            console.log('ℹ️ No tokens found, user stays logged out');
         }
         // If no tokens, user stays logged out (default state)
     }
@@ -107,8 +130,10 @@ export class AuthService {
             const accessToken = this._accessToken();
             if (accessToken) {
                 localStorage.setItem(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
+                console.log('💾 Access token saved to localStorage');
             } else {
                 localStorage.removeItem(TOKEN_KEYS.ACCESS_TOKEN);
+                console.log('🗑️ Access token removed from localStorage');
             }
         });
 
@@ -116,8 +141,10 @@ export class AuthService {
             const refreshToken = this._refreshToken();
             if (refreshToken) {
                 localStorage.setItem(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
+                console.log('💾 Refresh token saved to localStorage');
             } else {
                 localStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);  
+                console.log('🗑️ Refresh token removed from localStorage');
             }
         });
     }
@@ -227,10 +254,12 @@ export class AuthService {
     }
 
     logout(): void {
+        console.log('🚪 Logout initiated - clearing all tokens and user data');
         // Clear all signals
         this._accessToken.set(null);
         this._refreshToken.set(null);
         this._currentUser.set(null);
+        console.log('✅ Logout completed');
     }
 
     /**
@@ -274,6 +303,8 @@ export class AuthService {
             return throwError(() => new Error('Няма наличен токен за обновяване'));
         }
 
+        console.log('🔄 Attempting token refresh...');
+
         return this.authHttpService.refreshToken(refreshToken).pipe(
             tap((httpResponse) => {
                 // Extract tokens from headers
@@ -285,6 +316,7 @@ export class AuthService {
                 if (accessToken) {
                     this._accessToken.set(accessToken);
                     this.updateUserFromToken(accessToken);
+                    console.log('✅ Token refresh successful');
                 }
 
                 if (newRefreshToken) {
@@ -295,8 +327,20 @@ export class AuthService {
                 return true;
             }),
             catchError((error) => {
-                this.logout();
-                return throwError(() => new Error('Сесията изтече. Моля, влезте отново.'));
+                console.log('❌ Token refresh failed:', error.status, error.message);
+                
+                // Only logout for authentication-related errors
+                if (error?.status === 401 || error?.status === 403 || 
+                    (error?.message && error.message.includes('refresh')) ||
+                    (error?.error && typeof error.error === 'string' && 
+                     (error.error.includes('token') || error.error.includes('expired')))) {
+                    console.log('🚪 Authentication error during refresh, logging out');
+                    this.logout();
+                    return throwError(() => new Error('Сесията изтече. Моля, влезте отново.'));
+                } else {
+                    console.log('⚠️ Server error during refresh, but not logging out');
+                    return throwError(() => new Error('Временен проблем със сървъра. Моля, опитайте отново.'));
+                }
             })
         );
     }

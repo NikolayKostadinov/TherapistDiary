@@ -1,6 +1,5 @@
 namespace TherapistDiary.Domain.Entities;
 
-using Common.Constants;
 using Errors;
 using Primitives.Abstract;
 using Resources;
@@ -12,11 +11,12 @@ public class Appointment : DeletableEntity
     {
     }
 
-    private Appointment(Guid therapistId, Guid therapyTypeId, DateOnly date, TimeOnly start, TimeOnly end,
+    private Appointment(Guid patientId, Guid therapistId, Guid therapyId, DateOnly date, TimeOnly start, TimeOnly end,
         string? notes = null)
     {
+        PatientId = patientId;
         TherapistId = therapistId;
-        TherapyTypeId = therapyTypeId;
+        TherapyId = therapyId;
         Date = date;
         Start = start;
         End = end;
@@ -29,8 +29,8 @@ public class Appointment : DeletableEntity
     public Guid TherapistId { get; private set; }
     public User Therapist { get; private set; } = null!;
 
-    public Guid TherapyTypeId { get; private set; }
-    public TherapyType TherapyType { get; private set; } = null!;
+    public Guid TherapyId { get; private set; }
+    public Therapy Therapy { get; private set; } = null!;
 
     public DateOnly Date { get; private set; }
     public TimeOnly Start { get; private set; }
@@ -47,7 +47,7 @@ public class Appointment : DeletableEntity
         string? notes = null)
     {
         TherapistId = therapistId;
-        TherapyTypeId = therapyTypeId;
+        TherapyId = therapyTypeId;
         Date = date;
         Start = start;
         End = end;
@@ -56,14 +56,15 @@ public class Appointment : DeletableEntity
     }
 
     public static Result<Appointment> Create(
+        Guid patientId,
         Guid therapistId,
-        Guid therapyTypeId,
+        Guid therapyId,
         DateOnly date,
         TimeOnly start,
         TimeOnly end,
         string? notes = null)
     {
-        var appointment = new Appointment(therapistId, therapyTypeId, date, start, end, notes);
+        var appointment = new Appointment(patientId, therapistId, therapyId, date, start, end, notes);
         return appointment.Validate(Operations.Create);
     }
 

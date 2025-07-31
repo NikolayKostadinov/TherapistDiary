@@ -16,12 +16,12 @@ import { PagedResult } from '../../../common/models/paged-result.model';
     providedIn: 'root'
 })
 export class AuthHttpService {
-    private readonly http = inject(HttpClient);
+    private readonly httpClient = inject(HttpClient);
 
       constructor() { }
 
     login(loginRequest: LoginRequest): Observable<HttpResponse<AuthResponse>> {
-        return this.http.post(
+        return this.httpClient.post(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.LOGIN}`,
             loginRequest,
             { observe: 'response' }
@@ -34,7 +34,7 @@ export class AuthHttpService {
     }
 
     refreshToken(refreshToken: string): Observable<HttpResponse<AuthResponse>> {
-        return this.http.post(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REFRESH}`, {}, {
+        return this.httpClient.post(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REFRESH}`, {}, {
             headers: {
                 'X-Refresh-Token': refreshToken
             },
@@ -50,7 +50,7 @@ export class AuthHttpService {
     }
 
     register(registerData: RegisterRequest): Observable<HttpResponse<AuthResponse>> {
-        return this.http.post(
+        return this.httpClient.post(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REGISTER}`,
             registerData,
             { observe: 'response' }
@@ -63,7 +63,7 @@ export class AuthHttpService {
     }
 
     updateProfile(updateUserRequest: UserEditProfileModel): Observable<HttpResponse<AuthResponse>> {
-        return this.http.put(
+        return this.httpClient.put(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${updateUserRequest.id}`,
             updateUserRequest,
             { observe: 'response' }
@@ -76,7 +76,7 @@ export class AuthHttpService {
     }
 
     deleteProfile(id: string): Observable<HttpResponse<void>> {
-        return this.http.delete<void>(
+        return this.httpClient.delete<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${id}`,
             { observe: 'response' }
         ).pipe(
@@ -88,7 +88,7 @@ export class AuthHttpService {
     }
 
     getUserProfile(id: string): Observable<HttpResponse<UserProfileModel>> {
-        return this.http.get<UserProfileModel>(
+        return this.httpClient.get<UserProfileModel>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${id}`,
             { observe: 'response' }
         ).pipe(
@@ -102,7 +102,7 @@ export class AuthHttpService {
     getAllUsers(pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<UserProfileModel>>> {
         let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
 
-        return this.http.get<PagedResult<UserProfileModel>>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`,
+        return this.httpClient.get<PagedResult<UserProfileModel>>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`,
             {
                 params: params,
                 observe: 'response'
@@ -117,7 +117,7 @@ export class AuthHttpService {
 
 
     addRoleToUser(id: string, role: string) {
-        return this.http.patch<void>(
+        return this.httpClient.patch<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.ADD_TO_ROLE}/${id}/${role}`,
             { observe: 'response' }
         ).pipe(
@@ -128,7 +128,7 @@ export class AuthHttpService {
         );
     }
     removeRoleFromUser(id: string, role: string) {
-        return this.http.patch<void>(
+        return this.httpClient.patch<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REMOVE_FROM_ROLE}/${id}/${role}`,
             { observe: 'response' }
         ).pipe(
@@ -160,7 +160,7 @@ export class AuthHttpService {
     }
 
     changePassword(userId: string, changePasswordRequest: ChangePasswordModel): Observable<HttpResponse<void>> {
-        return this.http.patch<void>(
+        return this.httpClient.patch<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.CHANGE_PASSWORD}/${userId}`,
             changePasswordRequest,
             { observe: 'response' }
