@@ -521,34 +521,3 @@ jspm_packages/
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
-
-# ================================
-# PREVENT TEMPORARY FILES CREATION
-# ================================
-
-# Temporary Angular components and services
-**/demo.component.ts
-**/auth-modals.component.ts
-**/login.component.*
-**/register.component.*
-**/profile-form1/
-**/profile-image-upload/
-**/token.service.ts
-**/token-storage.service.ts
-**/user-state.service.ts
-**/local-storage.service.ts
-**/modal.service.ts
-
-# Temporary directories
-**/constants/
-**/interfaces/
-**/services/client/
-**/utils/client/
-**/common/services/
-**/common/utils/
-
-# Any other temporary files
-**/*.temp.*
-**/*.tmp.*
-**/*_temp.*
-**/*_tmp.*
