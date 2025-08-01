@@ -12,7 +12,11 @@ export const API_ENDPOINTS = {
         ADD_TO_ROLE: '/api/Account/add-role',
         REMOVE_FROM_ROLE: '/api/Account/remove-role',
     },
-    APPOINTMENTS: '/api/appointments',
+    APPOINTMENTS: {
+        BASE: '/api/appointments',
+        BY_PATIENT: '/api/appointments/by-patient',
+        BY_THERAPIST: '/api/appointments/by-therapist',
+    },
 
     FIREBASE: {
         UPLOAD_PROFILE_IMAGE: 'profile-pictures',

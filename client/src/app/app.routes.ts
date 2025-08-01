@@ -30,9 +30,12 @@ export const routes: Routes = [
             { path: 'users', loadComponent: () => import('./features/admin/user-table/user-table').then(c => c.UserTable), canActivate: [AdminGuard] }
         ]
     },
-    { path: 'appointment', children: [
-        { path: 'create', loadComponent: () => import('./features/appointment/appointment-create/appointment-create').then(c => c.AppointmentCreate), canActivate: [AuthenticatedGuard] }
-    ] },
+    {
+        path: 'appointment', children: [
+            { path: 'my-appointments', loadComponent: () => import('./features/appointment/my-appointments/my-appointments-table/my-appointments-table').then(c => c.MyAppointmentsTable), canActivate: [AuthenticatedGuard] },
+            { path: 'create', loadComponent: () => import('./features/appointment/appointment-create/appointment-create').then(c => c.AppointmentCreate), canActivate: [AuthenticatedGuard] }
+        ]
+    },
     /*--------------------------End Of Lazy Loading Components-----------------------------*/
     { path: 'login', component: Login, canActivate: [UnauthenticatedGuard] },
     { path: 'register', component: Register, canActivate: [UnauthenticatedGuard] },

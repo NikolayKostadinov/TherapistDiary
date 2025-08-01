@@ -6,8 +6,11 @@ namespace TherapistDiary.Persistence.Seed;
 
 using System;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Common.Extensions;
 using Domain.Entities;
 using TherapistDiary.Domain.Infrastructure;
@@ -339,6 +342,36 @@ public class ApplicationInitializer : ISeeder
             transaction.Rollback();
             throw;
         }
+
+        if (!_context.Set<TherapyType>().Any())
+        {
+            await TherapiesSeed();
+        }
+
+        if (!_context.Set<Appointment>().Any())
+        {
+            // Get therapists (users with Therapist role)
+            var therapists = await _userManager.GetUsersInRoleAsync("Therapist") as List<User> ?? new List<User>();
+
+            // Get patients (users with no roles)
+            var patients = new List<User>();
+            foreach (var user in _users)
+            {
+                if (!_usersToRoles[user.UserName ?? string.Empty].Any())
+                {
+                    var dbUser = await _userManager.FindByNameAsync(user.UserName);
+                    if (dbUser != null)
+                    {
+                        patients.Add(dbUser);
+                    }
+                }
+            }
+
+            // Get all therapies
+            var therapies = await _context.Set<Therapy>().ToListAsync();
+
+            await AppointmentSeed(therapists, patients, therapies);
+        }
     }
 
     private async Task SeedUsersAndRolesAsync()
@@ -388,6 +421,150 @@ public class ApplicationInitializer : ISeeder
                         .Select(x => x.Description))
             );
         }
+    }
+
+    private async Task AppointmentSeed(List<User> therapists, List<User> patients, List<Therapy>therapies)
+    {
+        var appointments = new List<Appointment>();
+        var random = new Random();
+
+        // Генерираме 40 записа
+        for (int i = 0; i < 40; i++)
+        {
+            var therapistId = therapists[random.Next(therapists.Count)].Id;
+            var patientId = patients[random.Next(patients.Count)].Id;
+            var therapyId = therapies[random.Next(therapies.Count)].Id;
+
+            // Генерираме дати от днес до 30 дни нататък
+            var daysFromToday = random.Next(0, 31); // 0 до 30 дни включително
+            var appointmentDate = DateOnly.FromDateTime(DateTime.Now.AddDays(daysFromToday));
+
+            // Генерираме час между 9:00 и 17:00
+            var startHour = random.Next(9, 17);
+            var startMinute = random.Next(0, 2) * 30; // 0 или 30 минути
+            var startTime = new TimeOnly(startHour, startMinute);
+            var endTime = startTime.AddMinutes(50); // 50-минутни сесии
+
+            var notes = GeneratePatientNotes(random);
+
+            var appointmentResult = Appointment.Create(
+                patientId,
+                therapistId,
+                therapyId,
+                appointmentDate,
+                startTime,
+                endTime,
+                notes
+            );
+
+            if (appointmentResult.IsSuccess)
+            {
+                appointments.Add(appointmentResult.Value);
+            }
+
+            // Добавяме малко забавяне за различни CreatedOn времена
+            await Task.Delay(10);
+        }
+
+        if (appointments.Any())
+        {
+            await _context.Set<Appointment>().AddRangeAsync(appointments);
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"Добавени {appointments.Count} записа за срещи.");
+        }
+    }
+
+    private static string GeneratePatientNotes(Random random)
+    {
+        var patientNotes = new[]
+        {
+            "Чувствам се много по-добре след последната сесия",
+            "Имам нужда да говоря за проблемите в семейството",
+            "Все още имам проблеми със съня",
+            "Искам да работим върху моята тревожност",
+            "Чувствам се готов/а за нови предизвикателства",
+            "Имам въпроси относно техниките за релаксация",
+            "Случи се нещо важно, което искам да споделя",
+            "Прилагам съветите от миналия път",
+            "Имам трудности с концентрацията",
+            "Чувствам се по-уверен/а в себе си",
+            "Искам да говорим за работата ми",
+            "Имам проблем с управлението на гнева",
+            "Нуждая се от подкрепа при вземане на решения",
+            "Чувствам голям напредък в терапията",
+            "",
+            "Започнах да прилагам дихателните техники",
+            "Имам нужда от помощ с комуникацията",
+            "Чувствам се по-спокоен/а напоследък",
+            "Искам да работим върху самочувствието ми",
+            "Имам трудности в отношенията",
+            "Чувствам се мотивиран/а за промяна",
+            "Нуждая се от стратегии за справяне със стреса"
+        };
+
+        return patientNotes[random.Next(patientNotes.Length)];
+    }
+
+    private async Task TherapiesSeed()
+    {
+        var therapyType1 = TherapyType.Create("Деца", "https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-1.jpg?alt=media&token=1286cddf-c035-475d-a8a9-df6f93d2a21f").Value;
+        Thread.Sleep(200);
+        var therapyType2 = TherapyType.Create("Тийнейджъри", "https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-2.jpg?alt=media&token=d8809dcf-aa5f-4457-80cb-4ff8b424ba44").Value;
+        Thread.Sleep(200);
+        var therapyType3 = TherapyType.Create("Семейства & Двойки","https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-3.jpg?alt=media&token=c6a63126-082b-4e91-bb4b-b0d28812b4a2").Value;
+        Thread.Sleep(200);
+        var therapyType4 = TherapyType.Create("Възрастни","https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-4.jpg?alt=media&token=9c1248bc-4f55-47c7-84e2-9da09598e18c").Value;
+
+        therapyType1.Therapies.AddRange([
+            Therapy.Create("Психодиагностика").Value,
+            Therapy.Create("Психотерапия").Value,
+            Therapy.Create("Работа с емоциите").Value,
+            Therapy.Create("Куклотерапия").Value,
+            Therapy.Create("Приказкотерапия").Value,
+            Therapy.Create("Семейна среща").Value,
+            Therapy.Create("Хомеопатия").Value,
+
+        ]);
+
+        therapyType2.Therapies.AddRange([
+            Therapy.Create("Хранителни разтройства").Value,
+            Therapy.Create("Емоционални крайности").Value,
+            Therapy.Create("Гняв и агресия").Value,
+            Therapy.Create("Трежовност").Value,
+            Therapy.Create("Фобии / страхове").Value,
+            Therapy.Create("Изолация").Value,
+            Therapy.Create("Трудности в общуването").Value,
+        ]);
+
+        therapyType3.Therapies.AddRange([
+            Therapy.Create("Фамилна терапия").Value,
+            Therapy.Create("Терапия на брачни двойки").Value,
+            Therapy.Create("Терапия на двойки").Value,
+            Therapy.Create("Трежовност").Value,
+        ]);
+
+        therapyType4.Therapies.AddRange([
+            Therapy.Create("Житейски кризи").Value,
+            Therapy.Create("Панически атаки").Value,
+            Therapy.Create("Натрапчиви мисли").Value,
+            Therapy.Create("Безпокойство").Value,
+            Therapy.Create("Депресивни състояния").Value,
+            Therapy.Create("Семеен конфликт").Value,
+            Therapy.Create("Раздяла / Развод").Value,
+            Therapy.Create("Семейни констелации").Value,
+        ]);
+
+
+        IEnumerable<TherapyType> therapyTypes =
+        [
+            therapyType1,
+            therapyType2,
+            therapyType3,
+            therapyType4
+        ];
+
+        await _context.Set<TherapyType>().AddRangeAsync(therapyTypes);
+        await _context.SaveChangesAsync();
     }
 
 }

@@ -9,11 +9,11 @@ import { ToasterService } from "../../../layout";
 import { TherapistsService } from '../../therapists/services/therapists.service';
 import { TherapistListModel } from '../../therapists/models/therapist.list.model';
 import { TherapyListModel } from '../../therapy-types/models/therapy.list.model';
-import { AppointmentService } from "../services/appointment.service";
-import { AppointmentTimeModel, AppointmentCreateModel } from '../models';
 import { AppointmentTimePipe } from '../appointment-time.pipe';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/services';
+import { AppointmentService } from "../services/appointment.service";
+import { AppointmentCreateModel, AppointmentTimeModel } from "../models";
 
 @Component({
   selector: "app-appointment-create",

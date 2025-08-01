@@ -1,52 +1,54 @@
 <div class="container-fluid appointment py-5">
     <div class="container py-5">
         <div class="row g-5 align-items-center">
-            <div class="col-lg-6 "
-                appScrollAnimation
-                animationType="fadeInLeft"
-                [animationDelay]="200">
+            <div class="col-lg-6 " appScrollAnimation animationType="fadeInLeft" [animationDelay]="200">
                 <div class="section-title text-start">
                     <h4 class="sub-title pe-3 mb-0">Запазете час</h4>
                     <h1 class="display-4 mb-4">Готов ли си да се погрижиш за себе си?</h1>
-                    <p class="mb-4">Запази своя час лесно и дискретно. Направи първата крачка към вътрешен баланс и психично благополучие. Нашите специалисти са тук, за да те подкрепят по пътя към промяната.</p>
+                    <p class="mb-4">Запази своя час лесно и дискретно. Направи първата крачка към вътрешен баланс и
+                        психично благополучие. Нашите специалисти са тук, за да те подкрепят по пътя към промяната.</p>
                     <div class="row g-4">
                         <div class="col-sm-6">
                             <div class="d-flex flex-column h-100">
                                 <div class="mb-4">
-                                    <h5 class="mb-3"><i class="fa fa-check text-primary me-2"></i> Индивидуална терапия</h5>
-                                    <p class="mb-0">Пространство за теб, в което можеш да изразиш чувствата си свободно и да откриеш нови начини за справяне с житейските предизвикателства.</p>
+                                    <h5 class="mb-3"><i class="fa fa-check text-primary me-2"></i> Индивидуална терапия
+                                    </h5>
+                                    <p class="mb-0">Пространство за теб, в което можеш да изразиш чувствата си свободно
+                                        и да откриеш нови начини за справяне с житейските предизвикателства.</p>
                                 </div>
                                 <div class="mb-4">
-                                    <h5 class="mb-3"><i class="fa fa-check text-primary me-2"></i> Семейна и партньорска терапия</h5>
-                                    <p class="mb-0">Ако искаш, мога да добавя и български бутон вместо "More Details", например: „Научи повече“ или „Виж всички услуги“.</p>
+                                    <h5 class="mb-3"><i class="fa fa-check text-primary me-2"></i> Семейна и партньорска
+                                        терапия</h5>
+                                    <p class="mb-0">Ако искаш, мога да добавя и български бутон вместо "More Details",
+                                        например: „Научи повече“ или „Виж всички услуги“.</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="video h-100">
-                                <img src="img/client.jpg" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
+                                <img src="img/client.jpg" class="img-fluid rounded w-100 h-100"
+                                     style="object-fit: cover;" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6"
-                appScrollAnimation
-                animationType="fadeInRight"
-                [animationDelay]="400">
+            <div class="col-lg-6" appScrollAnimation animationType="fadeInRight" [animationDelay]="400">
                 <div class="appointment-container rounded px-5 py-4">
                     <p class="fs-4 text-uppercase text-primary">Свържи се</p>
                     <h1 class="display-5 mb-4">Запази час</h1>
+                    @if (generalError()) {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ generalError() }}
+                    </div>
+                    }
                     <form [formGroup]="form" (ngSubmit)="onSubmit()">
                         <div class="form-row mb-3">
                             <div class="form-group">
-                                <label for="therapyType"
-                                    class="form-label">Тип терапия *</label>
-                                <select type="text"
-                                    id="therapyType"
-                                    formControlName="therapyType"
-                                    class="form-select"
-                                    [class.is-invalid]="getFieldError('therapyType')">
+                                <label for="therapyType" class="form-label">Тип терапия *</label>
+                                <select type="text" id="therapyType" formControlName="therapyType" class="form-select"
+                                        [class.is-invalid]="getFieldError('therapyType')">
                                     <option value="" selected hidden>Изберете тип на терапия...</option>
                                     @for(therapyType of therapyTypes(); track therapyType.id){
                                     <option [value]="therapyType.id">{{therapyType.name}}</option>
@@ -59,13 +61,9 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="therapy"
-                                    class="form-label">Терапия *</label>
-                                <select type="text"
-                                    id="therapy"
-                                    formControlName="therapy"
-                                    class="form-select"
-                                    [class.is-invalid]="getFieldError('therapy')">
+                                <label for="therapy" class="form-label">Терапия *</label>
+                                <select type="text" id="therapy" formControlName="therapy" class="form-select"
+                                        [class.is-invalid]="getFieldError('therapy')">
                                     <option value="" disabled selected hidden>
                                         @if (!isTherapyTypeSelected()) {
                                         Първо изберете тип терапия...
@@ -86,13 +84,9 @@
 
                         <div class="form-row mb-3">
                             <div class="form-group">
-                                <label for="therapist"
-                                    class="form-label">Терапевт *</label>
-                                <select type="text"
-                                    id="therapist"
-                                    formControlName="therapist"
-                                    class="form-select"
-                                    [class.is-invalid]="getFieldError('therapist')">
+                                <label for="therapist" class="form-label">Терапевт *</label>
+                                <select type="text" id="therapist" formControlName="therapist" class="form-select"
+                                        [class.is-invalid]="getFieldError('therapist')">
                                     <option ngValue="" disabled selected hidden>
                                         @if (!therapyTypes()) {
                                         Първо изберете терапия...
@@ -114,36 +108,27 @@
 
                         <div class="form-row mb-3">
                             <div class="form-group">
-                                <label for="date"
-                                    class="form-label">Дата *</label>
-                                <input type="date"
-                                    id="date"
-                                    formControlName="date"
-                                    class="form-control"
-                                    [class.is-invalid]="getFieldError('date')"
-                                    placeholder="Изберете дата" />
+                                <label for="date" class="form-label">Дата *</label>
+                                <input type="date" id="date" formControlName="date" class="form-control"
+                                       [class.is-invalid]="getFieldError('date')" placeholder="Изберете дата" />
 
                                 <div class="invalid-feedback">
                                     {{ getFieldError('date') }}
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="time"
-                                    class="form-label">Час *</label>
-                                <select type="text"
-                                    id="time"
-                                    formControlName="time"
-                                    class="form-select"
-                                    [class.is-invalid]="getFieldError('time')">
+                                <label for="time" class="form-label">Час *</label>
+                                <select type="text" id="time" formControlName="time" class="form-select"
+                                        [class.is-invalid]="getFieldError('time')">
                                     @if (!isDateSelected()) {
                                     Първо изберете data...
                                     } @else {
-                                    
+
                                     Изберете час...
                                     }
                                     <option ngValue="" disabled selected hidden>Изберете час...</option>
                                     @for (time of availableAppointments(); track $index) {
-                                        <option [value]="time.start">{{time | appointmentTime}}</option>
+                                    <option [value]="time.start">{{time | appointmentTime}}</option>
                                     }
 
                                 </select>
@@ -154,30 +139,22 @@
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
-                            <label for="time"
-                                class="form-label">Коментар</label>
-                            <textarea
-                                id="comment"
-                                name="comment"
-                                cols="30"
-                                rows="5"
-                                formControlName="comment"
-                                class="form-control"
-                                [class.is-invalid]="getFieldError('comment')"
-                                placeholder="Оставете коментар"></textarea>
+                            <label for="time" class="form-label">Коментар</label>
+                            <textarea id="comment" name="comment" cols="30" rows="5" formControlName="comment"
+                                      class="form-control" [class.is-invalid]="getFieldError('comment')"
+                                      placeholder="Оставете коментар"></textarea>
                         </div>
 
                         <div class="row gy-3 gx-4">
                             <div class="col-12">
-                                <button 
-                                    type="submit" 
-                                    class="btn btn-primary text-white w-100 py-3 px-5"
-                                    [disabled]="form.invalid || isSubmitting()">
+                                <button type="submit" class="btn btn-primary text-white w-100 py-3 px-5"
+                                        [disabled]="form.invalid || isSubmitting()">
                                     @if (isSubmitting()) {
-                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                        Записване...
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"
+                                          aria-hidden="true"></span>
+                                    Записване...
                                     } @else {
-                                        Запази час
+                                    Запази час
                                     }
                                 </button>
                             </div>

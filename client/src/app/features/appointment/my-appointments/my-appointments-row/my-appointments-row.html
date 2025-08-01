@@ -1,0 +1,22 @@
+<td>{{ index }}</td>
+<td>
+    <strong>{{ appointment.date | date:'dd/MM/yyyy' }}</strong>
+</td>
+<td>
+    <span class="text-muted">{{ appointment | appointmentTime }}</span>
+</td>
+<td>
+    <div class="d-flex align-items-center">
+        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2"
+             style="width: 32px; height: 32px; color: white; font-size: 14px;">
+            {{ appointment.therapistFullName.charAt(0) || 'T' }}
+        </div>
+        <span>{{ appointment.therapistFullName || 'Неизвестен терапевт' }}</span>
+    </div>
+</td>
+<td>{{ appointment.therapyName || 'Не е зададен тип' }}</td>
+<td>
+    <button type="button" class="btn btn-sm btn-danger">
+        <i class="fas fa-times"></i> Отмяна
+    </button>
+</td>

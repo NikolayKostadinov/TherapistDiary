@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -16,12 +16,11 @@ import { PagedResult } from '../../../common/models/paged-result.model';
     providedIn: 'root'
 })
 export class AuthHttpService {
-    private readonly httpClient = inject(HttpClient);
 
-      constructor() { }
+    constructor(private readonly http: HttpClient) { }
 
     login(loginRequest: LoginRequest): Observable<HttpResponse<AuthResponse>> {
-        return this.httpClient.post(
+        return this.http.post(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.LOGIN}`,
             loginRequest,
             { observe: 'response' }
@@ -34,7 +33,7 @@ export class AuthHttpService {
     }
 
     refreshToken(refreshToken: string): Observable<HttpResponse<AuthResponse>> {
-        return this.httpClient.post(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REFRESH}`, {}, {
+        return this.http.post(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REFRESH}`, {}, {
             headers: {
                 'X-Refresh-Token': refreshToken
             },
@@ -50,7 +49,7 @@ export class AuthHttpService {
     }
 
     register(registerData: RegisterRequest): Observable<HttpResponse<AuthResponse>> {
-        return this.httpClient.post(
+        return this.http.post(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REGISTER}`,
             registerData,
             { observe: 'response' }
@@ -63,7 +62,7 @@ export class AuthHttpService {
     }
 
     updateProfile(updateUserRequest: UserEditProfileModel): Observable<HttpResponse<AuthResponse>> {
-        return this.httpClient.put(
+        return this.http.put(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${updateUserRequest.id}`,
             updateUserRequest,
             { observe: 'response' }
@@ -76,7 +75,7 @@ export class AuthHttpService {
     }
 
     deleteProfile(id: string): Observable<HttpResponse<void>> {
-        return this.httpClient.delete<void>(
+        return this.http.delete<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${id}`,
             { observe: 'response' }
         ).pipe(
@@ -88,7 +87,7 @@ export class AuthHttpService {
     }
 
     getUserProfile(id: string): Observable<HttpResponse<UserProfileModel>> {
-        return this.httpClient.get<UserProfileModel>(
+        return this.http.get<UserProfileModel>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}/${id}`,
             { observe: 'response' }
         ).pipe(
@@ -102,7 +101,7 @@ export class AuthHttpService {
     getAllUsers(pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<UserProfileModel>>> {
         let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
 
-        return this.httpClient.get<PagedResult<UserProfileModel>>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`,
+        return this.http.get<PagedResult<UserProfileModel>>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`,
             {
                 params: params,
                 observe: 'response'
@@ -117,7 +116,7 @@ export class AuthHttpService {
 
 
     addRoleToUser(id: string, role: string) {
-        return this.httpClient.patch<void>(
+        return this.http.patch<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.ADD_TO_ROLE}/${id}/${role}`,
             { observe: 'response' }
         ).pipe(
@@ -128,7 +127,7 @@ export class AuthHttpService {
         );
     }
     removeRoleFromUser(id: string, role: string) {
-        return this.httpClient.patch<void>(
+        return this.http.patch<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REMOVE_FROM_ROLE}/${id}/${role}`,
             { observe: 'response' }
         ).pipe(
@@ -160,7 +159,7 @@ export class AuthHttpService {
     }
 
     changePassword(userId: string, changePasswordRequest: ChangePasswordModel): Observable<HttpResponse<void>> {
-        return this.httpClient.patch<void>(
+        return this.http.patch<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.CHANGE_PASSWORD}/${userId}`,
             changePasswordRequest,
             { observe: 'response' }
@@ -168,6 +167,23 @@ export class AuthHttpService {
             catchError((error: HttpErrorResponse) => {
                 const errorMessage = Utils.getErrorMessage(error, 'смяна на паролата');
                 return throwError(() => ({ ...error, message: errorMessage }));
+            })
+        );
+    }
+
+    getMyAppointments(patientId: string, pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<any>>> {
+        let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
+        params = params.set('patientId', patientId);
+
+        return this.http.get<PagedResult<any>>(`${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_PATIENT}`,
+            {
+                params: params,
+                observe: 'response'
+            }
+        ).pipe(
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'записаните часове');
+                return throwError(() => new Error(errorMessage));
             })
         );
     }
