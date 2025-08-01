@@ -13,14 +13,17 @@ public class TherapyType : DeletableEntity
         Therapies = new HashSet<Therapy>();
     }
 
-    private TherapyType(string name, string bannerPictureUrl) : this()
+    private TherapyType(
+        string name,
+        string bannerPictureUrl)
+        : this()
     {
         Name = name;
         BannerPictureUrl = bannerPictureUrl;
     }
 
-    public string Name { get; private set; }
-    public string BannerPictureUrl { get; private set; }
+    public string Name { get; private set; }= null!;
+    public string BannerPictureUrl { get; private set; } = null!;
     public ICollection<Therapy> Therapies { get; private set; }
 
     public static Result<TherapyType> Create(string name, string bannerPictureUrl)

@@ -5,12 +5,12 @@ using Domain.Infrastructure;
 using Domain.Repositories;
 using Domain.Shared;
 
-public class CreateAppointmentCommand : ICreateAppointmentCommand
+public class CreateAppointmentCommandHandler : ICreateAppointmentCommandHandler
 {
     private readonly IAppointmentRepository _patientRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CreateAppointmentCommand(IAppointmentRepository patientRepository, IUnitOfWork unitOfWork)
+    public CreateAppointmentCommandHandler(IAppointmentRepository patientRepository, IUnitOfWork unitOfWork)
     {
         _patientRepository = patientRepository ?? throw new ArgumentNullException(nameof(patientRepository));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));

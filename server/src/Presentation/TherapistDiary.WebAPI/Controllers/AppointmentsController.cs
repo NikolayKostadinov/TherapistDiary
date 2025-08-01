@@ -2,23 +2,31 @@ namespace TherapistDiary.WebAPI.Controllers;
 
 using Abstract;
 using Application.Appointments.Commands.Create;
+using Application.Appointments.Queries.GetAllAppointmentByPatient;
+using Application.Appointments.Queries.GetAllAppointmentByTherapist;
 using Application.Appointments.Queries.GetAvailableAppointments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 public class AppointmentsController: ApiController
 {
-    private readonly IGetAvailableAppointmentsQuery _query;
-    private readonly ICreateAppointmentCommand _createAppointmentCommand;
+    private readonly IGetAvailableAppointmentsQueryHandler _queryHandler;
+    private readonly ICreateAppointmentCommandHandler _createAppointmentCommandHandlerHandler;
+    private readonly IGetAllAppointmentByPatientQueryHandler _getAllAppointmentByPatientQueryHandler;
+    private readonly IGetAllAppointmentByTherapistQueryHandler _getAllAppointmentByTherapistQueryHandler;
 
     public AppointmentsController(
         ILogger<AppointmentsController> logger,
-        IGetAvailableAppointmentsQuery query,
-        ICreateAppointmentCommand createAppointmentCommand)
+        IGetAvailableAppointmentsQueryHandler queryHandler,
+        ICreateAppointmentCommandHandler createAppointmentCommandHandlerHandler,
+        IGetAllAppointmentByPatientQueryHandler getAllAppointmentByPatientQueryHandler,
+        IGetAllAppointmentByTherapistQueryHandler getAllAppointmentByTherapistQueryHandler)
         : base(logger)
     {
-        _query = query;
-        _createAppointmentCommand = createAppointmentCommand;
+        _queryHandler = queryHandler;
+        _createAppointmentCommandHandlerHandler = createAppointmentCommandHandlerHandler;
+        _getAllAppointmentByPatientQueryHandler = getAllAppointmentByPatientQueryHandler;
+        _getAllAppointmentByTherapistQueryHandler = getAllAppointmentByTherapistQueryHandler;
     }
 
     [Authorize]
@@ -27,7 +35,25 @@ public class AppointmentsController: ApiController
         [FromRoute]GetAvailableAppointmentsRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _query.Handle(request, cancellationToken);
+        var result = await _queryHandler.Handle(request, cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : HandleFailure(result);
+    }
+
+    [HttpGet("by-patient")]
+    public async Task<IActionResult> GetAllByPatient([FromQuery]GetAllAppointmentByPatientRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _getAllAppointmentByPatientQueryHandler.Handle(request, cancellationToken);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : HandleFailure(result);
+    }
+
+    [HttpGet("by-therapist")]
+    public async Task<IActionResult> GetAllByTherapist([FromQuery]GetAllAppointmentByTherapistRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _getAllAppointmentByTherapistQueryHandler.Handle(request, cancellationToken);
         return result.IsSuccess
             ? Ok(result.Value)
             : HandleFailure(result);
@@ -39,7 +65,7 @@ public class AppointmentsController: ApiController
         [FromBody] CreateAppointmentRequest request,
         CancellationToken cancellationToken )
     {
-        var result = await _createAppointmentCommand.Handle(request, cancellationToken);
+        var result = await _createAppointmentCommandHandlerHandler.Handle(request, cancellationToken);
         return result.IsSuccess
             ? Ok(result.Value)
             : HandleFailure(result);

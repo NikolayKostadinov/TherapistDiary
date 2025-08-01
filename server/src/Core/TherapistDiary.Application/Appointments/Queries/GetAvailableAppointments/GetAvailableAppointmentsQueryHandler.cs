@@ -8,12 +8,12 @@ using Infrastructure.AutoMapper;
 using Responses;
 using TherapistDiary.Common.Extensions;
 
-public class GetAvailableAppointmentsQuery:IGetAvailableAppointmentsQuery
+public class GetAvailableAppointmentsQueryHandler:IGetAvailableAppointmentsQueryHandler
 {
     private readonly IBusinessHoursService _businessHoursService;
     private readonly IAppointmentRepository _appointmentRepository;
 
-    public GetAvailableAppointmentsQuery(
+    public GetAvailableAppointmentsQueryHandler(
         IBusinessHoursService businessHoursService,
         IAppointmentRepository appointmentRepository)
     {
@@ -30,6 +30,5 @@ public class GetAvailableAppointmentsQuery:IGetAvailableAppointmentsQuery
         var reservedHours = await _appointmentRepository.GetAppointments<BusinessHour>(request.TherapistId, request.Date);
         return businessHours.Where(x => reservedHours.All(r => r.Start != x.Start))
             .To<List<AvailableAppointmentResponse>>();
-
     }
 }

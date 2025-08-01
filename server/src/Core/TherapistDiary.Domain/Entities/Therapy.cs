@@ -15,10 +15,10 @@ public class Therapy : DeletableEntity
         Name = name;
     }
 
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
 
     public Guid TherapyTypeId { get; private set; }
-    public TherapyType TherapyType { get; private set; }
+    public TherapyType TherapyType { get; private set; } = null!;
 
     public static Result<Therapy> Create(string name)
     {

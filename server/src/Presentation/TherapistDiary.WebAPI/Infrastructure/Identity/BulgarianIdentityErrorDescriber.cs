@@ -47,13 +47,13 @@ public class BulgarianIdentityErrorDescriber : IdentityErrorDescriber
         Description = GetLocalizedString("LoginAlreadyAssociated", "Потребител с този вход вече съществува.")
     };
 
-    public override IdentityError InvalidUserName(string userName) => new IdentityError
+    public override IdentityError InvalidUserName(string? userName) => new IdentityError
     {
         Code = nameof(InvalidUserName),
         Description = string.Format(GetLocalizedString("InvalidUserName", "Потребителското име '{0}' е невалидно, може да съдържа само букви и цифри."), userName)
     };
 
-    public override IdentityError InvalidEmail(string email) => new IdentityError
+    public override IdentityError InvalidEmail(string? email) => new IdentityError
     {
         Code = nameof(InvalidEmail),
         Description = string.Format(GetLocalizedString("InvalidEmail", "Имейлът '{0}' е невалиден."), email)
