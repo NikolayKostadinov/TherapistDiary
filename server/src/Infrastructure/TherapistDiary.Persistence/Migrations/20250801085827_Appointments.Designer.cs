@@ -12,8 +12,8 @@ using TherapistDiary.Persistence;
 namespace TherapistDiary.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250731083259_AppointmentFix")]
-    partial class AppointmentFix
+    [Migration("20250801085827_Appointments")]
+    partial class Appointments
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -157,6 +157,9 @@ namespace TherapistDiary.Persistence.Migrations
 
                     b.Property<Guid>("TherapistId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TherapistNotes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("TherapyId")
                         .HasColumnType("uniqueidentifier");

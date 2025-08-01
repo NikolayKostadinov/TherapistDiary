@@ -9,4 +9,5 @@ public class AppointmentByTherapistDto
     public TimeOnly Start { get; set; }
     public TimeOnly End { get; set; }
     public string? Notes { get; set; }
+    public string? TherapistNotes { get; set; }
 }

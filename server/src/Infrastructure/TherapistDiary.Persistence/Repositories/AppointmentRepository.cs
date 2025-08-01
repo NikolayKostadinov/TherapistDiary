@@ -48,8 +48,9 @@ public class AppointmentRepository:IAppointmentRepository
         {
             var searchTermLower = parameters.SearchTerm.ToLower();
             query = query.Where(p =>
-                EF.Functions.Like(p.Therapy.Name, $"%{parameters.SearchTerm}%") ||
-                EF.Functions.Like(p.Therapist.FullName ?? "", $"%{parameters.SearchTerm}%") ||
+                EF.Functions.Like(p.Therapist.FirstName ?? "", $"%{searchTermLower}%") ||
+                EF.Functions.Like(p.Therapist.MidName ?? "", $"%{searchTermLower}%") ||
+                EF.Functions.Like(p.Therapist.LastName ?? "", $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Date.ToString(), $"%{parameters.SearchTerm}%"));
         }
 
@@ -90,12 +91,12 @@ public class AppointmentRepository:IAppointmentRepository
 
     public async Task<(IEnumerable<AppointmentByTherapistDto> patients, int totalCount, int totalPages)>
         GetAllByTherapistPagedAsync(
-        Guid patientId,
+        Guid therapistId,
         PaginationParameters parameters,
         CancellationToken cancellationToken)
     {
         var query = _context.Set<Appointment>()
-            .Where(a=>a.PatientId == patientId)
+            .Where(a=>a.TherapistId == therapistId)
             .Include(a=>a.Patient)
             .Include(a=>a.Therapy)
             .AsQueryable();
@@ -105,9 +106,11 @@ public class AppointmentRepository:IAppointmentRepository
         {
             var searchTermLower = parameters.SearchTerm.ToLower();
             query = query.Where(p =>
-                EF.Functions.Like(p.Therapy.Name, $"%{parameters.SearchTerm}%") ||
-                EF.Functions.Like(p.Patient.FullName ?? "", $"%{parameters.SearchTerm}%") ||
-                EF.Functions.Like(p.Date.ToString(), $"%{parameters.SearchTerm}%"));
+                EF.Functions.Like(p.Therapy.Name, $"%{searchTermLower}%") ||
+                EF.Functions.Like(p.Patient.FirstName ?? "", $"%{searchTermLower}%") ||
+                EF.Functions.Like(p.Patient.MidName ?? "", $"%{searchTermLower}%") ||
+                EF.Functions.Like(p.Patient.LastName ?? "", $"%{searchTermLower}%") ||
+                EF.Functions.Like(p.Date.ToString(), $"%{searchTermLower}%"));
         }
 
         // Calculate total count AFTER filtering

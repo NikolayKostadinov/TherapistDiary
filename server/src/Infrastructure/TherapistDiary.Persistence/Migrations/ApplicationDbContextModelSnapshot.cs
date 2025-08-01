@@ -155,6 +155,9 @@ namespace TherapistDiary.Persistence.Migrations
                     b.Property<Guid>("TherapistId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("TherapistNotes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("TherapyId")
                         .HasColumnType("uniqueidentifier");
 

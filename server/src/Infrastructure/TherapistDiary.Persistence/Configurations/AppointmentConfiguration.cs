@@ -10,6 +10,13 @@ public class AppointmentConfiguration: IEntityTypeConfiguration<Appointment>
     {
         builder.ToTable("Appointment");
 
+        builder.Property(a => a.Notes)
+            .HasColumnType("nvarchar(max)")
+            ;
+
+        builder.Property(a => a.TherapistNotes)
+            .HasColumnType("nvarchar(max)");
+
         builder
             .HasOne(a => a.Therapist)
             .WithMany()

@@ -38,6 +38,8 @@ public class Appointment : DeletableEntity
 
     public string? Notes { get; private set; }
 
+    public string? TherapistNotes { get; private set; }
+
     public Result<Appointment> Update(
         Guid therapistId,
         Guid therapyTypeId,

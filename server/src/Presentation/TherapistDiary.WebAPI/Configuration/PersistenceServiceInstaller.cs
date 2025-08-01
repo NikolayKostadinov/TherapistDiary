@@ -57,6 +57,7 @@ public class PersistentServiceInstaller : IServiceInstaller
         // ------------------------------- Global ISeed SetUp ------------------------------------------------------------
         services.AddScoped<ApplicationInitializer>();
         services.AddScoped<TherapiesSeed>();
+        services.AddScoped<AppointmentSeed>();
     }
 
     private static bool IsRunningInContainer()

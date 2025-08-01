@@ -18,11 +18,12 @@ namespace TherapistDiary.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TherapistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TherapyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TherapyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Start = table.Column<TimeOnly>(type: "time", nullable: false),
                     End = table.Column<TimeOnly>(type: "time", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TherapistNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedFrom = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -45,9 +46,9 @@ namespace TherapistDiary.Persistence.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Appointment_TherapyTypes_TherapyTypeId",
-                        column: x => x.TherapyTypeId,
-                        principalTable: "TherapyTypes",
+                        name: "FK_Appointment_Therapies_TherapyId",
+                        column: x => x.TherapyId,
+                        principalTable: "Therapies",
                         principalColumn: "Id");
                 });
 
@@ -67,9 +68,9 @@ namespace TherapistDiary.Persistence.Migrations
                 column: "TherapistId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointment_TherapyTypeId",
+                name: "IX_Appointment_TherapyId",
                 table: "Appointment",
-                column: "TherapyTypeId");
+                column: "TherapyId");
         }
 
         /// <inheritdoc />
