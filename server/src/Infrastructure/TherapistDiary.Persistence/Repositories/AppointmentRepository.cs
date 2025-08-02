@@ -110,7 +110,7 @@ public class AppointmentRepository:IAppointmentRepository
                 EF.Functions.Like(p.Patient.FirstName, $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Patient.MidName ?? "", $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Patient.LastName, $"%{searchTermLower}%") ||
-                EF.Functions.Like(p.Date.ToString(), $"%{searchTermLower}%"));
+                EF.Functions.Like(p.Date.ToString("dd/MM/yyyy"), $"%{searchTermLower}%"));
         }
 
         // Calculate total count AFTER filtering

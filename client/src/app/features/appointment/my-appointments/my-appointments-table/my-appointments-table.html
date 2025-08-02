@@ -4,7 +4,8 @@
             <div class="common-container">
                 <div class="common-header">
                     <h1>Моите записани часове</h1>
-                    <p>Преглед и управление на вашите записани терапевтични сесии</p>
+                    <p>Преглед и управление на вашите записани терапевтични
+                        сесии</p>
                 </div>
 
                 <!-- Search Section -->
@@ -14,11 +15,16 @@
                             <span class="input-group-text">
                                 <i class="fas fa-search"></i>
                             </span>
-                            <input type="text" class="form-control search-input" [value]="searchTerm() || ''"
-                                   (input)="onSearchInput($event)" placeholder="Търсене по терапевт, дата, статус..."
+                            <input type="text"
+                                   class="form-control search-input"
+                                   [value]="searchTerm() || ''"
+                                   (input)="onSearchInput($event)"
+                                   placeholder="Търсене по терапевт, дата, статус..."
                                    aria-label="Търсене на записани часове">
                             @if (searchTerm()) {
-                            <button type="button" class="btn btn-outline-danger btn-clear" (click)="onSearch('')"
+                            <button type="button"
+                                    class="btn btn-outline-danger btn-clear"
+                                    (click)="onSearch('')"
                                     title="Изчисти търсенето">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -37,7 +43,8 @@
                 <!-- Loading Indicator -->
                 @if (isLoading()) {
                 <div class="d-flex justify-content-center my-4">
-                    <div class="spinner-border text-primary" role="status">
+                    <div class="spinner-border text-primary"
+                         role="status">
                         <span class="visually-hidden">Зареждане...</span>
                     </div>
                 </div>
@@ -49,20 +56,26 @@
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col" class="sortable-header" (click)="onSort('appointmentDate')"
+                            <th scope="col"
+                                class="sortable-header"
+                                (click)="onSort('appointmentDate')"
                                 style="cursor: pointer;">
                                 Дата
                                 @if (sortBy() === 'appointmentDate') {
-                                <i class="fas" [class.fa-sort-up]="sortDescending() === 'false'"
+                                <i class="fas"
+                                   [class.fa-sort-up]="sortDescending() === 'false'"
                                    [class.fa-sort-down]="sortDescending() === 'true'"></i>
                                 }
                             </th>
                             <th scope="col">Час</th>
-                            <th scope="col" class="sortable-header" (click)="onSort('therapistName')"
+                            <th scope="col"
+                                class="sortable-header"
+                                (click)="onSort('therapistName')"
                                 style="cursor: pointer;">
                                 Терапевт
                                 @if (sortBy() === 'therapistName') {
-                                <i class="fas" [class.fa-sort-up]="sortDescending() === 'false'"
+                                <i class="fas"
+                                   [class.fa-sort-up]="sortDescending() === 'false'"
                                    [class.fa-sort-down]="sortDescending() === 'true'"></i>
                                 }
                             </th>
@@ -73,11 +86,14 @@
                     <tbody>
                         @if (appointments().length === 0) {
                         <tr>
-                            <td colspan="6" class="text-center py-4">
-                                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <td colspan="6"
+                                class="text-center py-4">
+                                <i
+                                   class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
                                 <p class="text-muted mb-0">
                                     @if (searchTerm()) {
-                                    Няма намерени записани часове за търсенето "{{ searchTerm() }}"
+                                    Няма намерени записани часове за търсенето
+                                    "{{ searchTerm() }}"
                                     } @else {
                                     Все още нямате записани часове
                                     }
@@ -85,9 +101,12 @@
                             </td>
                         </tr>
                         } @else {
-                        @for (appointment of appointments(); track appointment.id; let i = $index) {
-                        <tr app-my-appointments-row [appointment]="appointment"
-                            [index]="(currentPage() - 1) * pageSize() + i + 1">
+                        @for (appointment of appointments(); track
+                        appointment.id; let i = $index) {
+                        <tr app-my-appointments-row
+                            [appointment]="appointment"
+                            [index]="(currentPage() - 1) * pageSize() + i + 1"
+                            (delete)="onDeleteClick($event)">
                         </tr>
                         }
                         }
@@ -96,40 +115,24 @@
                 }
 
                 <!-- Pagination -->
-                @if (!isLoading() && totalPages() > 1) {
-                <nav aria-label="Навигация за записани часове" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" [class.disabled]="currentPage() === 1">
-                            <button class="page-link" (click)="onPageChange(currentPage() - 1)"
-                                    [disabled]="currentPage() === 1">
-                                <i class="fas fa-chevron-left"></i> Предишна
-                            </button>
-                        </li>
-
-                        @for (page of [].constructor(totalPages()); track $index; let i = $index) {
-                        <li class="page-item" [class.active]="currentPage() === i + 1">
-                            <button class="page-link" (click)="onPageChange(i + 1)">
-                                {{ i + 1 }}
-                            </button>
-                        </li>
-                        }
-
-                        <li class="page-item" [class.disabled]="currentPage() === totalPages()">
-                            <button class="page-link" (click)="onPageChange(currentPage() + 1)"
-                                    [disabled]="currentPage() === totalPages()">
-                                Следваща <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-
-                <!-- Results Info -->
-                <div class="text-center text-muted mt-2">
-                    Показани {{ appointments().length }} от {{ totalCount() }} записани часа
-                    (Страница {{ currentPage() }} от {{ totalPages() }})
-                </div>
+                @if (!isLoading() && pagerData()) {
+                <app-pager [pager]="pagerData()"
+                           (pageChange)="onPageChange($event)"
+                           (pageSizeChange)="onPageSizeChange($event)">
+                </app-pager>
                 }
             </div>
         </div>
     </div>
 </div>
+
+<!-- Модал за потвърждение на изтриване -->
+<app-confirmation-modal [isVisible]="showDeleteModal()"
+                        title="Отмяна на час"
+                        message="Сигурни ли сте, че искате да отмените часа си?"
+                        warningText="Това действие е необратимо! Всички данни за часа ще бъдат изтрити завинаги."
+                        confirmText="Отмени часа"
+                        cancelText="Отказ"
+                        (confirm)="onConfirmDelete()"
+                        (cancel)="onCancelDelete()">
+</app-confirmation-modal>

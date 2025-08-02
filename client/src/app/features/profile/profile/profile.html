@@ -160,14 +160,6 @@
 </div>
 }
 
-<!-- Fallback - ако няма профил, няма loading и няма error
-@if (!userProfile() && !isLoading() && !hasError()) {
-<div class="no-profile">
-    <p>Няма данни за профила.</p>
-    <button (click)="onRetryLoadProfile()">Зареди профила</button>
-</div>
-} -->
-
 <!-- Модал за потвърждение на изтриване -->
 <app-confirmation-modal [isVisible]="showDeleteModal()" title="Изтриване на профил"
                         message="Сигурни ли сте, че искате да изтриете профила си?"

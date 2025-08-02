@@ -37,6 +37,15 @@ export class AppointmentService {
         );
     }
 
+    deleteAppointment(appointmentId: string): Observable<void> {
+        return this.httpClient.delete<void>(
+            `${this.apiUrl}/${appointmentId}`,
+            { observe: 'response' }
+        ).pipe(
+            map(() => void 0)
+        );
+    }
+
     getMyAppointments(patientId: string, pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<any>>> {
         let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
         params = params.set('patientId', patientId);

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { Component, computed, inject, signal, OnInit, DestroyRef, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, map, throwError } from 'rxjs';
@@ -7,18 +7,21 @@ import { AppointmentService } from '../../services/appointment.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserInfo } from '../../../auth/models';
 import { MyAppointmentModel } from '../../models';
-import { ApiError, PagedResult } from '../../../../common';
+import { ApiError, PagedResult, PagerModel, ConfirmationModal, Utils } from '../../../../common';
+import { Pager } from '../../../../layout/pager/pager';
+import { ToasterService } from '../../../../layout';
 
 @Component({
     selector: 'app-my-appointments-table',
-    imports: [CommonModule, MyAppointmentsRow],
+    imports: [CommonModule, MyAppointmentsRow, Pager, ConfirmationModal],
     templateUrl: './my-appointments-table.html',
     styleUrl: './my-appointments-table.css'
 })
 export class MyAppointmentsTable implements OnInit {
-    private appointmentService = inject(AppointmentService);
-    private authService = inject(AuthService);
-    private destroyRef = inject(DestroyRef);
+    private _appointmentService = inject(AppointmentService);
+    private _authService = inject(AuthService);
+    private _destroyRef = inject(DestroyRef);
+    private _toaster = inject(ToasterService);
 
     // Data signals
     private _appointmentsPagedList = signal<PagedResult<MyAppointmentModel> | null>(null);
@@ -38,15 +41,34 @@ export class MyAppointmentsTable implements OnInit {
     public totalPages = computed(() => this.appointmentsPagedList()?.totalPages || 0);
     public totalCount = computed(() => this.appointmentsPagedList()?.totalCount || 0);
 
+    private _destroyedAppointmentId: string | null = null;
+
+    // Pager data for the Pager component
+    public pagerData = computed(() => {
+        const pagedData = this.appointmentsPagedList();
+        if (!pagedData) return null;
+
+        return {
+            totalCount: pagedData.totalCount,
+            page: pagedData.page,
+            pageSize: pagedData.pageSize,
+            totalPages: pagedData.totalPages,
+            hasNextPage: pagedData.hasNextPage,
+            hasPreviousPage: pagedData.hasPreviousPage
+        } as PagerModel;
+    });
+
+    protected showDeleteModal = signal(false);
+
     ngOnInit(): void {
         this.loadAppointments();
     }
 
     public loadAppointments(): void {
-        const currentUser: UserInfo | null = this.authService.currentUser();
+        const currentUser: UserInfo | null = this._authService.currentUser();
         if (currentUser?.id) {
             this._isLoading.set(true);
-            this.appointmentService.getMyAppointments(
+            this._appointmentService.getMyAppointments(
                 currentUser.id,
                 this.currentPage(),
                 this.pageSize(),
@@ -55,7 +77,7 @@ export class MyAppointmentsTable implements OnInit {
                 this.sortDescending()
             )
                 .pipe(
-                    takeUntilDestroyed(this.destroyRef),
+                    takeUntilDestroyed(this._destroyRef),
                     map(response => response.body
                         ? <PagedResult<MyAppointmentModel>>{
                             ...response.body,
@@ -89,6 +111,12 @@ export class MyAppointmentsTable implements OnInit {
         this.loadAppointments();
     }
 
+    public onPageSizeChange(pageSize: number): void {
+        this.pageSize.set(pageSize);
+        this.currentPage.set(1);
+        this.loadAppointments();
+    }
+
     public onSearch(searchTerm: string): void {
         this.searchTerm.set(searchTerm || null);
         this.currentPage.set(1);
@@ -115,5 +143,34 @@ export class MyAppointmentsTable implements OnInit {
 
         this.currentPage.set(1);
         this.loadAppointments();
+    }
+
+
+    onDeleteClick(appointmentId: string): void {
+        this.showDeleteModal.set(true);
+        this._destroyedAppointmentId = appointmentId;
+    }
+
+    onConfirmDelete(): void {
+        this.showDeleteModal.set(false);
+        if (this._destroyedAppointmentId) {
+            this._isLoading.set(true);
+            const appointmentId = this._destroyedAppointmentId ?? '';
+            this._appointmentService.deleteAppointment(appointmentId).subscribe({
+                next: () => {
+                    this._isLoading.set(false);
+                    this.loadAppointments();
+                },
+                error: (error: ApiError) => {
+                    this._isLoading.set(false);
+                    this._toaster.error(`Грешка при изтриване на записа! ${Utils.getGeneralErrorMessage(error)}`);
+                }
+            });
+            this._destroyedAppointmentId = null;
+        }
+    }
+
+    onCancelDelete(): void {
+        this.showDeleteModal.set(false);
     }
 }

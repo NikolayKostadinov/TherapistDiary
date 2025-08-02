@@ -11,12 +11,15 @@
              style="width: 32px; height: 32px; color: white; font-size: 14px;">
             {{ appointment.therapistFullName.charAt(0) || 'T' }}
         </div>
-        <span>{{ appointment.therapistFullName || 'Неизвестен терапевт' }}</span>
+        <span>{{ appointment.therapistFullName || 'Неизвестен терапевт'
+            }}</span>
     </div>
 </td>
 <td>{{ appointment.therapyName || 'Не е зададен тип' }}</td>
 <td>
-    <button type="button" class="btn btn-sm btn-danger">
+    <button type="button"
+            class="btn btn-sm btn-danger"
+            (click)="deleteElement()">
         <i class="fas fa-times"></i> Отмяна
     </button>
 </td>
