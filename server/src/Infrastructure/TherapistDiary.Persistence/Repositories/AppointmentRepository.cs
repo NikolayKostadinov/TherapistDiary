@@ -107,9 +107,9 @@ public class AppointmentRepository:IAppointmentRepository
             var searchTermLower = parameters.SearchTerm.ToLower();
             query = query.Where(p =>
                 EF.Functions.Like(p.Therapy.Name, $"%{searchTermLower}%") ||
-                EF.Functions.Like(p.Patient.FirstName ?? "", $"%{searchTermLower}%") ||
+                EF.Functions.Like(p.Patient.FirstName, $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Patient.MidName ?? "", $"%{searchTermLower}%") ||
-                EF.Functions.Like(p.Patient.LastName ?? "", $"%{searchTermLower}%") ||
+                EF.Functions.Like(p.Patient.LastName, $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Date.ToString(), $"%{searchTermLower}%"));
         }
 
@@ -146,5 +146,18 @@ public class AppointmentRepository:IAppointmentRepository
             .ToListAsync(cancellationToken);
 
         return (results, totalCount, totalPages);
+    }
+
+    public async Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _context
+            .Set<Appointment>()
+            .FindAsync(id, cancellationToken);
+    }
+
+    public Task DeleteAsync(Appointment patient, CancellationToken cancellationToken)
+    {
+        _context.Set<Appointment>().Remove(patient);
+        return Task.CompletedTask;
     }
 }

@@ -46,7 +46,8 @@ public class Appointment : DeletableEntity
         DateOnly date,
         TimeOnly start,
         TimeOnly end,
-        string? notes = null)
+        string? notes = null,
+        string? therapistNotes = null)
     {
         TherapistId = therapistId;
         TherapyId = therapyTypeId;
@@ -54,6 +55,7 @@ public class Appointment : DeletableEntity
         Start = start;
         End = end;
         Notes = notes;
+        TherapistNotes = therapistNotes;
         return Validate(Operations.Update);
     }
 

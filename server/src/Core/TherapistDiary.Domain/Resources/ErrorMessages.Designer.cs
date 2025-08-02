@@ -60,11 +60,29 @@ namespace TherapistDiary.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Appointment Id:&apos;{0}&apos; not found!.
+        /// </summary>
+        public static string APPOINTMENT_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("APPOINTMENT_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The start time must be before the end time..
         /// </summary>
         public static string BEGIN_MUST_BE_BEFORE_START {
             get {
                 return ResourceManager.GetString("BEGIN_MUST_BE_BEFORE_START", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot delete appointment that has already been completed!.
+        /// </summary>
+        public static string CANNOT_DELETE_APPOINTMENT_IN_PAST {
+            get {
+                return ResourceManager.GetString("CANNOT_DELETE_APPOINTMENT_IN_PAST", resourceCulture);
             }
         }
         

@@ -63,4 +63,10 @@
     <data name="BEGIN_MUST_BE_BEFORE_START" xml:space="preserve">
         <value>The start time must be before the end time.</value>
     </data>
+    <data name="CANNOT_DELETE_APPOINTMENT_IN_PAST" xml:space="preserve">
+        <value>Cannot delete appointment that has already been completed!</value>
+    </data>
+    <data name="APPOINTMENT_NOT_FOUND" xml:space="preserve">
+        <value>Appointment Id:'{0}' not found!</value>
+    </data>
 </root>

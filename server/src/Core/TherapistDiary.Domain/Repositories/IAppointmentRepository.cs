@@ -15,4 +15,6 @@ public interface IAppointmentRepository
 
     Task<(IEnumerable<AppointmentByPatientDto> patients, int totalCount, int totalPages)> GetAllByPatientPagedAsync(Guid patientId, PaginationParameters parameters, CancellationToken cancellationToken);
     Task<(IEnumerable<AppointmentByTherapistDto> patients, int totalCount, int totalPages)> GetAllByTherapistPagedAsync(Guid therapistId, PaginationParameters parameters, CancellationToken cancellationToken);
+    Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task DeleteAsync(Appointment patient, CancellationToken cancellationToken);
 }

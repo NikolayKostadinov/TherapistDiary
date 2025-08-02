@@ -56,4 +56,10 @@
     <data name="BEGIN_MUST_BE_BEFORE_START" xml:space="preserve">
         <value>Началният час трябва да бъде преди крайния.</value>
     </data>
+    <data name="CANNOT_DELETE_APPOINTMENT_IN_PAST" xml:space="preserve">
+        <value>Не може да бъде изтрит час който е изпълнен!</value>
+    </data>
+    <data name="APPOINTMENT_NOT_FOUND" xml:space="preserve">
+        <value>Час Id:'{0}' не е открит!</value>
+    </data>
 </root>
