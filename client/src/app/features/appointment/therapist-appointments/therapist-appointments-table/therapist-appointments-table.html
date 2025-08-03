@@ -1,1 +1,220 @@
-<p>therapist-appointments-table works!</p>
+<div class="container-fluid mt-4 mb-3 mx-auto">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="common-container">
+                <div class="common-header">
+                    <h1>Записани часове от пациенти</h1>
+                    <p>Преглед и управление на записаните часове от вашите
+                        пациенти</p>
+                </div>
+
+                <!-- Search Section -->
+                <div class="row g-3 align-items-center mb-3">
+                    <div class="col-md-6 search-wrapper">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control search-input"
+                                   [value]="searchTerm() || ''"
+                                   (input)="onSearchInput($event)"
+                                   placeholder="Търсене по пациент, дата..."
+                                   aria-label="Търсене на записани часове">
+                            @if (searchTerm()) {
+                            <button type="button"
+                                    class="btn btn-outline-danger btn-clear"
+                                    (click)="onSearch('')"
+                                    title="Изчисти търсенето">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        @if (searchTerm()) {
+                        <small class="text-muted">
+                            Търсене за: "<strong>{{ searchTerm() }}</strong>"
+                        </small>
+                        }
+                    </div>
+                    <div class="col-md-2">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    title="Покажи/скрий колони">
+                                <i class="fas fa-columns me-1"></i>Колони
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input type="checkbox"
+                                               [checked]="visibleColumns().date"
+                                               (change)="toggleColumn('date')"
+                                               class="form-check-input me-2">
+                                        Дата
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input type="checkbox"
+                                               [checked]="visibleColumns().time"
+                                               (change)="toggleColumn('time')"
+                                               class="form-check-input me-2">
+                                        Час
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input type="checkbox"
+                                               [checked]="visibleColumns().patient"
+                                               (change)="toggleColumn('patient')"
+                                               class="form-check-input me-2">
+                                        Пациент
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input type="checkbox"
+                                               [checked]="visibleColumns().phone"
+                                               (change)="toggleColumn('phone')"
+                                               class="form-check-input me-2">
+                                        Телефон
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input type="checkbox"
+                                               [checked]="visibleColumns().therapy"
+                                               (change)="toggleColumn('therapy')"
+                                               class="form-check-input me-2">
+                                        Тип терапия
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input type="checkbox"
+                                               [checked]="visibleColumns().notes"
+                                               (change)="toggleColumn('notes')"
+                                               class="form-check-input me-2">
+                                        Бележки
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                @if (isLoading()) {
+                <div class="d-flex justify-content-center my-4">
+                    <div class="spinner-border text-primary"
+                         role="status">
+                        <span class="visually-hidden">Зареждане...</span>
+                    </div>
+                </div>
+                }
+
+                <!-- Table Section -->
+                @if (!isLoading()) {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            @if (visibleColumns().date) {
+                            <th scope="col"
+                                class="sortable-header"
+                                (click)="onSort('appointmentDate')"
+                                style="cursor: pointer;">
+                                Дата
+                                <i [class]="getSortIcon('appointmentDate')"></i>
+                            </th>
+                            }
+                            @if (visibleColumns().time) {
+                            <th scope="col">Час</th>
+                            }
+                            @if (visibleColumns().patient) {
+                            <th scope="col"
+                                class="sortable-header"
+                                (click)="onSort('patientFullName')"
+                                style="cursor: pointer;">
+                                Пациент
+                                <i [class]="getSortIcon('patientFullName')"></i>
+                            </th>
+                            }
+                            @if (visibleColumns().phone) {
+                            <th scope="col">Телефон</th>
+                            }
+                            @if (visibleColumns().therapy) {
+                            <th scope="col"
+                                class="sortable-header"
+                                (click)="onSort('therapyName')"
+                                style="cursor: pointer;">
+                                Тип терапия
+                                <i [class]="getSortIcon('therapyName')"></i>
+                            </th>
+                            }
+                            @if (visibleColumns().notes) {
+                            <th scope="col">Бележки</th>
+                            }
+                            <th scope="col">Бележки на терапевта</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (appointments().length === 0) {
+                        <tr>
+                            <td [attr.colspan]="getVisibleColumnsCount()"
+                                class="text-center py-4">
+                                <i
+                                   class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">
+                                    @if (searchTerm()) {
+                                    Няма намерени записани часове за търсенето
+                                    "{{ searchTerm() }}"
+                                    } @else {
+                                    Все още нямате записани часове от пациенти
+                                    }
+                                </p>
+                            </td>
+                        </tr>
+                        } @else {
+                        @for (appointment of appointments(); track
+                        appointment.id; let i = $index) {
+                        <tr app-therapist-appointments-row
+                            [appointment]="appointment"
+                            [index]="(currentPage() - 1) * pageSize() + i + 1"
+                            [visibleColumns]="visibleColumns()"
+                            (delete)="onDeleteClick($event)"
+                            (updateNotes)="onUpdateNotes($event)">
+                        </tr>
+                        }
+                        }
+                    </tbody>
+                </table>
+                }
+
+                <!-- Pagination -->
+                @if (!isLoading() && pagerData()) {
+                <app-pager [pager]="pagerData()"
+                           (pageChange)="onPageChange($event)"
+                           (pageSizeChange)="onPageSizeChange($event)">
+                </app-pager>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модал за потвърждение на изтриване -->
+<app-confirmation-modal [isVisible]="showDeleteModal()"
+                        title="Отмяна на час"
+                        message="Сигурни ли сте, че искате да отмените часа на пациента?"
+                        warningText="Това действие е необратимо! Всички данни за часа ще бъдат изтрити завинаги."
+                        confirmText="Отмени часа"
+                        cancelText="Отказ"
+                        (confirm)="onConfirmDelete()"
+                        (cancel)="onCancelDelete()">
+</app-confirmation-modal>

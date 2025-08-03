@@ -8,7 +8,7 @@ using Domain.Repositories.Automapper;
 using Domain.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
 
-public class AppointmentRepository:IAppointmentRepository
+public class AppointmentRepository : IAppointmentRepository
 {
     private readonly ApplicationDbContext _context;
 
@@ -18,7 +18,7 @@ public class AppointmentRepository:IAppointmentRepository
     }
 
     public async Task<IEnumerable<T>> GetAppointments<T>(Guid therapistId, DateOnly requestDate)
-    where T: IMapFrom<Appointment>
+        where T : IMapFrom<Appointment>
     {
         return await _context.Set<Appointment>()
             .Where(a => a.TherapistId == therapistId && a.Date == requestDate)
@@ -33,14 +33,14 @@ public class AppointmentRepository:IAppointmentRepository
 
     public async Task<(IEnumerable<AppointmentByPatientDto> patients, int totalCount, int totalPages)>
         GetAllByPatientPagedAsync(
-        Guid patientId, 
-        PaginationParameters parameters,
-        CancellationToken cancellationToken)
+            Guid patientId,
+            PaginationParameters parameters,
+            CancellationToken cancellationToken)
     {
         var query = _context.Set<Appointment>()
-            .Where(a=>a.PatientId == patientId)
-            .Include(a=>a.Therapist)
-            .Include(a=>a.Therapy)
+            .Where(a => a.PatientId == patientId)
+            .Include(a => a.Therapist)
+            .Include(a => a.Therapy)
             .AsQueryable();
 
         // Apply filtering FIRST
@@ -51,7 +51,8 @@ public class AppointmentRepository:IAppointmentRepository
                 EF.Functions.Like(p.Therapist.FirstName ?? "", $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Therapist.MidName ?? "", $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Therapist.LastName ?? "", $"%{searchTermLower}%") ||
-                EF.Functions.Like(p.Date.ToString(), $"%{parameters.SearchTerm}%"));
+                EF.Functions.Like(p.Date.ToString(), $"%{parameters.SearchTerm}%") ||
+                EF.Functions.Like(p.Notes, $"%{parameters.SearchTerm}%"));
         }
 
         // Calculate total count AFTER filtering
@@ -63,15 +64,15 @@ public class AppointmentRepository:IAppointmentRepository
         {
             query = parameters.SortBy.ToLowerInvariant() switch
             {
-                "therapist" => parameters.SortDescending ?? false
-                    ? query.OrderByDescending(p => p.Therapist.FullName)
-                    : query.OrderBy(p =>  p.Therapist.FullName),
+                "therapistname" => parameters.SortDescending ?? false
+                    ? query.OrderByDescending(p => p.Therapist.FirstName).ThenByDescending(p=>p.Therapist.MidName).ThenByDescending(p=>p.Therapist.LastName)
+                    : query.OrderBy(p => p.Therapist.FirstName).ThenBy(p=>p.Therapist.MidName).ThenBy(p=>p.Therapist.LastName),
 
-                "therapy" => parameters.SortDescending ?? false
+                "therapyname" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.Therapy.Name)
                     : query.OrderBy(p => p.Therapy.Name),
 
-                "date" => parameters.SortDescending ?? false
+                "appointmentdate" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.Date)
                     : query.OrderBy(p => p.Date),
 
@@ -91,14 +92,14 @@ public class AppointmentRepository:IAppointmentRepository
 
     public async Task<(IEnumerable<AppointmentByTherapistDto> patients, int totalCount, int totalPages)>
         GetAllByTherapistPagedAsync(
-        Guid therapistId,
-        PaginationParameters parameters,
-        CancellationToken cancellationToken)
+            Guid therapistId,
+            PaginationParameters parameters,
+            CancellationToken cancellationToken)
     {
         var query = _context.Set<Appointment>()
-            .Where(a=>a.TherapistId == therapistId)
-            .Include(a=>a.Patient)
-            .Include(a=>a.Therapy)
+            .Where(a => a.TherapistId == therapistId)
+            .Include(a => a.Patient)
+            .Include(a => a.Therapy)
             .AsQueryable();
 
         // Apply filtering FIRST
@@ -110,7 +111,7 @@ public class AppointmentRepository:IAppointmentRepository
                 EF.Functions.Like(p.Patient.FirstName, $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Patient.MidName ?? "", $"%{searchTermLower}%") ||
                 EF.Functions.Like(p.Patient.LastName, $"%{searchTermLower}%") ||
-                EF.Functions.Like(p.Date.ToString("dd/MM/yyyy"), $"%{searchTermLower}%"));
+                EF.Functions.Like(p.Date.ToString(), $"%{searchTermLower}%"));
         }
 
         // Calculate total count AFTER filtering
@@ -122,15 +123,19 @@ public class AppointmentRepository:IAppointmentRepository
         {
             query = parameters.SortBy.ToLowerInvariant() switch
             {
-                "patient" => parameters.SortDescending ?? false
-                    ? query.OrderByDescending(p => p.Patient.FullName)
-                    : query.OrderBy(p =>  p.Patient.FullName),
+                "patientfullname" => parameters.SortDescending ?? false
+                    ? query.OrderByDescending(p => p.Patient.FirstName)
+                        .ThenByDescending(p => p.Patient.MidName)
+                        .ThenByDescending(p => p.Patient.LastName)
+                    : query.OrderBy(p => p.Patient.FirstName)
+                        .ThenBy(p => p.Patient.MidName)
+                        .ThenBy(p => p.Patient.LastName),
 
-                "therapy" => parameters.SortDescending ?? false
+                "therapyname" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.Therapy.Name)
                     : query.OrderBy(p => p.Therapy.Name),
 
-                "date" => parameters.SortDescending ?? false
+                "appointmentdate" => parameters.SortDescending ?? false
                     ? query.OrderByDescending(p => p.Date)
                     : query.OrderBy(p => p.Date),
 
@@ -158,6 +163,12 @@ public class AppointmentRepository:IAppointmentRepository
     public Task DeleteAsync(Appointment patient, CancellationToken cancellationToken)
     {
         _context.Set<Appointment>().Remove(patient);
+        return Task.CompletedTask;
+    }
+
+    public Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken)
+    {
+        _context.Set<Appointment>().Update(appointment);
         return Task.CompletedTask;
     }
 }

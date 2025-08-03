@@ -32,7 +32,7 @@ export class MyAppointmentsTable implements OnInit {
     public pageSize = signal(10);
     public searchTerm = signal<string | null>(null);
     public sortBy = signal<string | null>(null);
-    public sortDescending = signal<string | null>(null);
+    public sortDescending = signal<boolean | null>(null);
 
     // Computed properties
     public appointmentsPagedList = computed(() => this._appointmentsPagedList());
@@ -133,12 +133,23 @@ export class MyAppointmentsTable implements OnInit {
         const currentDirection = this.sortDescending();
 
         if (currentSort === sortBy) {
-            // Toggle direction
-            this.sortDescending.set(currentDirection === 'true' ? 'false' : 'true');
+            // Same column clicked - cycle through states
+            if (currentDirection === false) {
+                // Currently ascending -> change to descending
+                this.sortDescending.set(true);
+            } else if (currentDirection === true) {
+                // Currently descending -> remove sorting
+                this.sortBy.set(null);
+                this.sortDescending.set(null);
+            } else {
+                // No sorting -> set to ascending
+                this.sortBy.set(sortBy);
+                this.sortDescending.set(false);
+            }
         } else {
-            // New sort field
+            // New sort field: set ascending
             this.sortBy.set(sortBy);
-            this.sortDescending.set('false');
+            this.sortDescending.set(false);
         }
 
         this.currentPage.set(1);
@@ -172,5 +183,31 @@ export class MyAppointmentsTable implements OnInit {
 
     onCancelDelete(): void {
         this.showDeleteModal.set(false);
+    }
+
+    onUpdateNotes(event: { id: string, notes: string }): void {
+        this._isLoading.set(true);
+        this._appointmentService.updateAppointmentNotes(event.id, event.notes)
+            .pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe({
+                next: () => {
+                    this._isLoading.set(false);
+                    this._toaster.success('Бележките са запазени успешно!');
+                    this.loadAppointments(); // Reload to get updated data
+                },
+                error: (error: ApiError) => {
+                    this._isLoading.set(false);
+                    this._toaster.error(`Грешка при запазване на бележките! ${Utils.getGeneralErrorMessage(error)}`);
+                }
+            });
+    }
+
+    getSortIcon(column: string): string {
+        if (this.sortBy() !== column) {
+            return "fas fa-sort text-muted";
+        }
+        return this.sortDescending()
+            ? "fas fa-sort-up text-primary"
+            : "fas fa-sort-down text-primary";
     }
 }

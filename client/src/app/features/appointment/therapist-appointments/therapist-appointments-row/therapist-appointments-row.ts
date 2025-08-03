@@ -1,20 +1,28 @@
 import { Component, EventEmitter, Input, Output, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-import { MyAppointmentModel } from '../../models';
+import { TherapistAppointmentModel } from '../../models';
 import { AppointmentTimeModel } from '../../models';
 import { AppointmentTimePipe } from "../../appointment-time.pipe";
 import { ApplicationForm, Utils } from '../../../../common';
 
 @Component({
-    selector: 'tr[app-my-appointments-row]',
+    selector: 'tr[app-therapist-appointments-row]',
     imports: [CommonModule, AppointmentTimePipe, ReactiveFormsModule],
-    templateUrl: './my-appointments-row.html',
-    styleUrl: './my-appointments-row.css'
+    templateUrl: './therapist-appointments-row.html',
+    styleUrl: './therapist-appointments-row.css'
 })
-export class MyAppointmentsRow extends ApplicationForm implements OnInit {
-    @Input({ required: true }) appointment!: MyAppointmentModel;
+export class TherapistAppointmentsRow extends ApplicationForm implements OnInit {
+    @Input({ required: true }) appointment!: TherapistAppointmentModel;
     @Input({ required: true }) index!: number;
+    @Input({ required: true }) visibleColumns!: {
+        date: boolean;
+        time: boolean;
+        patient: boolean;
+        phone: boolean;
+        therapy: boolean;
+        notes: boolean;
+    };
 
     @Output() delete = new EventEmitter<string>();
     @Output() updateNotes = new EventEmitter<{ id: string, notes: string }>();
@@ -31,7 +39,7 @@ export class MyAppointmentsRow extends ApplicationForm implements OnInit {
 
     private initializeForm(): void {
         this.form = this.fb.group({
-            notes: [this.appointment.notes || '', [Validators.maxLength(500)]]
+            therapistNotes: [this.appointment.therapistNotes || '', [Validators.maxLength(500)]]
         });
 
         Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
@@ -44,7 +52,7 @@ export class MyAppointmentsRow extends ApplicationForm implements OnInit {
 
     public startEditingNotes(): void {
         this.form.patchValue({
-            notes: this.appointment.notes || ''
+            therapistNotes: this.appointment.therapistNotes || ''
         });
         this.isEditingNotes.set(true);
     }
@@ -52,11 +60,11 @@ export class MyAppointmentsRow extends ApplicationForm implements OnInit {
     public saveNotes(): void {
         if (this.form.valid) {
             const formValue = this.form.value;
-            const newNotes = formValue.notes?.trim() || '';
+            const newTherapistNotes = formValue.therapistNotes?.trim() || '';
 
             this.updateNotes.emit({
                 id: this.appointment.id,
-                notes: newNotes
+                notes: newTherapistNotes
             });
             this.isEditingNotes.set(false);
         }
@@ -65,6 +73,10 @@ export class MyAppointmentsRow extends ApplicationForm implements OnInit {
     public cancelEditingNotes(): void {
         this.form.reset();
         this.isEditingNotes.set(false);
+    }
+
+    get therapistNotesControl() {
+        return this.form.get('therapistNotes');
     }
 
     get notesControl() {

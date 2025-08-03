@@ -3,6 +3,7 @@ namespace TherapistDiary.Domain.Dtos;
 public class AppointmentByTherapistDto
 {
     public Guid Id { get; set; }
+    public string TherapyName { get; set; } = null!;
     public string PatientFullName { get; set; } = null!;
     public string PatientPhoneNumber { get; set; } = null!;
     public DateOnly Date { get; set; }

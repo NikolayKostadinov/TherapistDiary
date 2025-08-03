@@ -3,6 +3,9 @@ namespace TherapistDiary.WebAPI.Controllers;
 using Abstract;
 using Application.Appointments.Commands.Create;
 using Application.Appointments.Commands.Delete;
+using Application.Appointments.Commands.Update;
+using Application.Appointments.Commands.UpdateNotes;
+using Application.Appointments.Commands.UpdateTherapistNotes;
 using Application.Appointments.Queries.GetAllAppointmentByPatient;
 using Application.Appointments.Queries.GetAllAppointmentByTherapist;
 using Application.Appointments.Queries.GetAvailableAppointments;
@@ -16,6 +19,8 @@ public class AppointmentsController : ApiController
     private readonly IGetAllAppointmentByPatientQueryHandler _getAllAppointmentByPatientQueryHandler;
     private readonly IGetAllAppointmentByTherapistQueryHandler _getAllAppointmentByTherapistQueryHandler;
     private readonly IDeleteAppointmentCommandHandler _deleteAppointmentCommandHandler;
+    private readonly IUpdateAppointmentNotesCommandHandler _updateAppointmentNotesCommandHandler;
+    private readonly IUpdateAppointmentTherapistNotesCommandHandler _updateAppointmentTherapistNotesCommandHandler;
 
     public AppointmentsController(
         ILogger<AppointmentsController> logger,
@@ -23,7 +28,7 @@ public class AppointmentsController : ApiController
         ICreateAppointmentCommandHandler createAppointmentCommandHandlerHandler,
         IGetAllAppointmentByPatientQueryHandler getAllAppointmentByPatientQueryHandler,
         IGetAllAppointmentByTherapistQueryHandler getAllAppointmentByTherapistQueryHandler,
-        IDeleteAppointmentCommandHandler deleteAppointmentCommandHandler)
+        IDeleteAppointmentCommandHandler deleteAppointmentCommandHandler, IUpdateAppointmentNotesCommandHandler updateAppointmentNotesCommandHandler, IUpdateAppointmentTherapistNotesCommandHandler updateAppointmentTherapistNotesCommandHandler)
         : base(logger)
     {
         _queryHandler = queryHandler;
@@ -31,6 +36,8 @@ public class AppointmentsController : ApiController
         _getAllAppointmentByPatientQueryHandler = getAllAppointmentByPatientQueryHandler;
         _getAllAppointmentByTherapistQueryHandler = getAllAppointmentByTherapistQueryHandler;
         _deleteAppointmentCommandHandler = deleteAppointmentCommandHandler;
+        _updateAppointmentNotesCommandHandler = updateAppointmentNotesCommandHandler;
+        _updateAppointmentTherapistNotesCommandHandler = updateAppointmentTherapistNotesCommandHandler;
     }
 
     [Authorize]
@@ -86,4 +93,29 @@ public class AppointmentsController : ApiController
             ? NoContent()
             : HandleFailure(result);
     }
+
+    [Authorize]
+    [HttpPatch("{id:guid:required}/notes")]
+    public async Task<IActionResult> Update([FromRoute]Guid id, [FromBody]UpdateAppointmentNotesRequest request, CancellationToken cancellationToken)
+    {
+        request.Id = id;
+        var result = await _updateAppointmentNotesCommandHandler.Handle(request, cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : HandleFailure(result);
+    }
+
+    [Authorize(Roles = "Therapist")]
+    [HttpPatch("{id:guid:required}/therapist-notes")]
+    public async Task<IActionResult> Update(
+        [FromRoute]Guid id,
+        [FromBody]UpdateAppointmentTherapistNotesRequest request, CancellationToken cancellationToken)
+    {
+        request.Id = id;
+        var result = await _updateAppointmentTherapistNotesCommandHandler.Handle(request, cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : HandleFailure(result);
+    }
+
 }

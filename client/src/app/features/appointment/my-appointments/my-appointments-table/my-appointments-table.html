@@ -19,7 +19,7 @@
                                    class="form-control search-input"
                                    [value]="searchTerm() || ''"
                                    (input)="onSearchInput($event)"
-                                   placeholder="Търсене по терапевт, дата, статус..."
+                                   placeholder="Търсене по терапевт, дата..."
                                    aria-label="Търсене на записани часове">
                             @if (searchTerm()) {
                             <button type="button"
@@ -61,11 +61,7 @@
                                 (click)="onSort('appointmentDate')"
                                 style="cursor: pointer;">
                                 Дата
-                                @if (sortBy() === 'appointmentDate') {
-                                <i class="fas"
-                                   [class.fa-sort-up]="sortDescending() === 'false'"
-                                   [class.fa-sort-down]="sortDescending() === 'true'"></i>
-                                }
+                                <i [class]="getSortIcon('appointmentDate')"></i>
                             </th>
                             <th scope="col">Час</th>
                             <th scope="col"
@@ -73,20 +69,23 @@
                                 (click)="onSort('therapistName')"
                                 style="cursor: pointer;">
                                 Терапевт
-                                @if (sortBy() === 'therapistName') {
-                                <i class="fas"
-                                   [class.fa-sort-up]="sortDescending() === 'false'"
-                                   [class.fa-sort-down]="sortDescending() === 'true'"></i>
-                                }
+                                <i [class]="getSortIcon('therapistName')"></i>
                             </th>
-                            <th scope="col">Тип терапия</th>
-                            <th scope="col">Действия</th>
+                            <th scope="col"
+                                class="sortable-header"
+                                (click)="onSort('therapyName')"
+                                style="cursor: pointer;">
+                                Тип терапия
+                                <i [class]="getSortIcon('therapyName')"></i>
+                            </th>
+                            <th scope="col">Бележки</th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (appointments().length === 0) {
                         <tr>
-                            <td colspan="6"
+                            <td colspan="7"
                                 class="text-center py-4">
                                 <i
                                    class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
@@ -106,7 +105,8 @@
                         <tr app-my-appointments-row
                             [appointment]="appointment"
                             [index]="(currentPage() - 1) * pageSize() + i + 1"
-                            (delete)="onDeleteClick($event)">
+                            (delete)="onDeleteClick($event)"
+                            (updateNotes)="onUpdateNotes($event)">
                         </tr>
                         }
                         }

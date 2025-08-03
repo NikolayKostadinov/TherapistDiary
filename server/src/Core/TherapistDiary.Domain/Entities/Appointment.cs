@@ -86,4 +86,16 @@ public class Appointment : DeletableEntity
                     operation: operation
                 ));
     }
+
+    public Result<Appointment> UpdateNotes(string? notes)
+    {
+        Notes = notes;
+        return Validate(Operations.Update);
+    }
+
+    public Result<Appointment> UpdateTherapistNotes(string? notes)
+    {
+        TherapistNotes = notes;
+        return Validate(Operations.Update);
+    }
 }

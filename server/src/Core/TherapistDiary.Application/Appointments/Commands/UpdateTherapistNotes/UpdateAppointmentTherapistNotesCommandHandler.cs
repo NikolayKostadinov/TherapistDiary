@@ -1,23 +1,23 @@
-namespace TherapistDiary.Application.Appointments.Commands.Update;
+namespace TherapistDiary.Application.Appointments.Commands.UpdateTherapistNotes;
 
+using Domain.Entities;
+using Domain.Infrastructure;
+using Domain.Repositories;
 using Domain.Resources;
-using TherapistDiary.Domain.Entities;
-using TherapistDiary.Domain.Infrastructure;
-using TherapistDiary.Domain.Repositories;
-using TherapistDiary.Domain.Shared;
+using Domain.Shared;
 
-public class UpdateAppointmentCommandHandler : IUpdateAppointmentCommandHandler
+public class UpdateAppointmentTherapistNotesCommandHandler : IUpdateAppointmentTherapistNotesCommandHandler
 {
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateAppointmentCommandHandler(IAppointmentRepository patientRepository, IUnitOfWork unitOfWork)
+    public UpdateAppointmentTherapistNotesCommandHandler(IAppointmentRepository patientRepository, IUnitOfWork unitOfWork)
     {
         _appointmentRepository = patientRepository ?? throw new ArgumentNullException(nameof(patientRepository));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
-    public async Task<Result<Appointment>> Handle(UpdateAppointmentRequest request, CancellationToken cancellationToken)
+    public async Task<Result<Appointment>> Handle(UpdateAppointmentTherapistNotesRequest request, CancellationToken cancellationToken)
     {
         var appointment = await _appointmentRepository.GetByIdAsync(request.Id, cancellationToken);
         if (appointment is null)
@@ -26,7 +26,7 @@ public class UpdateAppointmentCommandHandler : IUpdateAppointmentCommandHandler
             return Result.Failure<Appointment>(Error.Create(message));
         }
 
-        var appointmentResult = appointment.Update( request.TherapistId, request.TherapyId, request.Date, request.Start, request.End, request.Notes, request.TherapistNotes);
+        var appointmentResult = appointment.UpdateTherapistNotes( request.TherapistNotes);
         if (appointmentResult.IsFailure) return appointmentResult;
 
         appointment = appointmentResult.Value;

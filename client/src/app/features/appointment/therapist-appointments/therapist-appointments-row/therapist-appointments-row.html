@@ -1,34 +1,58 @@
 <td>{{ index }}</td>
+@if (visibleColumns.date) {
 <td>
     <strong>{{ appointment.date | date:'dd/MM/yyyy' }}</strong>
 </td>
+}
+@if (visibleColumns.time) {
 <td>
     <span class="text-muted">{{ appointment | appointmentTime }}</span>
 </td>
+}
+@if (visibleColumns.patient) {
 <td>
     <div class="d-flex align-items-center">
-        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2"
+        <div class="rounded-circle bg-success d-flex align-items-center justify-content-center me-2"
              style="width: 32px; height: 32px; color: white; font-size: 14px;">
-            {{ appointment.therapistFullName.charAt(0) || 'T' }}
+            {{ appointment.patientFullName.charAt(0) || 'П' }}
         </div>
-        <span>{{ appointment.therapistFullName || 'Неизвестен терапевт'
-            }}</span>
+        <span>{{ appointment.patientFullName || 'Неизвестен пациент' }}</span>
     </div>
 </td>
+}
+@if (visibleColumns.phone) {
+<td>
+    <a [href]="'tel:' + appointment.patientPhoneNumber"
+       class="text-decoration-none"
+       [title]="'Обади се на ' + appointment.patientFullName">
+        <i class="fas fa-phone me-1"></i>{{ appointment.patientPhoneNumber ||
+        'Няма
+        телефон' }}
+    </a>
+</td>
+}
+@if (visibleColumns.therapy) {
 <td>{{ appointment.therapyName || 'Не е зададен тип' }}</td>
+}
+@if (visibleColumns.notes) {
+<td [title]="appointment.notes">
+    {{ appointment.notes?.length ?? 0 > 50 ?
+    (appointment.notes | slice:0:50)
+    + '...' : appointment.notes || 'Няма бележки' }}
+</td>
+}
 <td>
     @if (!isEditingNotes()) {
-    @if (appointment.notes) {
-    <div class="d-flex align-items-center justify-content-between">
-        <span class="text-muted notes-text"
-              [title]="appointment.notes">
-            {{ appointment.notes.length > 50 ? (appointment.notes | slice:0:50)
-            + '...' : appointment.notes }}
-        </span>
+    @if (appointment.therapistNotes) {
+    <div class="d-flex align-items-start justify-content-between">
+        <div class="text-muted notes-text flex-grow-1 me-2"
+             style="white-space: pre-wrap; word-break: break-word;">
+            {{ appointment.therapistNotes }}
+        </div>
         <button type="button"
-                class="btn btn-sm btn-outline-primary ms-2"
+                class="btn btn-sm btn-outline-primary flex-shrink-0"
                 (click)="startEditingNotes()"
-                title="Редактирай бележки">
+                title="Редактирай бележки на терапевта">
             <i class="fas fa-edit"></i>
         </button>
     </div>
@@ -38,7 +62,7 @@
         <button type="button"
                 class="btn btn-sm btn-outline-primary ms-2"
                 (click)="startEditingNotes()"
-                title="Добави бележки">
+                title="Добави бележки на терапевта">
             <i class="fas fa-plus"></i>
         </button>
     </div>
@@ -48,16 +72,16 @@
         <form [formGroup]="form"
               (ngSubmit)="saveNotes()">
             <textarea class="form-control form-control-sm mb-2"
-                      formControlName="notes"
-                      placeholder="Въведете бележки..."
+                      formControlName="therapistNotes"
+                      placeholder="Въведете бележки на терапевта..."
                       rows="2"
                       maxlength="500"
-                      [class.is-invalid]="notesControl?.touched && notesControl?.invalid">
+                      [class.is-invalid]="therapistNotesControl?.touched && therapistNotesControl?.invalid">
                 </textarea>
 
-            @if (getFieldError('notes')) {
+            @if (getFieldError('therapistNotes')) {
             <div class="invalid-feedback d-block">
-                {{ getFieldError('notes') }}
+                {{ getFieldError('therapistNotes') }}
             </div>
             }
 
@@ -69,7 +93,7 @@
                     <i class="fas fa-check"></i>
                 </button>
                 <button type="button"
-                        class="btn btn-sm btn-outline-danger"
+                        class="btn btn-sm btn-danger text-white"
                         (click)="cancelEditingNotes()"
                         title="Отмени">
                     <i class="fas fa-times"></i>
@@ -81,9 +105,9 @@
 </td>
 <td>
     <button type="button"
-            class="btn btn-sm btn-outline-danger"
+            class="btn btn-sm btn-outline-danger "
             (click)="deleteElement()"
-            title="Отмени часа">
+            title="Отмени часа на пациента">
         <i class="fas fa-times"></i>
     </button>
 </td>

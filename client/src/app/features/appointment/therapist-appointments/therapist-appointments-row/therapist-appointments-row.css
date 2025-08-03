@@ -1,10 +1,17 @@
 .notes-text {
     display: block;
+    max-width: 300px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
+
+.notes-display {
     max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: help;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.4;
+    color: #6c757d;
 }
 
 .notes-edit-container {

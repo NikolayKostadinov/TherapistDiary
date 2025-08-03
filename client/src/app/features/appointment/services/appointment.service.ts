@@ -3,7 +3,7 @@ import { environment } from '../../../../environments/environment';
 import { API_ENDPOINTS, Utils, PagedResult } from '../../../common';
 import { HttpClient, HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { AppointmentTimeModel, AppointmentCreateModel } from '../models';
+import { AppointmentTimeModel, AppointmentCreateModel, MyAppointmentModel, TherapistAppointmentModel } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -46,11 +46,11 @@ export class AppointmentService {
         );
     }
 
-    getMyAppointments(patientId: string, pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<any>>> {
+    getMyAppointments(patientId: string, pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: boolean | null = null): Observable<HttpResponse<PagedResult<any>>> {
         let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
         params = params.set('patientId', patientId);
 
-        return this.httpClient.get<PagedResult<any>>(`${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_PATIENT}`,
+        return this.httpClient.get<PagedResult<MyAppointmentModel>>(`${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_PATIENT}`,
             {
                 params: params,
                 observe: 'response'
@@ -63,11 +63,11 @@ export class AppointmentService {
         );
     }
 
-    getTherapistAppointments(therapistId: string, pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<any>>> {
+    getTherapistAppointments(therapistId: string, pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: boolean | null = null): Observable<HttpResponse<PagedResult<any>>> {
         let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
         params = params.set('therapistId', therapistId);
 
-        return this.httpClient.get<PagedResult<any>>(`${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_THERAPIST}`,
+        return this.httpClient.get<PagedResult<TherapistAppointmentModel>>(`${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_THERAPIST}`,
             {
                 params: params,
                 observe: 'response'
@@ -80,7 +80,7 @@ export class AppointmentService {
         );
     }
 
-    private initializeQueryParams(pageNumber: number, pageSize: number, searchTerm: string | null, sortBy: string | null, sortDescending: string | null): HttpParams {
+    private initializeQueryParams(pageNumber: number, pageSize: number, searchTerm: string | null, sortBy: string | null, sortDescending: boolean | null): HttpParams {
         let params = new HttpParams()
             .set('pageNumber', pageNumber.toString())
             .set('pageSize', pageSize.toString());
@@ -97,6 +97,34 @@ export class AppointmentService {
             params = params.set('sortDescending', sortDescending);
         }
         return params;
+    }
+
+    updateAppointmentNotes(appointmentId: string, notes: string): Observable<void> {
+        return this.httpClient.patch<void>(
+            `${this.apiUrl}/${appointmentId}/notes`,
+            { notes },
+            { observe: 'response' }
+        ).pipe(
+            map(() => void 0),
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'бележките');
+                return throwError(() => new Error(errorMessage));
+            })
+        );
+    }
+
+    updateTherapistNotes(appointmentId: string, therapistNotes: string): Observable<void> {
+        return this.httpClient.patch<void>(
+            `${this.apiUrl}/${appointmentId}/therapist-notes`,
+            { therapistNotes },
+            { observe: 'response' }
+        ).pipe(
+            map(() => void 0),
+            catchError((error: HttpErrorResponse) => {
+                const errorMessage = Utils.getErrorMessage(error, 'бележките на терапевта');
+                return throwError(() => new Error(errorMessage));
+            })
+        );
     }
 }
 

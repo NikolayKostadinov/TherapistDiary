@@ -1,0 +1,21 @@
+/* Inherits all styles from the global common styles */
+
+.sortable-header {
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.sortable-header:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.sortable-header:hover i {
+    color: #0d6efd !important;
+}
+
+.sortable-header i {
+    margin-left: 8px;
+    font-size: 0.85em;
+    transition: color 0.2s ease;
+}
