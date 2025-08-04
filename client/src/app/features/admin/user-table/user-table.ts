@@ -1,20 +1,6 @@
 import { CommonModule } from "@angular/common";
-import {
-    AfterViewInit,
-    Component,
-    computed,
-    inject,
-    OnInit,
-    signal,
-    Signal,
-} from "@angular/core";
-import {
-    ApiError,
-    ConfirmationModal,
-    PagedResult,
-    PagerModel,
-    Utils,
-} from "../../../common";
+import { AfterViewInit, Component, computed, inject, OnInit, signal, Signal, } from "@angular/core";
+import { ApiError, ConfirmationModal, PagedResult, PagerModel, Utils} from "../../../common";
 import { ToasterService } from "../../../layout";
 import { Pager } from "../../../layout/pager/pager";
 import { UserListModel } from "../../profile/models/user-list.model";
@@ -85,30 +71,36 @@ export class UserTable implements OnInit, AfterViewInit {
 
     onSortColumn(column: string): void {
         if (this.sortBy() === column) {
-            if (!this.sortDescending()) {
-                // First click: ascending -> descending
-                this.sortDescending.set(true);
-            } else {
-                // Second click: descending -> no sorting
-                this.sortBy.set(null);
-                this.sortDescending.set(false);
-            }
+            const current = this.sortDescending();
+            this.toggleSortOrder(current);
         } else {
-            // New column: start with ascending
             this.sortBy.set(column);
             this.sortDescending.set(false);
         }
-
-        // Apply the sort
         this.performSort();
+    }
+
+    private toggleSortOrder(current: boolean): void {
+        if (!current) {
+            // Currently ascending -> change to descending
+            this.sortDescending.set(true);
+        } else {
+            // Currently descending -> remove sorting
+            this.sortBy.set(null);
+            this.sortDescending.set(false);
+        }
     }
 
     private performSort(): void {
         const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
+        this.loadUsers(1, currentPageSize); // Reset to first page when sorting
+    }
+
+    private loadUsers(page: number, pageSize: number): void {
         this.userManagementServise.loadUsers(
-            1, // Reset to first page when sorting
-            currentPageSize,
-            this.searchTerm(),
+            page,
+            pageSize,
+            this.searchTerm() || null, // Convert empty string to null
             this.sortBy(),
             this.sortBy() ? (this.sortDescending() ? "true" : "false") : null
         );
@@ -122,58 +114,39 @@ export class UserTable implements OnInit, AfterViewInit {
     onConfirmDelete(): void {
         this.showDeleteModal.set(false);
         const userId = this.clickedUser()?.id;
-        if (userId) {
-            this.userManagementServise.deleteProfile(userId).subscribe({
-                next: () => {
-                    this.toaster.success(
-                        `Потребителя '${this.clickedUser()?.fullName}' беше успешно изтрит`
-                    );
-                },
-                error: (error: ApiError) => {
-                    const errorDescroption = Utils.getGeneralErrorMessage(error);
-                    this.toaster.error(errorDescroption);
-                },
-            });
-        }
+        if (!userId) return;
+
+        this.userManagementServise.deleteProfile(userId).subscribe({
+            next: () => {
+                this.toaster.success(
+                    `Потребителя '${this.clickedUser()?.fullName}' беше успешно изтрит`
+                );
+            },
+            error: (error: ApiError) => {
+                const errorDescroption = Utils.getGeneralErrorMessage(error);
+                this.toaster.error(errorDescroption);
+            },
+        });
     }
 
     onCancelDelete(): void {
         this.showDeleteModal.set(false);
+        this.clickedUser.set(null);
     }
 
     onPageSizeChange(pageSize: number): void {
-        // Зареждаме първата страница с новия размер
-        this.userManagementServise.loadUsers(
-            1,
-            pageSize,
-            this.searchTerm(),
-            this.sortBy(),
-            this.sortBy() ? (this.sortDescending() ? "true" : "false") : null
-        );
+        this.loadUsers(1, pageSize);
     }
 
     onPageChange(page: number): void {
-        // Зареждаме новата страница със същия размер
         const currentPageSize = this.usersPagedList()?.pageSize ?? 10;
-        this.userManagementServise.loadUsers(
-            page,
-            currentPageSize,
-            this.searchTerm(),
-            this.sortBy(),
-            this.sortBy() ? (this.sortDescending() ? "true" : "false") : null
-        );
+        this.loadUsers(page, currentPageSize);
     }
 
     onClearSearch(): void {
         this.searchTerm.set("");
         const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
-        this.userManagementServise.loadUsers(
-            1,
-            currentPageSize,
-            null,
-            this.sortBy(),
-            this.sortBy() ? (this.sortDescending() ? "true" : "false") : null
-        );
+        this.loadUsers(1, currentPageSize);
     }
 
     onSearchInput(event: Event): void {
@@ -210,22 +183,17 @@ export class UserTable implements OnInit, AfterViewInit {
     private performSearch(): void {
         // Reset to first page when searching
         const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
-        this.userManagementServise.loadUsers(
-            1,
-            currentPageSize,
-            this.searchTerm(),
-            this.sortBy(),
-            this.sortBy() ? (this.sortDescending() ? "true" : "false") : null
-        );
+        this.loadUsers(1, currentPageSize);
     }
 
     getSortIcon(column: string): string {
         if (this.sortBy() !== column) {
             return "fas fa-sort text-muted";
         }
-        return this.sortDescending()
-            ? "fas fa-sort-up text-primary"
-            : "fas fa-sort-down text-primary";
+        const isDescending = this.sortDescending();
+        return isDescending
+            ? "fas fa-sort-up text-primary"   // descending
+            : "fas fa-sort-down text-primary"; // ascending
     }
 
     isSortable(column: string): boolean {

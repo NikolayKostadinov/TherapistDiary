@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output, signal, OnInit } from '@angular
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { MyAppointmentModel } from '../../models';
-import { AppointmentTimeModel } from '../../models';
 import { AppointmentTimePipe } from "../../appointment-time.pipe";
 import { ApplicationForm, Utils } from '../../../../common';
 
@@ -43,9 +42,7 @@ export class MyAppointmentsRow extends ApplicationForm implements OnInit {
     }
 
     public startEditingNotes(): void {
-        this.form.patchValue({
-            notes: this.appointment.notes || ''
-        });
+        this.form.patchValue({ notes: this.appointment.notes || '' });
         this.isEditingNotes.set(true);
     }
 
@@ -67,7 +64,7 @@ export class MyAppointmentsRow extends ApplicationForm implements OnInit {
         this.isEditingNotes.set(false);
     }
 
-    get notesControl() {
-        return this.form.get('notes');
+    get notesControlIsValid() {
+        return this.form.get('notes')?.valid && this.form.get('notes')?.touched;
     }
 }

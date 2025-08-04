@@ -20,14 +20,11 @@
     @if (!isEditingNotes()) {
     @if (appointment.notes) {
     <div class="d-flex align-items-center justify-content-between">
-        <span class="text-muted notes-text"
-              [title]="appointment.notes">
+        <span class="text-muted notes-text" [title]="appointment.notes">
             {{ appointment.notes.length > 50 ? (appointment.notes | slice:0:50)
             + '...' : appointment.notes }}
         </span>
-        <button type="button"
-                class="btn btn-sm btn-outline-primary ms-2"
-                (click)="startEditingNotes()"
+        <button type="button" class="btn btn-sm btn-outline-primary ms-2" (click)="startEditingNotes()"
                 title="Редактирай бележки">
             <i class="fas fa-edit"></i>
         </button>
@@ -35,9 +32,7 @@
     } @else {
     <div class="d-flex align-items-center justify-content-between">
         <em class="text-muted">Няма бележки</em>
-        <button type="button"
-                class="btn btn-sm btn-outline-primary ms-2"
-                (click)="startEditingNotes()"
+        <button type="button" class="btn btn-sm btn-outline-primary ms-2" (click)="startEditingNotes()"
                 title="Добави бележки">
             <i class="fas fa-plus"></i>
         </button>
@@ -45,14 +40,10 @@
     }
     } @else {
     <div class="notes-edit-container">
-        <form [formGroup]="form"
-              (ngSubmit)="saveNotes()">
-            <textarea class="form-control form-control-sm mb-2"
-                      formControlName="notes"
-                      placeholder="Въведете бележки..."
-                      rows="2"
-                      maxlength="500"
-                      [class.is-invalid]="notesControl?.touched && notesControl?.invalid">
+        <form [formGroup]="form" (ngSubmit)="saveNotes()">
+            <textarea class="form-control form-control-sm mb-2" formControlName="notes"
+                      placeholder="Въведете бележки..." rows="2" maxlength="500"
+                      [class.is-invalid]="!notesControlIsValid">
                 </textarea>
 
             @if (getFieldError('notes')) {
@@ -62,15 +53,11 @@
             }
 
             <div class="d-flex gap-1">
-                <button type="submit"
-                        class="btn btn-sm btn-primary text-white"
-                        [disabled]="form.invalid"
+                <button type="submit" class="btn btn-sm btn-primary text-white" [disabled]="form.invalid"
                         title="Запази">
                     <i class="fas fa-check"></i>
                 </button>
-                <button type="button"
-                        class="btn btn-sm btn-outline-danger"
-                        (click)="cancelEditingNotes()"
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelEditingNotes()"
                         title="Отмени">
                     <i class="fas fa-times"></i>
                 </button>
@@ -80,10 +67,7 @@
     }
 </td>
 <td>
-    <button type="button"
-            class="btn btn-sm btn-outline-danger"
-            (click)="deleteElement()"
-            title="Отмени часа">
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteElement()" title="Отмени часа">
         <i class="fas fa-times"></i>
     </button>
 </td>

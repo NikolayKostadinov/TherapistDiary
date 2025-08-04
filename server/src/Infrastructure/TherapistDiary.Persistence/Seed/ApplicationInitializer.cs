@@ -428,8 +428,8 @@ public class ApplicationInitializer : ISeeder
         var appointments = new List<Appointment>();
         var random = new Random();
 
-        // Генерираме 40 записа
-        for (int i = 0; i < 40; i++)
+        // Генерираме 100 записа
+        for (int i = 0; i < 100; i++)
         {
             var therapistId = therapists[random.Next(therapists.Count)].Id;
             var patientId = patients[random.Next(patients.Count)].Id;
