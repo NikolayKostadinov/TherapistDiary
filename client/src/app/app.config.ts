@@ -5,6 +5,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { authInterceptor, tokenRefreshInterceptor } from './features/auth/interceptors';
+import { errorInterceptor } from './common';
 import { AuthService } from './features/auth/services';
 
 export const appConfig: ApplicationConfig = {
@@ -14,7 +15,8 @@ export const appConfig: ApplicationConfig = {
         provideRouter(routes),
         provideHttpClient(withInterceptors([
             authInterceptor,
-            tokenRefreshInterceptor
+            tokenRefreshInterceptor,
+            errorInterceptor
         ])),
         provideAnimations(),
         provideAppInitializer(() => {

@@ -7,7 +7,7 @@ import { AppointmentService } from '../../services/appointment.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserInfo } from '../../../auth/models';
 import { TherapistAppointmentModel } from '../../models';
-import { ApiError, PagedResult, PagerModel, ConfirmationModal, Utils } from '../../../../common';
+import { ApiError, PagedResult, PagerModel, ConfirmationModal, Utils, PagedFilteredRequest } from '../../../../common';
 import { Pager } from '../../../../layout/pager/pager';
 import { ToasterService } from '../../../../layout';
 
@@ -74,42 +74,45 @@ export class TherapistAppointmentsTable implements OnInit {
         const currentUser: UserInfo | null = this._authService.currentUser();
         if (currentUser?.id) {
             this.isLoading.set(true);
-            this._appointmentService.getTherapistAppointments(
-                currentUser.id,
-                this.currentPage(),
-                this.pageSize(),
-                this.searchTerm(),
-                this.sortBy(),
-                this.sortDescending()
-            )
-                .pipe(
-                    takeUntilDestroyed(this._destroyRef),
-                    map((response: any) => response.body
-                        ? <PagedResult<TherapistAppointmentModel>>{
-                            ...response.body,
-                            items: response.body.items.map((appointment: any) => {
-                                return ({
-                                    ...appointment,
-                                    // Format dates and times if needed
-                                }) as TherapistAppointmentModel;
-                            })
-                        }
-                        : null),
-                    catchError((error) => {
-                        return throwError(() => error);
-                    })
-                ).subscribe({
-                    next: (appointmentsPagedList: PagedResult<TherapistAppointmentModel> | null) => {
-                        this.appointmentsPagedList.set(appointmentsPagedList);
-                        this.isLoading.set(false);
-                    },
-                    error: (error: ApiError) => {
-                        this.appointmentsPagedList.set(null);
-                        this.isLoading.set(false);
-                        console.error('Error loading therapist appointments:', error);
-                    },
-                });
+            const parameters = this.createPagedFilteredRequest()
+            this._appointmentService.getTherapistAppointments(currentUser.id, parameters).pipe(
+                takeUntilDestroyed(this._destroyRef),
+                map((response: any) => response.body
+                    ? <PagedResult<TherapistAppointmentModel>>{
+                        ...response.body,
+                        items: response.body.items.map((appointment: any) => {
+                            return ({
+                                ...appointment,
+                                // Format dates and times if needed
+                            }) as TherapistAppointmentModel;
+                        })
+                    }
+                    : null),
+                catchError((error) => {
+                    return throwError(() => error);
+                })
+            ).subscribe({
+                next: (appointmentsPagedList: PagedResult<TherapistAppointmentModel> | null) => {
+                    this.appointmentsPagedList.set(appointmentsPagedList);
+                    this.isLoading.set(false);
+                },
+                error: (error: ApiError) => {
+                    this.appointmentsPagedList.set(null);
+                    this.isLoading.set(false);
+                    console.error('Error loading therapist appointments:', error);
+                },
+            });
         }
+    }
+
+    private createPagedFilteredRequest() {
+        return <PagedFilteredRequest>{
+            pageNumber: this.currentPage(),
+            pageSize: this.pageSize(),
+            searchTerm: this.searchTerm(),
+            sortBy: this.sortBy(),
+            sortDescending: this.sortDescending()
+        };
     }
 
     public onPageChange(page: number): void {

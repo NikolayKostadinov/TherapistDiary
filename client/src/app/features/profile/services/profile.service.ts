@@ -1,7 +1,7 @@
 import { effect, Injectable, signal, DestroyRef, inject, computed } from '@angular/core';
 import { AuthHttpService, AuthService } from "../../auth";
 import { ChangePasswordModel, UserEditProfileModel, UserProfileModel } from '../models';
-import { catchError, map, Observable, tap, throwError } from 'rxjs';
+import { map, Observable, tap, throwError } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Utils } from '../../../common/utils';
 
@@ -46,11 +46,9 @@ export class ProfileServices {
                 (httpResponse) => {
                     this.authService.updateTokensFromResponse(httpResponse);
                 }),
-            map(() => void 0), // Return void
-            catchError((error) => {
-                return throwError(() => error);
-            })
+            map(() => void 0) // Return void
         );
+        // Глобалният interceptor ще обработи грешките автоматично
     }
 
     public deleteProfile(id: string): Observable<void> {
@@ -63,12 +61,9 @@ export class ProfileServices {
                     this.authService.logout();
                 }),
                 map(() => void 0), // Return void
-                takeUntilDestroyed(this.destroyRef),
-                catchError((error) => {
-                    this._errorMessage.set('Неуспешно изтриване на профила');
-                    return throwError(() => error);
-                })
+                takeUntilDestroyed(this.destroyRef)
             );
+        // Глобалният interceptor ще обработи грешките автоматично
     }
 
     private loadUserProfile(id: string): void {
@@ -79,10 +74,7 @@ export class ProfileServices {
         this.authHttpService.getUserProfile(id)
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
-                map(response => response.body!),
-                catchError((error) => {
-                    return throwError(() => error);
-                })
+                map(response => response.body!)
             )
             .subscribe({
                 next: (profile: UserProfileModel) => {
@@ -115,11 +107,9 @@ export class ProfileServices {
         };
 
         return this.authHttpService.changePassword(currentUser.id, changePasswordRequest).pipe(
-            map(() => void 0), // Return void
-            catchError((error) => {
-                return throwError(() => error);
-            })
+            map(() => void 0) // Return void
         );
+        // Глобалният interceptor ще обработи грешките автоматично
     }
 
 }

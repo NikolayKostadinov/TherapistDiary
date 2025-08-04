@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { API_ENDPOINTS, Utils, PagedResult } from '../../../common';
-import { HttpClient, HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
-import { catchError, map, Observable, throwError } from 'rxjs';
-import { AppointmentTimeModel, AppointmentCreateModel, MyAppointmentModel, TherapistAppointmentModel } from '../models';
+import { API_ENDPOINTS, PagedFilteredRequest, PagedResult } from '../../../common';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
+import { AppointmentCreateModel, AppointmentTimeModel, MyAppointmentModel, TherapistAppointmentModel } from '../models';
+
 
 @Injectable({
     providedIn: 'root'
@@ -19,11 +20,7 @@ export class AppointmentService {
             `${this.apiUrl}/${therapistId}/${date}`,
             { observe: 'response' }
         ).pipe(
-            map(response => response.body || []),
-            catchError((error: HttpErrorResponse) => {
-                const errorMessage = Utils.getErrorMessage(error, 'наличните часове');
-                return throwError(() => new Error(errorMessage));
-            })
+            map(response => response.body || [])
         );
     }
 
@@ -46,55 +43,49 @@ export class AppointmentService {
         );
     }
 
-    getMyAppointments(patientId: string, pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: boolean | null = null): Observable<HttpResponse<PagedResult<any>>> {
-        let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
+    getMyAppointments(patientId: string, parameters: PagedFilteredRequest): Observable<HttpResponse<PagedResult<any>>> {
+
+        let params = this.initializeQueryParams(parameters);
         params = params.set('patientId', patientId);
 
-        return this.httpClient.get<PagedResult<MyAppointmentModel>>(`${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_PATIENT}`,
+        const appointmentUrl = `${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_PATIENT}`;
+        return this.httpClient.get<PagedResult<MyAppointmentModel>>(appointmentUrl,
             {
                 params: params,
                 observe: 'response'
             }
-        ).pipe(
-            catchError((error: HttpErrorResponse) => {
-                const errorMessage = Utils.getErrorMessage(error, 'записаните часове');
-                return throwError(() => new Error(errorMessage));
-            })
         );
     }
 
-    getTherapistAppointments(therapistId: string, pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: boolean | null = null): Observable<HttpResponse<PagedResult<any>>> {
-        let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
+    getTherapistAppointments( therapistId: string, parameters: PagedFilteredRequest): Observable<HttpResponse<PagedResult<any>>> {
+
+        let params = this.initializeQueryParams(parameters);
         params = params.set('therapistId', therapistId);
 
-        return this.httpClient.get<PagedResult<TherapistAppointmentModel>>(`${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_THERAPIST}`,
+        const therapistAppointmentsUrl = `${environment.baseUrl}${API_ENDPOINTS.APPOINTMENTS.BY_THERAPIST}`;
+        return this.httpClient.get<PagedResult<TherapistAppointmentModel>>(therapistAppointmentsUrl,
             {
                 params: params,
                 observe: 'response'
             }
-        ).pipe(
-            catchError((error: HttpErrorResponse) => {
-                const errorMessage = Utils.getErrorMessage(error, 'записаните часове');
-                return throwError(() => new Error(errorMessage));
-            })
         );
     }
 
-    private initializeQueryParams(pageNumber: number, pageSize: number, searchTerm: string | null, sortBy: string | null, sortDescending: boolean | null): HttpParams {
+    private initializeQueryParams(parameters: PagedFilteredRequest): HttpParams {
         let params = new HttpParams()
-            .set('pageNumber', pageNumber.toString())
-            .set('pageSize', pageSize.toString());
+            .set('pageNumber', parameters.pageNumber.toString())
+            .set('pageSize', parameters.pageSize?.toString() || '10');
 
-        if (searchTerm) {
-            params = params.set('searchTerm', searchTerm);
+        if (parameters.searchTerm) {
+            params = params.set('searchTerm', parameters.searchTerm);
         }
 
-        if (sortBy) {
-            params = params.set('sortBy', sortBy);
+        if (parameters.sortBy) {
+            params = params.set('sortBy', parameters.sortBy);
         }
 
-        if (sortDescending !== null) {
-            params = params.set('sortDescending', sortDescending);
+        if (parameters.sortDescending !== null) {
+            params = params.set('sortDescending', parameters.sortDescending ?? false);
         }
         return params;
     }
@@ -105,12 +96,9 @@ export class AppointmentService {
             { notes },
             { observe: 'response' }
         ).pipe(
-            map(() => void 0),
-            catchError((error: HttpErrorResponse) => {
-                const errorMessage = Utils.getErrorMessage(error, 'бележките');
-                return throwError(() => new Error(errorMessage));
-            })
+            map(() => void 0)
         );
+        // Глобалният interceptor ще обработи грешките автоматично
     }
 
     updateTherapistNotes(appointmentId: string, therapistNotes: string): Observable<void> {
@@ -119,12 +107,9 @@ export class AppointmentService {
             { therapistNotes },
             { observe: 'response' }
         ).pipe(
-            map(() => void 0),
-            catchError((error: HttpErrorResponse) => {
-                const errorMessage = Utils.getErrorMessage(error, 'бележките на терапевта');
-                return throwError(() => new Error(errorMessage));
-            })
+            map(() => void 0)
         );
+        // Глобалният interceptор ще обработи грешките автоматично
     }
 }
 
