@@ -1,15 +1,14 @@
-import { Component, computed, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, map, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { TherapistAppointmentsRow } from '../therapist-appointments-row/therapist-appointments-row';
 import { AppointmentService } from '../../services/appointment.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserInfo } from '../../../auth/models';
 import { TherapistAppointmentModel } from '../../models';
-import { ApiError, PagedResult, PagerModel, ConfirmationModal, Utils, PagedFilteredRequest } from '../../../../common';
+import { ApiError, PagedResult, ConfirmationModal, Utils, PagedFilteredRequest, BaseTableComponent } from '../../../../common';
 import { Pager } from '../../../../layout/pager/pager';
-import { ToasterService } from '../../../../layout';
 
 @Component({
     selector: 'app-therapist-appointments-table',
@@ -17,24 +16,15 @@ import { ToasterService } from '../../../../layout';
     templateUrl: './therapist-appointments-table.html',
     styleUrl: './therapist-appointments-table.css'
 })
-export class TherapistAppointmentsTable implements OnInit {
+export class TherapistAppointmentsTable extends BaseTableComponent<TherapistAppointmentModel> implements OnInit {
     private _appointmentService = inject(AppointmentService);
     private _authService = inject(AuthService);
-    private _destroyRef = inject(DestroyRef);
-    private _toaster = inject(ToasterService);
 
-    // Consolidated data and state
-    public appointmentsPagedList = signal<PagedResult<TherapistAppointmentModel> | null>(null);
-    public isLoading = signal<boolean>(false);
-    public currentPage = signal(1);
-    public pageSize = signal(10);
-    public searchTerm = signal<string | null>(null);
-    public sortBy = signal<string | null>(null);
-    public sortDescending = signal<boolean | null>(null);
+    // Специфични за този компонент сигнали
     public showDeleteModal = signal(false);
     private _destroyedAppointmentId: string | null = null;
 
-    // Column visibility
+    // Column visibility - специфична функционалност за този компонент
     private _visibleColumns = signal({
         date: true,
         time: true,
@@ -46,137 +36,42 @@ export class TherapistAppointmentsTable implements OnInit {
 
     public visibleColumns = computed(() => this._visibleColumns());
 
-    // Computed properties
-    public appointments = computed(() => this.appointmentsPagedList()?.items || []);
-    public totalPages = computed(() => this.appointmentsPagedList()?.totalPages || 0);
-    public totalCount = computed(() => this.appointmentsPagedList()?.totalCount || 0);
-
-    // Pager data for the Pager component
-    public pagerData = computed(() => {
-        const pagedData = this.appointmentsPagedList();
-        if (!pagedData) return null;
-
-        return {
-            totalCount: pagedData.totalCount,
-            page: pagedData.page,
-            pageSize: pagedData.pageSize,
-            totalPages: pagedData.totalPages,
-            hasNextPage: pagedData.hasNextPage,
-            hasPreviousPage: pagedData.hasPreviousPage
-        } as PagerModel;
-    });
+    // Aliases за по-удобно използване в шаблона
+    public get appointments() { return this.items; }
+    public get appointmentsPagedList() { return this.pagedList; }
 
     ngOnInit(): void {
-        this.loadAppointments();
+        this.loadData();
     }
 
-    public loadAppointments(): void {
+    protected loadDataFromService(request: PagedFilteredRequest): Observable<any> {
         const currentUser: UserInfo | null = this._authService.currentUser();
-        if (currentUser?.id) {
-            this.isLoading.set(true);
-            const parameters = this.createPagedFilteredRequest()
-            this._appointmentService.getTherapistAppointments(currentUser.id, parameters).pipe(
-                takeUntilDestroyed(this._destroyRef),
-                map((response: any) => response.body
-                    ? <PagedResult<TherapistAppointmentModel>>{
-                        ...response.body,
-                        items: response.body.items.map((appointment: any) => {
-                            return ({
-                                ...appointment,
-                                // Format dates and times if needed
-                            }) as TherapistAppointmentModel;
-                        })
-                    }
-                    : null),
-                catchError((error) => {
-                    return throwError(() => error);
+        if (!currentUser?.id) {
+            throw new Error('Няма автентифициран потребител');
+        }
+        return this._appointmentService.getTherapistAppointments(currentUser.id, request);
+    }
+
+    protected mapServiceResponse(response: any): PagedResult<TherapistAppointmentModel> | null {
+        return response.body
+            ? <PagedResult<TherapistAppointmentModel>>{
+                ...response.body,
+                items: response.body.items.map((appointment: any) => {
+                    return ({
+                        ...appointment,
+                        // Format dates and times if needed
+                    }) as TherapistAppointmentModel;
                 })
-            ).subscribe({
-                next: (appointmentsPagedList: PagedResult<TherapistAppointmentModel> | null) => {
-                    this.appointmentsPagedList.set(appointmentsPagedList);
-                    this.isLoading.set(false);
-                },
-                error: (error: ApiError) => {
-                    this.appointmentsPagedList.set(null);
-                    this.isLoading.set(false);
-                    console.error('Error loading therapist appointments:', error);
-                },
-            });
-        }
+            }
+            : null;
     }
 
-    private createPagedFilteredRequest() {
-        return <PagedFilteredRequest>{
-            pageNumber: this.currentPage(),
-            pageSize: this.pageSize(),
-            searchTerm: this.searchTerm(),
-            sortBy: this.sortBy(),
-            sortDescending: this.sortDescending()
-        };
+    protected override handleLoadError(error: any): void {
+        console.error('Error loading therapist appointments:', error);
+        // Тук можете да добавите специфично обработване на грешки ако е необходимо
     }
 
-    public onPageChange(page: number): void {
-        this.currentPage.set(page);
-        this.loadAppointments();
-    }
-
-    public onPageSizeChange(pageSize: number): void {
-        this.pageSize.set(pageSize);
-        this.currentPage.set(1);
-        this.loadAppointments();
-    }
-
-    public onSearch(searchTerm: string): void {
-        this.searchTerm.set(searchTerm || null);
-        this.currentPage.set(1);
-        this.loadAppointments();
-    }
-
-    public onSearchInput(event: Event): void {
-        const target = event.target as HTMLInputElement;
-        this.onSearch(target.value);
-    }
-
-    public onSort(sortBy: string): void {
-        if (this.sortBy() === sortBy) {
-            const current = this.sortDescending();
-            this.toggleSortOrder(current);
-        } else {
-            this.sortBy.set(sortBy);
-            this.sortDescending.set(false);
-        }
-        this.currentPage.set(1);
-        this.loadAppointments();
-    }
-
-    private toggleSortOrder(current: boolean | null): void {
-        switch (current) {
-            case null:
-                this.sortDescending.set(false); // ascending
-                break;
-            case false:
-                this.sortDescending.set(true); // descending
-                break;
-            case true:
-                this.sortBy.set(null); // no sort
-                this.sortDescending.set(null);
-                break;
-        }
-    }
-
-    getSortIcon(column: string): string {
-        if (this.sortBy() !== column) {
-            return "fas fa-sort text-muted";
-        }
-        const isDescending = this.sortDescending();
-        if (isDescending === false) {
-            return "fas fa-sort-down text-primary"; // ascending
-        } else if (isDescending === true) {
-            return "fas fa-sort-up text-primary";   // descending
-        }
-        return "fas fa-sort text-muted"; // no sort
-    }
-
+    // Специфични методи за този компонент
     onDeleteClick(appointmentId: string): void {
         this.showDeleteModal.set(true);
         this._destroyedAppointmentId = appointmentId;
@@ -191,11 +86,11 @@ export class TherapistAppointmentsTable implements OnInit {
         this._appointmentService.deleteAppointment(appointmentId).subscribe({
             next: () => {
                 this.isLoading.set(false);
-                this.loadAppointments();
+                this.loadData();
             },
             error: (error: ApiError) => {
                 this.isLoading.set(false);
-                this._toaster.error(`Грешка при изтриване на записа! ${Utils.getGeneralErrorMessage(error)}`);
+                this.toaster.error(`Грешка при изтриване на записа! ${Utils.getGeneralErrorMessage(error)}`);
             }
         });
         this._destroyedAppointmentId = null;
@@ -209,20 +104,21 @@ export class TherapistAppointmentsTable implements OnInit {
     onUpdateNotes(event: { id: string, notes: string }): void {
         this.isLoading.set(true);
         this._appointmentService.updateTherapistNotes(event.id, event.notes)
-            .pipe(takeUntilDestroyed(this._destroyRef))
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
                 next: () => {
                     this.isLoading.set(false);
-                    this._toaster.success('Бележките на терапевта са запазени успешно!');
-                    this.loadAppointments(); // Reload to get updated data
+                    this.toaster.success('Бележките на терапевта са запазени успешно!');
+                    this.loadData(); // Reload to get updated data
                 },
                 error: (error: ApiError) => {
                     this.isLoading.set(false);
-                    this._toaster.error(`Грешка при запазване на бележките на терапевта! ${Utils.getGeneralErrorMessage(error)}`);
+                    this.toaster.error(`Грешка при запазване на бележките на терапевта! ${Utils.getGeneralErrorMessage(error)}`);
                 }
             });
     }
 
+    // Методи за управление на видимостта на колони
     toggleColumn(columnKey: string): void {
         const currentColumns = this._visibleColumns();
         const updatedColumns = { ...currentColumns };

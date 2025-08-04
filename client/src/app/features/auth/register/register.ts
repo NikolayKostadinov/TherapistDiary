@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../services';
 import { RegisterRequest } from '../models';
 import { Utils } from '../../../common/utils';
-import { ApplicationForm, VALIDATION_PATTERNS } from '../../../common';
+import { BaseApplicationFormComponent, VALIDATION_PATTERNS } from '../../../common';
 
 @Component({
     selector: 'app-register',
@@ -13,7 +13,7 @@ import { ApplicationForm, VALIDATION_PATTERNS } from '../../../common';
     templateUrl: './register.html',
     styleUrl: './register.css'
 })
-export class Register extends ApplicationForm {
+export class Register extends BaseApplicationFormComponent {
     private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
 

@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, DestroyRef, inject, OnInit, signal, Signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from "@angular/forms";
-import { ApplicationForm, ScrollAnimationDirective, Utils } from "../../../common";
+import { BaseApplicationFormComponent, ScrollAnimationDirective, Utils } from "../../../common";
 import { TherapyTypeService } from "../../therapy-types/services/therapytype.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { TherapyTypeListModel } from "../../therapy-types/models";
@@ -21,7 +21,7 @@ import { AppointmentCreateModel, AppointmentTimeModel } from "../models";
     templateUrl: "./appointment-create.html",
     styleUrl: "./appointment-create.css",
 })
-export class AppointmentCreate extends ApplicationForm implements OnInit {
+export class AppointmentCreate extends BaseApplicationFormComponent implements OnInit {
     private therapyTypesService = inject(TherapyTypeService);
     private therapistsService = inject(TherapistsService);
     private appointmentService = inject(AppointmentService);

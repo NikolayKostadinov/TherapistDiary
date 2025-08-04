@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
-import { AfterViewInit, Component, computed, inject, OnInit, signal, Signal, } from "@angular/core";
-import { ApiError, ConfirmationModal, PagedResult, PagerModel, Utils} from "../../../common";
-import { ToasterService } from "../../../layout";
+import { AfterViewInit, Component, inject, OnInit, signal, computed } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { ApiError, ConfirmationModal, PagedResult, Utils, PagedFilteredRequest, BaseTableComponent } from "../../../common";
 import { Pager } from "../../../layout/pager/pager";
 import { UserListModel } from "../../profile/models/user-list.model";
 import { ToggleRoleModel } from "../models/toggle-role.model";
@@ -14,98 +14,70 @@ import { UserTableRow } from "../user-table-row/user-table-row";
     templateUrl: "./user-table.html",
     styleUrl: "./user-table.css",
 })
-export class UserTable implements OnInit, AfterViewInit {
-    private readonly userManagementServise = inject(UserManagementService);
-    private readonly toaster = inject(ToasterService);
+export class UserTable extends BaseTableComponent<UserListModel> implements OnInit, AfterViewInit {
+    private readonly userManagementService = inject(UserManagementService);
 
-    protected pageSizes = [10, 50, 100];
-    protected pageSize = 10;
-    protected usersPagedList: Signal<PagedResult<UserListModel> | null>;
-    protected usersPager: Signal<PagerModel | null>;
+    // Специфични за този компонент сигнали
     protected clickedUser = signal<UserListModel | null>(null);
     protected showDeleteModal = signal(false);
-    protected isLoading: Signal<boolean>;
-    protected pageOffset: Signal<number>;
 
-    // Search functionality
-    protected searchTerm = signal<string>("");
-    private searchTimeout: any = null;
+    // Computed за compatibility с шаблона
+    protected pageOffset = computed(() => {
+        const currentPage = this.pagerData()?.page ?? 1;
+        const currentPageSize = this.pagedList()?.pageSize ?? 10;
+        return (currentPage - 1) * currentPageSize;
+    });
 
-    // Sorting functionality
-    protected sortBy = signal<string | null>(null);
-    protected sortDescending = signal<boolean>(false);
+    // Aliases за по-удобно използване в шаблона
+    public get usersPagedList() { return this.pagedList; }
+    public get usersPager() { return this.pagerData; }
 
     constructor() {
-        this.usersPagedList = this.userManagementServise.usersPagedList;
-        this.usersPager = computed(() => {
-            const pagedList = this.usersPagedList();
+        super();
+    }
 
-            if (!pagedList) return null;
-
-            const pagerModel = {
-                totalCount: pagedList.totalCount,
-                page: pagedList.page,
-                pageSize: pagedList.pageSize,
-                totalPages: pagedList.totalPages,
-                hasNextPage: pagedList.hasNextPage,
-                hasPreviousPage: pagedList.hasPreviousPage,
-            } as PagerModel;
-
-            return pagerModel;
-        });
-        this.pageOffset = computed(() => {
-            const currentPage = this.usersPager()?.page ?? 1;
-            const currentPageSize = this.usersPagedList()?.pageSize ?? 10;
-            return (currentPage - 1) * currentPageSize;
-        });
-        this.isLoading = this.userManagementServise.isLoading;
+    ngOnInit(): void {
+        this.loadData();
     }
 
     ngAfterViewInit(): void {
         // Initialization complete
     }
 
-    ngOnInit(): void {
-        this.userManagementServise.loadUsers(1, this.pageSize); // Променям от 2 на 10
+    protected loadDataFromService(request: PagedFilteredRequest): Observable<any> {
+        // Директно връщаме празен Observable, защото ще използваме override на loadData
+        return of(null);
     }
 
-    onSortColumn(column: string): void {
-        if (this.sortBy() === column) {
-            const current = this.sortDescending();
-            this.toggleSortOrder(current);
-        } else {
-            this.sortBy.set(column);
-            this.sortDescending.set(false);
-        }
-        this.performSort();
+    protected mapServiceResponse(response: any): PagedResult<UserListModel> | null {
+        return response;
     }
 
-    private toggleSortOrder(current: boolean): void {
-        if (!current) {
-            // Currently ascending -> change to descending
-            this.sortDescending.set(true);
-        } else {
-            // Currently descending -> remove sorting
-            this.sortBy.set(null);
-            this.sortDescending.set(false);
-        }
+    protected override handleLoadError(error: any): void {
+        console.error('Error loading users:', error);
     }
 
-    private performSort(): void {
-        const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
-        this.loadUsers(1, currentPageSize); // Reset to first page when sorting
-    }
+    // Override loadData за директна интеграция с UserManagementService
+    public override loadData(): void {
+        const request = this.createPagedFilteredRequest();
 
-    private loadUsers(page: number, pageSize: number): void {
-        this.userManagementServise.loadUsers(
-            page,
-            pageSize,
-            this.searchTerm() || null, // Convert empty string to null
-            this.sortBy(),
-            this.sortBy() ? (this.sortDescending() ? "true" : "false") : null
+        // Използваме директно услугата
+        this.userManagementService.loadUsers(
+            request.pageNumber,
+            request.pageSize,
+            request.searchTerm,
+            request.sortBy,
+            request.sortDescending ? (request.sortDescending ? "true" : "false") : null
         );
+
+        // Синхронизираме състоянието директно
+        setTimeout(() => {
+            this.pagedList.set(this.userManagementService.usersPagedList());
+            this.isLoading.set(this.userManagementService.isLoading());
+        }, 0);
     }
 
+    // Специфични методи за този компонент
     onDeleteClick(user: UserListModel): void {
         this.clickedUser.set(user);
         this.showDeleteModal.set(true);
@@ -116,15 +88,15 @@ export class UserTable implements OnInit, AfterViewInit {
         const userId = this.clickedUser()?.id;
         if (!userId) return;
 
-        this.userManagementServise.deleteProfile(userId).subscribe({
+        this.userManagementService.deleteProfile(userId).subscribe({
             next: () => {
                 this.toaster.success(
                     `Потребителя '${this.clickedUser()?.fullName}' беше успешно изтрит`
                 );
             },
             error: (error: ApiError) => {
-                const errorDescroption = Utils.getGeneralErrorMessage(error);
-                this.toaster.error(errorDescroption);
+                const errorDescription = Utils.getGeneralErrorMessage(error);
+                this.toaster.error(errorDescription);
             },
         });
     }
@@ -134,39 +106,8 @@ export class UserTable implements OnInit, AfterViewInit {
         this.clickedUser.set(null);
     }
 
-    onPageSizeChange(pageSize: number): void {
-        this.loadUsers(1, pageSize);
-    }
-
-    onPageChange(page: number): void {
-        const currentPageSize = this.usersPagedList()?.pageSize ?? 10;
-        this.loadUsers(page, currentPageSize);
-    }
-
-    onClearSearch(): void {
-        this.searchTerm.set("");
-        const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
-        this.loadUsers(1, currentPageSize);
-    }
-
-    onSearchInput(event: Event): void {
-        const target = event.target as HTMLInputElement;
-        const value = target.value;
-
-        // Clear previous timeout
-        if (this.searchTimeout) {
-            clearTimeout(this.searchTimeout);
-        }
-
-        // Set new timeout for debounced search
-        this.searchTimeout = setTimeout(() => {
-            this.searchTerm.set(value);
-            this.performSearch();
-        }, 300);
-    }
-
     onToggleRole($event: ToggleRoleModel): void {
-        this.userManagementServise
+        this.userManagementService
             .toggleUserRole($event.user.id, $event.role)
             .subscribe({
                 next: () => {
@@ -180,24 +121,21 @@ export class UserTable implements OnInit, AfterViewInit {
                 },
             });
     }
-    private performSearch(): void {
-        // Reset to first page when searching
-        const currentPageSize = this.usersPagedList()?.pageSize ?? this.pageSize;
-        this.loadUsers(1, currentPageSize);
+
+    onClearSearch(): void {
+        this.searchTerm.set("");
+        this.currentPage.set(1);
+        this.loadData();
     }
 
-    getSortIcon(column: string): string {
-        if (this.sortBy() !== column) {
-            return "fas fa-sort text-muted";
-        }
-        const isDescending = this.sortDescending();
-        return isDescending
-            ? "fas fa-sort-up text-primary"   // descending
-            : "fas fa-sort-down text-primary"; // ascending
-    }
-
-    isSortable(column: string): boolean {
+    // Override isSortable за специфичните колони
+    public override isSortable(column: string): boolean {
         const sortableColumns = ["firstName", "midName", "lastName", "phoneNumber"];
         return sortableColumns.includes(column);
+    }
+
+    // Compatibility методи за шаблона
+    onSortColumn(column: string): void {
+        this.onSort(column);
     }
 }

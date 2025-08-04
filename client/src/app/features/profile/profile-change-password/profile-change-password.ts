@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ApplicationForm, Utils } from '../../../common';
+import { BaseApplicationFormComponent, Utils } from '../../../common';
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileServices } from '../services/profile.service';
@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
     templateUrl: './profile-change-password.html',
     styleUrl: './profile-change-password.css'
 })
-export class ProfileChangePassword extends ApplicationForm implements OnInit {
+export class ProfileChangePassword extends BaseApplicationFormComponent implements OnInit {
     private readonly profileService = inject(ProfileServices);
     private readonly router = inject(Router);
 

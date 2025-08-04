@@ -1,10 +1,11 @@
 import { inject, signal } from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { ApiError, ApiErrorResponse, ValidationError } from "./models";
-import { Utils } from "./utils";
-import { ToasterService } from "../layout";
+import { ToasterService } from "../../layout";
+import { ApiError, ApiErrorResponse, ValidationError } from "../models";
+import { Utils } from "../utils";
 
-export abstract class ApplicationForm {
+
+export abstract class BaseApplicationFormComponent {
     protected serverErrors = signal<ValidationError[]>([]);
     protected generalError = signal<string>('');
     protected readonly fb: FormBuilder = inject(FormBuilder);

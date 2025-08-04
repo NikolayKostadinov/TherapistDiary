@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { LoginRequest } from '../models';
 import { Utils } from '../../../common/utils';
-import { ApplicationForm } from '../../../common';
+import { BaseApplicationFormComponent } from '../../../common';
 
 @Component({
     selector: 'app-login',
@@ -14,7 +14,7 @@ import { ApplicationForm } from '../../../common';
     templateUrl: './login.html',
     styleUrl: './login.css'
 })
-export class Login extends ApplicationForm {
+export class Login extends BaseApplicationFormComponent {
     private readonly router = inject(Router);
     private readonly authService = inject(AuthService);
 

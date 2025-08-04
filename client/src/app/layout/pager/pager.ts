@@ -56,14 +56,18 @@ export class Pager {
         this.pageSizeChange.emit(newPageSize);
     }
 
-    onPageClick(pageNumber: number) {
+    onPageClick(pageNumber: number, event?: Event) {
+        if (pageNumber === this.page) return;
         this.pageChange.emit(pageNumber);
     }
 
-    onNextPageClick() {
+    onNextPageClick(event?: Event) {
+        if (!this.hasNextPage) return;
         this.pageChange.emit(this.page + 1);
     }
-    onPreviousPageClick() {
+
+    onPreviousPageClick(event?: Event) {
+        if (!this.hasPreviousPage) return;
         this.pageChange.emit(this.page - 1);
     }
 

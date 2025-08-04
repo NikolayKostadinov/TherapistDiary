@@ -22,6 +22,3 @@ export * from './firebase/firebase.service';
 
 // Utils
 export * from './utils';
-
-// Application Form Base Class
-export * from './application.form';

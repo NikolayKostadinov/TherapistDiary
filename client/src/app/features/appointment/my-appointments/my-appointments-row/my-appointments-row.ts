@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { MyAppointmentModel } from '../../models';
 import { AppointmentTimePipe } from "../../appointment-time.pipe";
-import { ApplicationForm, Utils } from '../../../../common';
+import { BaseApplicationFormComponent, Utils } from '../../../../common';
 
 @Component({
     selector: 'tr[app-my-appointments-row]',
@@ -11,7 +11,7 @@ import { ApplicationForm, Utils } from '../../../../common';
     templateUrl: './my-appointments-row.html',
     styleUrl: './my-appointments-row.css'
 })
-export class MyAppointmentsRow extends ApplicationForm implements OnInit {
+export class MyAppointmentsRow extends BaseApplicationFormComponent implements OnInit {
     @Input({ required: true }) appointment!: MyAppointmentModel;
     @Input({ required: true }) index!: number;
 

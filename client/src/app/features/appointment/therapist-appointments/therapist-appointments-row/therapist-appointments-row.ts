@@ -4,7 +4,7 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { TherapistAppointmentModel } from '../../models';
 import { AppointmentTimeModel } from '../../models';
 import { AppointmentTimePipe } from "../../appointment-time.pipe";
-import { ApplicationForm, Utils } from '../../../../common';
+import { BaseApplicationFormComponent, Utils } from '../../../../common';
 
 @Component({
     selector: 'tr[app-therapist-appointments-row]',
@@ -12,7 +12,7 @@ import { ApplicationForm, Utils } from '../../../../common';
     templateUrl: './therapist-appointments-row.html',
     styleUrl: './therapist-appointments-row.css'
 })
-export class TherapistAppointmentsRow extends ApplicationForm implements OnInit {
+export class TherapistAppointmentsRow extends BaseApplicationFormComponent implements OnInit {
     @Input({ required: true }) appointment!: TherapistAppointmentModel;
     @Input({ required: true }) index!: number;
     @Input({ required: true }) visibleColumns!: {

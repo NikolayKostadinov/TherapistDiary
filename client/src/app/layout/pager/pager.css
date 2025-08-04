@@ -37,3 +37,46 @@
 ul.pagination {
     margin-bottom: 0;
 }
+
+/* Оптимизация за единичен клик */
+.pagination .page-link {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    touch-action: manipulation !important;
+    -webkit-touch-callout: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    /* Премахване на всички анимации/трансишъни */
+    transition: none !important;
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    /* Форсиране на немедлено реагиране */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+.pagination .page-link:hover {
+    background-color: #e9ecef !important;
+    border-color: #dee2e6 !important;
+    transition: none !important;
+}
+
+.pagination .page-link:active,
+.pagination .page-link:focus {
+    background-color: #d1ecf1 !important;
+    border-color: #bee5eb !important;
+    transform: none !important;
+    transition: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.pagination .page-item.disabled .page-link {
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
