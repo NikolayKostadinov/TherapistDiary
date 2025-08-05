@@ -7,6 +7,7 @@ using Domain.Resources;
 using Domain.Shared;
 using Infrastructure.AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Requests;
 using Responses;
 using TherapistDiary.Common.Extensions;
@@ -32,7 +33,7 @@ public class AccountService : IAccountService
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
-    public async Task<Result<UserResponse>> GetUserById(Guid userId )
+    public async Task<Result<UserResponse>> GetUserById(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user is null)
@@ -117,7 +118,7 @@ public class AccountService : IAccountService
             : Result.Failure(IdentityError(result));
     }
 
-   public async Task<Result<User>> AddUserInRoleAsync(string userId, string roleName)
+    public async Task<Result<User>> AddUserInRoleAsync(string userId, string roleName)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
@@ -148,14 +149,19 @@ public class AccountService : IAccountService
 
     public async Task<Result> DeleteAsync(Guid id)
     {
-        var user = await _userManager.FindByIdAsync(id.ToString());
+        var user = await _userRepository.GetByIdAsync(id);
         if (user is null)
         {
             var message = string.Format(ErrorMessages.USER_NOT_FOUND, id);
             return Result.Failure(Error.Create(message));
         }
 
-        var result = await _userManager.DeleteAsync(user);
+        // Perform soft delete
+        user.IsDeleted = true;
+        user.DeletedOn = _timeProvider.GetUtcNow().DateTime;
+        user.DeletedFrom = "System"; // You might want to get this from current user context
+
+        var result = await _userManager.UpdateAsync(user);
         return result.Succeeded
             ? Result.Success()
             : Result.Failure(IdentityError(result));

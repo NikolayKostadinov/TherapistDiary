@@ -1,9 +1,10 @@
 namespace TherapistDiary.Domain.Entities;
 
 using Microsoft.AspNetCore.Identity;
+using Primitives;
 using Shared;
 
-public class User : IdentityUser<Guid>
+public class User : IdentityUser<Guid>, IDeletableEntity
 {
     public User()
     {
@@ -18,6 +19,18 @@ public class User : IdentityUser<Guid>
     public string? Specialty { get; set; }
     public string? Biography { get; set; }
     public string? ProfilePictureUrl { get; set; }
+
+    // IDeletableEntity properties
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedOn { get; set; }
+    public string? DeletedFrom { get; set; }
+
+    // IAuditableEntity properties  
+    public DateTime CreatedOn { get; set; }
+    public bool PreserveCreatedOn { get; set; }
+    public DateTime? ModifiedOn { get; set; }
+    public string CreatedFrom { get; set; } = string.Empty;
+    public string? ModifiedFrom { get; set; }
 
     public string FullName => GetFullName();
 
