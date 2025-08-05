@@ -1,10 +1,10 @@
-import { Injectable, DestroyRef, signal, inject } from '@angular/core';
+import { Injectable, DestroyRef, inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpParams } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, map, tap, throwError, Observable } from 'rxjs';
 import { UserListModel } from '../../profile/models/user-list.model';
 import { UserProfileModel } from '../../profile/models';
-import { ApiError, PagedResult } from '../../../common';
+import { ApiError, PagedFilteredRequest, PagedResult } from '../../../common';
 import { environment } from '../../../../environments/environment';
 import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { AuthHttpService } from '../../auth';
@@ -18,23 +18,10 @@ export class UserManagementService {
     private readonly http = inject(HttpClient);
     private readonly destroyRef = inject(DestroyRef);
 
-
-    private _usersPagedList = signal<PagedResult<UserListModel> | null>(null);
-    private _isLoading = signal<boolean>(false);
-
-
     constructor() { }
 
-    public get usersPagedList() {
-        return this._usersPagedList.asReadonly();
-    }
-
-    public get isLoading() {
-        return this._isLoading.asReadonly();
-    }
-
-    public getAllUsers(pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<UserProfileModel>>> {
-        let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
+    public getAllUsers(request: PagedFilteredRequest): Observable<HttpResponse<PagedResult<UserProfileModel>>> {
+        let params = this.initializeQueryParams(request);
 
         return this.http.get<PagedResult<UserProfileModel>>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`,
             {
@@ -44,28 +31,27 @@ export class UserManagementService {
         );
     }
 
-    private initializeQueryParams(pageNumber: number, pageSize: number, searchTerm: string | null, sortBy: string | null, sortDescending: string | null) {
+    private initializeQueryParams(request: PagedFilteredRequest): HttpParams {
         let params = new HttpParams()
-            .set('pageNumber', pageNumber.toString())
-            .set('pageSize', pageSize.toString());
+            .set('pageNumber', request.pageNumber.toString())
+            .set('pageSize', request.pageSize ? request.pageSize.toString() : '10');
 
-        if (searchTerm) {
-            params = params.set('searchTerm', searchTerm);
+        if (request.searchTerm) {
+            params = params.set('searchTerm', request.searchTerm);
         }
 
-        if (sortBy) {
-            params = params.set('sortBy', sortBy);
+        if (request.sortBy) {
+            params = params.set('sortBy', request.sortBy);
         }
 
-        if (sortDescending !== null) {
-            params = params.set('sortDescending', sortDescending);
+        if (request.sortDescending !== null) {
+            params = params.set('sortDescending', request.sortDescending ?? false);
         }
         return params;
     }
 
-    public loadUsers(pageNumber: number = 1, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): void {
-        this._isLoading.set(true);
-        this.getAllUsers(pageNumber, pageSize, searchTerm, sortBy, sortDescending)
+    public loadUsers(request: PagedFilteredRequest): Observable<PagedResult<UserListModel> | null> {
+        return this.getAllUsers(request)
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 map(response => response
@@ -82,27 +68,15 @@ export class UserManagementService {
                     }
                     : null),
                 catchError((error) => {
+                    console.error('Error loading user profiles:', error);
                     return throwError(() => error);
                 })
-            ).subscribe({
-                next: (usersPagedList: PagedResult<UserListModel> | null) => {
-                    this._usersPagedList.set(usersPagedList);
-                    this._isLoading.set(false);
-                },
-                error: (error: ApiError) => {
-                    this._usersPagedList.set(null);
-                    this._isLoading.set(false);
-                    console.error('Error loading user profiles:', error);
-                },
-            });
+            );
     }
 
-    deleteProfile(userId: string) {
+    deleteProfile(userId: string): Observable<void> {
         return this.authHttpService.deleteProfile(userId)
             .pipe(
-                tap(() => {
-                    this.loadUsers();
-                }),
                 map(() => void 0), // Return void
                 takeUntilDestroyed(this.destroyRef),
                 catchError((error) => {
@@ -111,37 +85,42 @@ export class UserManagementService {
             );
     }
 
-    toggleUserRole(id: string, role: string) {
-        const user = this.usersPagedList()?.items.find(u => u.id === id);
-        if (user) {
-            if (this.userInRole(user, role)) {
-                return this.authHttpService.removeRoleFromUser(id, role)
-                    .pipe(
-                        tap(() => {
-                            this.loadUsers();
-                        }),
-                        map(() => void 0), // Return void
-                        takeUntilDestroyed(this.destroyRef),
-                        catchError((error) => {
-                            return throwError(() => error);
-                        })
-                    );
-
-            } else {
-                return this.authHttpService.addRoleToUser(id, role)
-                    .pipe(
-                        tap(() => {
-                            this.loadUsers();
-                        }), map(() => void 0), // Return void
-                        takeUntilDestroyed(this.destroyRef),
-                        catchError((error) => {
-                            return throwError(() => error);
-                        })
-                    );
-            }
+    toggleUserRole(user: UserListModel, role: string): Observable<void> {
+        if (this.userInRole(user, role)) {
+            return this.removeRoleFromUser(user.id, role)
+                .pipe(
+                    map(() => void 0), // Return void
+                    takeUntilDestroyed(this.destroyRef),
+                    catchError((error) => {
+                        return throwError(() => error);
+                    })
+                );
         } else {
-            return throwError(() => new Error('Потребителят не е намерен'));
+            return this.addRoleToUser(user.id, role)
+                .pipe(
+                    map(() => void 0), // Return void
+                    takeUntilDestroyed(this.destroyRef),
+                    catchError((error) => {
+                        return throwError(() => error);
+                    })
+                );
         }
+    }
+
+    public addRoleToUser(id: string, role: string): Observable<HttpResponse<void>> {
+        return this.http.patch<void>(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.ADD_TO_ROLE}/${id}/${role}`,
+            {},
+            { observe: 'response' }
+        );
+    }
+
+    public removeRoleFromUser(id: string, role: string): Observable<HttpResponse<void>> {
+        return this.http.patch<void>(
+            `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.REMOVE_FROM_ROLE}/${id}/${role}`,
+            {},
+            { observe: 'response' }
+        );
     }
 
     private userInRole(user: UserListModel, role: string) {

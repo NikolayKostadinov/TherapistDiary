@@ -9,6 +9,7 @@ import { UserInfo } from '../../../auth/models';
 import { MyAppointmentModel } from '../../models';
 import { ApiError, PagedResult, ConfirmationModal, Utils, PagedFilteredRequest, BaseTableComponent } from '../../../../common';
 import { Pager } from '../../../../layout/pager/pager';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-my-appointments-table',
@@ -20,7 +21,6 @@ export class MyAppointmentsTable extends BaseTableComponent<MyAppointmentModel> 
     private _appointmentService = inject(AppointmentService);
     private _authService = inject(AuthService);
 
-    public showDeleteModal = signal(false);
     private _destroyedAppointmentId: string | null = null;
 
     public get appointments() { return this.items; }
@@ -30,30 +30,12 @@ export class MyAppointmentsTable extends BaseTableComponent<MyAppointmentModel> 
         this.loadData();
     }
 
-    protected loadDataFromService(request: PagedFilteredRequest): Observable<any> {
+    protected loadDataFromService(request: PagedFilteredRequest): Observable<HttpResponse<PagedResult<MyAppointmentModel>>> {
         const currentUser: UserInfo | null = this._authService.currentUser();
         if (!currentUser?.id) {
             throw new Error('Няма автентифициран потребител');
         }
         return this._appointmentService.getMyAppointments(currentUser.id, request);
-    }
-
-    protected mapServiceResponse(response: any): PagedResult<MyAppointmentModel> | null {
-        return response.body
-            ? <PagedResult<MyAppointmentModel>>{
-                ...response.body,
-                items: response.body.items.map((appointment: any) => {
-                    return ({
-                        ...appointment,
-                    }) as MyAppointmentModel;
-                })
-            }
-            : null;
-    }
-
-    protected override handleLoadError(error: any): void {
-        console.error('Error loading my appointments:', error);
-        // Тук можете да добавите специфично обработване на грешки ако е необходимо
     }
 
     // Специфични методи за този компонент
@@ -81,7 +63,7 @@ export class MyAppointmentsTable extends BaseTableComponent<MyAppointmentModel> 
     }
 
     public onCancelDelete(): void {
-        this.showDeleteModal.set(false);
+        this.onCancelModalAction();
         this._destroyedAppointmentId = null;
     }
 

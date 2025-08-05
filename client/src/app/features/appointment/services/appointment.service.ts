@@ -43,7 +43,7 @@ export class AppointmentService {
         );
     }
 
-    getMyAppointments(patientId: string, parameters: PagedFilteredRequest): Observable<HttpResponse<PagedResult<any>>> {
+    getMyAppointments(patientId: string, parameters: PagedFilteredRequest): Observable<HttpResponse<PagedResult<MyAppointmentModel>>> {
 
         let params = this.initializeQueryParams(parameters);
         params = params.set('patientId', patientId);

@@ -21,7 +21,6 @@ export class TherapistAppointmentsTable extends BaseTableComponent<TherapistAppo
     private _authService = inject(AuthService);
 
     // Специфични за този компонент сигнали
-    public showDeleteModal = signal(false);
     private _destroyedAppointmentId: string | null = null;
 
     // Column visibility - специфична функционалност за този компонент
@@ -66,11 +65,6 @@ export class TherapistAppointmentsTable extends BaseTableComponent<TherapistAppo
             : null;
     }
 
-    protected override handleLoadError(error: any): void {
-        console.error('Error loading therapist appointments:', error);
-        // Тук можете да добавите специфично обработване на грешки ако е необходимо
-    }
-
     // Специфични методи за този компонент
     onDeleteClick(appointmentId: string): void {
         this.showDeleteModal.set(true);
@@ -97,7 +91,7 @@ export class TherapistAppointmentsTable extends BaseTableComponent<TherapistAppo
     }
 
     onCancelDelete(): void {
-        this.showDeleteModal.set(false);
+        this.onCancelModalAction();
         this._destroyedAppointmentId = null;
     }
 

@@ -64,7 +64,7 @@ export class MyAppointmentsRow extends BaseApplicationFormComponent implements O
         this.isEditingNotes.set(false);
     }
 
-    get notesControlIsValid() {
-        return this.form.get('notes')?.valid && this.form.get('notes')?.touched;
+    get notesControlIsInvalid() {
+        return !this.form.get('notes')?.valid && this.form.get('notes')?.touched;
     }
 }

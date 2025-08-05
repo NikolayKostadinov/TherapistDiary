@@ -1,8 +1,9 @@
-import { computed, signal, DestroyRef, inject, Signal } from '@angular/core';
+import { computed, signal, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { PagedResult, PagerModel, PagedFilteredRequest } from '../models';
 import { ToasterService } from '../../layout';
+import { HttpResponse } from '@angular/common/http';
 
 /**
  * Базов клас за таблици с пагиниране, сортиране и търсене
@@ -12,19 +13,31 @@ export abstract class BaseTableComponent<T> {
     protected readonly destroyRef = inject(DestroyRef);
 
     // Общи сигнали за всички таблици
-    public pagedList = signal<PagedResult<T> | null>(null);
-    public isLoading = signal<boolean>(false);
-    public currentPage = signal(1);
-    public pageSize = signal(10);
-    public searchTerm = signal<string | null>(null);
-    public sortBy = signal<string | null>(null);
-    public sortDescending = signal<boolean | null>(null);
-    public pageSizes = [10, 50, 100];
+    protected pagedList = signal<PagedResult<T> | null>(null);
+    protected isLoading = signal<boolean>(false);
+    protected currentPage = signal(1);
+    protected pageSize = signal(10);
+    protected searchTerm = signal<string | null>(null);
+    protected sortBy = signal<string | null>(null);
+    protected sortDescending = signal<boolean | null>(null);
+
+    // Общи modal сигнали
+    public showDeleteModal = signal(false);
+
+    // Пагинационни размери
+    protected pageSizes = [10, 50, 100];
+
 
     // Общи computed properties
-    public items = computed(() => this.pagedList()?.items || []);
-    public totalPages = computed(() => this.pagedList()?.totalPages || 0);
-    public totalCount = computed(() => this.pagedList()?.totalCount || 0);
+    protected items = computed(() => this.pagedList()?.items || []);
+    protected totalPages = computed(() => this.pagedList()?.totalPages || 0);
+    protected totalCount = computed(() => this.pagedList()?.totalCount || 0);
+    protected pageOffset = computed(() => {
+        const currentPage = this.pagerData()?.page ?? 1;
+        const currentPageSize = this.pagedList()?.pageSize ?? 10;
+        return (currentPage - 1) * currentPageSize;
+    });
+
 
     // Pager data за Pager компонента
     public pagerData = computed(() => {
@@ -42,26 +55,22 @@ export abstract class BaseTableComponent<T> {
     });
 
 
-    protected abstract loadDataFromService(request: PagedFilteredRequest): Observable<any>;
-
-    protected abstract mapServiceResponse(response: any): PagedResult<T> | null;
+    protected abstract loadDataFromService(request: PagedFilteredRequest): Observable<HttpResponse<PagedResult<T>>>;
 
     public loadData(): void {
         this.isLoading.set(true);
         const request = this.createPagedFilteredRequest();
-        
+
         this.loadDataFromService(request)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
-                next: (response) => {
-                    const mappedData = this.mapServiceResponse(response);
-                    this.pagedList.set(mappedData);
+                next: (response: HttpResponse<PagedResult<T>>) => {
+                    this.pagedList.set(response.body);
                     this.isLoading.set(false);
                 },
                 error: (error) => {
                     this.pagedList.set(null);
                     this.isLoading.set(false);
-                    this.handleLoadError(error);
                 }
             });
     }
@@ -74,10 +83,6 @@ export abstract class BaseTableComponent<T> {
             sortBy: this.sortBy(),
             sortDescending: this.sortDescending()
         };
-    }
-
-    protected handleLoadError(error: any): void {
-        console.error('Error loading data:', error);
     }
 
     // Методи за пагиниране
@@ -146,6 +151,18 @@ export abstract class BaseTableComponent<T> {
     }
 
     public isSortable(column: string): boolean {
-        return true; 
+        return true;
+    }
+
+    // Общи методи за clear search
+    public onClearSearch(): void {
+        this.searchTerm.set("");
+        this.currentPage.set(1);
+        this.loadData();
+    }
+
+    // Общи modal методи за delete операции
+    protected onCancelModalAction(): void {
+        this.showDeleteModal.set(false);
     }
 }

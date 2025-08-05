@@ -89,7 +89,7 @@
                         @for (appointment of appointments(); track
                         appointment.id; let i = $index) {
                         <tr app-my-appointments-row [appointment]="appointment"
-                            [index]="(currentPage() - 1) * pageSize() + i + 1" (delete)="onDeleteClick($event)"
+                            [index]="pageOffset() + i + 1" (delete)="onDeleteClick($event)"
                             (updateNotes)="onUpdateNotes($event)">
                         </tr>
                         }

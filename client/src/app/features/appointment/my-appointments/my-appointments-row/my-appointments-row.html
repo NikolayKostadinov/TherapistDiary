@@ -43,7 +43,7 @@
         <form [formGroup]="form" (ngSubmit)="saveNotes()">
             <textarea class="form-control form-control-sm mb-2" formControlName="notes"
                       placeholder="Въведете бележки..." rows="2" maxlength="500"
-                      [class.is-invalid]="!notesControlIsValid">
+                      [class.is-invalid]="notesControlIsInvalid">
                 </textarea>
 
             @if (getFieldError('notes')) {
