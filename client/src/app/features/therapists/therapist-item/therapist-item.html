@@ -1,17 +1,9 @@
-<div class="therapists-item rounded"
-     [routerLink]="['/therapists', 'details', therapist.id]">
+<div class="therapists-item rounded" [routerLink]="['/therapists', 'details', therapist.id]">
     <div class="therapists-img rounded-top h-100">
         <img [src]="therapist.profilePictureUrl ? therapist.profilePictureUrl : 'img/no-profile.jpg'"
-             class="img-fluid rounded-top w-100"
-             alt="">
-        <div class="therapists-icon d-flex justify-content-center">
-            <a class="btn btn-primary rounded-pill text-white"
-               routerLink="/appointment/create"><i class="fa fa-calendar"></i>
-                Запазете час</a>
-        </div>
+             class="img-fluid rounded-top w-100" alt="">
     </div>
-    <div
-         class="therapists-content text-center border border-primary border-top-0 rounded-bottom p-4">
+    <div class="therapists-content text-center border border-primary border-top-0 rounded-bottom p-4">
         <h5>{{therapist.fullName}}</h5>
         <p class="mb-0">{{therapist.specialty}}</p>
     </div>
