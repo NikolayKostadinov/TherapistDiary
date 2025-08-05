@@ -70,19 +70,6 @@ export class AuthHttpService {
         // Глобалният interceptor ще обработи грешките автоматично
     }
 
-    getAllUsers(pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<UserProfileModel>>> {
-        let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
-
-        return this.http.get<PagedResult<UserProfileModel>>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`,
-            {
-                params: params,
-                observe: 'response'
-            }
-        );
-        // Глобалният interceptor ще обработи грешките автоматично
-    }
-
-
     addRoleToUser(id: string, role: string) {
         return this.http.patch<void>(
             `${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.ADD_TO_ROLE}/${id}/${role}`,

@@ -1,8 +1,12 @@
 import { Injectable, DestroyRef, signal, inject } from '@angular/core';
+import { HttpClient, HttpResponse, HttpParams } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, map, tap, throwError } from 'rxjs';
+import { catchError, map, tap, throwError, Observable } from 'rxjs';
 import { UserListModel } from '../../profile/models/user-list.model';
+import { UserProfileModel } from '../../profile/models';
 import { ApiError, PagedResult } from '../../../common';
+import { environment } from '../../../../environments/environment';
+import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 import { AuthHttpService } from '../../auth';
 
 
@@ -11,6 +15,7 @@ import { AuthHttpService } from '../../auth';
 })
 export class UserManagementService {
     private readonly authHttpService = inject(AuthHttpService);
+    private readonly http = inject(HttpClient);
     private readonly destroyRef = inject(DestroyRef);
 
 
@@ -28,9 +33,39 @@ export class UserManagementService {
         return this._isLoading.asReadonly();
     }
 
+    public getAllUsers(pageNumber: number, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): Observable<HttpResponse<PagedResult<UserProfileModel>>> {
+        let params = this.initializeQueryParams(pageNumber, pageSize, searchTerm, sortBy, sortDescending);
+
+        return this.http.get<PagedResult<UserProfileModel>>(`${environment.baseUrl}${API_ENDPOINTS.ACCOUNT.BASE}`,
+            {
+                params: params,
+                observe: 'response'
+            }
+        );
+    }
+
+    private initializeQueryParams(pageNumber: number, pageSize: number, searchTerm: string | null, sortBy: string | null, sortDescending: string | null) {
+        let params = new HttpParams()
+            .set('pageNumber', pageNumber.toString())
+            .set('pageSize', pageSize.toString());
+
+        if (searchTerm) {
+            params = params.set('searchTerm', searchTerm);
+        }
+
+        if (sortBy) {
+            params = params.set('sortBy', sortBy);
+        }
+
+        if (sortDescending !== null) {
+            params = params.set('sortDescending', sortDescending);
+        }
+        return params;
+    }
+
     public loadUsers(pageNumber: number = 1, pageSize: number = 10, searchTerm: string | null = null, sortBy: string | null = null, sortDescending: string | null = null): void {
         this._isLoading.set(true);
-        this.authHttpService.getAllUsers(pageNumber, pageSize, searchTerm, sortBy, sortDescending)
+        this.getAllUsers(pageNumber, pageSize, searchTerm, sortBy, sortDescending)
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 map(response => response

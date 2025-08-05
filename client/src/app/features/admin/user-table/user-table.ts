@@ -61,20 +61,31 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
     public override loadData(): void {
         const request = this.createPagedFilteredRequest();
 
-        // Използваме директно услугата
+        // Използваме директно услугата с правилните параметри
         this.userManagementService.loadUsers(
             request.pageNumber,
             request.pageSize,
             request.searchTerm,
             request.sortBy,
-            request.sortDescending ? (request.sortDescending ? "true" : "false") : null
+            request.sortDescending ? "true" : "false"
         );
 
-        // Синхронизираме състоянието директно
-        setTimeout(() => {
-            this.pagedList.set(this.userManagementService.usersPagedList());
-            this.isLoading.set(this.userManagementService.isLoading());
-        }, 0);
+        // Синхронизираме състоянието чрез polling (за простота)
+        const checkDataLoaded = () => {
+            const users = this.userManagementService.usersPagedList();
+            const loading = this.userManagementService.isLoading();
+
+            this.pagedList.set(users);
+            this.isLoading.set(loading);
+
+            // Ако все още зарежда, проверявай отново след малко
+            if (loading) {
+                setTimeout(checkDataLoaded, 100);
+            }
+        };
+
+        // Започни проверката
+        setTimeout(checkDataLoaded, 50);
     }
 
     // Специфични методи за този компонент
@@ -93,6 +104,7 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
                 this.toaster.success(
                     `Потребителя '${this.clickedUser()?.fullName}' беше успешно изтрит`
                 );
+                this.loadData(); // Презареди данните след изтриване
             },
             error: (error: ApiError) => {
                 const errorDescription = Utils.getGeneralErrorMessage(error);
@@ -114,6 +126,7 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
                     this.toaster.success(
                         `Ролята на потребителя '${$event.user.fullName}' беше успешно променена на '${$event.role}'`
                     );
+                    this.loadData(); // Презареди данните след промяна на роля
                 },
                 error: (error: ApiError) => {
                     const errorDescription = Utils.getGeneralErrorMessage(error);
