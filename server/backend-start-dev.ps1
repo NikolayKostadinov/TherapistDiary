@@ -9,7 +9,7 @@ Write-Host "🚀 Starting backend services..." -ForegroundColor Green
 
 # Start Docker Compose services
 Write-Host "🐳 Starting Docker Compose services..." -ForegroundColor Cyan
-docker compose up -d
+docker compose -f docker-compose.dev.yml up -d
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Failed to start Docker services" -ForegroundColor Red

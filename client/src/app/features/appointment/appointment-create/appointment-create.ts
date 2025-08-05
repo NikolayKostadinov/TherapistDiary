@@ -201,7 +201,7 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
                 next: () => {
                     this.isSubmitting.set(false);
                     this.toasterService.success("Часът е запазен успешно!");
-                    this.router.navigate(['/my-appointments']); // или към списък с часове
+                    this.router.navigate(['my-appointments']); // или към списък с часове
                 },
                 error: (error) => {
                     this.isSubmitting.set(false);

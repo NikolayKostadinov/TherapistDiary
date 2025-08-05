@@ -22,7 +22,7 @@ if ($PullLatest) {
 
 # Start Docker Compose services using demo compose file
 Write-Host "🐳 Starting Demo Docker Compose services..." -ForegroundColor Cyan
-docker compose -f docker-compose.demo.yml up -d
+docker compose -f docker-compose.yml up -d
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Failed to start Docker services" -ForegroundColor Red
