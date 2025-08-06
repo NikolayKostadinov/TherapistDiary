@@ -191,7 +191,7 @@ export const adminGuard: CanActivateFn = () => {
 
 - Short-lived (15 минути)
 - JWT формат с embedded claims
-- Съхранява се в memory (signal)
+- Съхранява се в memory (signal) и Local Storage
 - Автоматично се инжектира в HTTP заявки
 
 **Refresh Token:**

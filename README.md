@@ -140,7 +140,7 @@ client/src/app/
 
 - Всеки feature е самостоятелен модул със собствени компоненти, сервиси и модели
 - Standalone компоненти без NgModules за по-добра tree-shaking оптимизация
-- Lazy loading за всички основни путища (routes)
+- Lazy loading за всички основни пътища (routes)
 
 ##### 2. Reactive Architecture с Angular Signals
 
