@@ -14,7 +14,7 @@ TherapistDiary е Single Page Application (SPA) разработена с Angula
 - **Bootstrap 5** - CSS framework за стилизиране
 - **Font Awesome** - икони
 - **Angular Router** - client-side routing
-- **Angular Forms** - reactive forms за валидация
+- **Angular Forms** - reactive forms за въвеждане на данни
 
 ### Backend
 
@@ -57,35 +57,177 @@ ng serve
 
 ## Архитектура на проекта
 
-### Frontend структура
+### Frontend структура и архитектурни принципи
+
+Клиентското приложение следва модулна архитектура, основана на Angular 18+ best practices със standalone компоненти и сигнал-базирана реактивност.
+
+#### Основна организация
 
 ``` folder structure
 client/src/app/
-├── common/                 # Споделени компоненти и utilities
-│   ├── components/         # Base компоненти и модали
-│   ├── constants/         # API endpoints и константи
-│   ├── guards/           # Route guards
-│   ├── interceptors/     # HTTP interceptors
-│   ├── models/          # TypeScript интерфейси
-│   ├── pipes/           # Custom pipes
-│   └── services/        # Споделени services
-├── features/            # Feature модули
-│   ├── admin/          # Администраторски панел
-│   ├── appointment/    # Управление на часове
-│   ├── auth/          # Автентикация
-│   ├── home/          # Начална страница
-│   ├── profile/       # Потребителски профил
-│   ├── therapists/    # Списък и детайли на терапевти
-│   └── therapy-types/ # Видове терапии
-└── layout/            # Layout компоненти
-    ├── header/        # Navigation
-    ├── footer/        # Footer
-    └── toaster/       # Notification система
+├── common/                                     # Споделена функционалност
+│   ├── components/                             # Базови компоненти за наследяване
+│   │   ├── base-table.component.ts             # Базов клас за таблици с pagination/sorting
+│   │   ├── base-application-form.component.ts  # Базов клас за форми с error handling
+│   │   └── confirmation-modal/                 # Modal за потвърждение на действия
+│   ├── constants/                              # API endpoints и константи
+│   │   └── api-endpoints.ts                    # Централизирани API URLs
+│   ├── directives/                             # Custom Angular директиви
+│   │   └── scroll-animation.directive.ts       # Scroll-triggered анимации
+│   ├── firebase/                               # Firebase configuration и сервиси
+│   │   ├── firebase.config.ts                  # Firebase настройки
+│   │   └── firebase.service.ts                 # Firebase file upload service
+│   ├── interceptors/                           # Общи HTTP interceptors
+│   │   └── error.interceptor.ts                # Глобално error handling
+│   ├── models/                                 # TypeScript интерфейси и типове
+│   │   ├── api-error.model.ts                  # Error response модели
+│   │   ├── paged-result.model.ts               # Generic pagination модел
+│   │   └── paged-filtered-request.ts           # Request модел за pagination
+│   ├── services/                               # Споделени сервиси
+│   │   └── logging.service.ts                  # Centralized logging
+│   └── utils.ts                                # Utility функции
+├── features/                                   # Feature-based модули (standalone)
+│   ├── admin/                                  # Администраторски панел
+│   │   ├── services/                           # Admin-specific сервиси
+│   │   └── user-table/                         # Управление на потребители
+│   ├── appointment/                            # Управление на часове
+│   │   ├── models/                             # Appointment модели
+│   │   ├── services/                           # Appointment сервиси
+│   │   ├── appointment-create/                 # Създаване на час
+│   │   ├── my-appointments/                    # Часовете на пациента
+│   │   ├── therapist-appointments/             # Часовете на терапевта
+│   │   └── appointment-time.pipe.ts            # Pipe за форматиране на време
+│   ├── auth/                                   # Автентикация
+│   │   ├── models/                             # Auth модели (login, register)
+│   │   ├── services/                           # Authentication сервиси
+│   │   ├── interceptors/                       # Auth-specific interceptors
+│   │   │   ├── auth.interceptor.ts             # JWT token injection
+│   │   │   └── token-refresh.interceptor.ts    # Automatic token refresh
+│   │   ├── login/                              # Login компонент
+│   │   └── register/                           # Registration компонент
+│   ├── home/                                   # Начална страница
+│   ├── profile/                                # Потребителски профил
+│   │   ├── services/                           # Profile сервиси
+│   │   ├── profile/                            # Преглед на профил
+│   │   ├── profile-edit/                       # Редактиране на профил
+│   │   └── profile-change-password/            # Смяна на парола
+│   ├── therapists/                             # Терапевти модул
+│   │   ├── models/                             # Therapist модели
+│   │   ├── services/                           # Therapist сервиси
+│   │   ├── therapist-board/                    # Списък с терапевти (catalog)
+│   │   ├── therapist-details/                  # Детайли за терапевт
+│   │   └── therapist-item/                     # Единичен терапевт компонент
+│   └── therapy-types/                          # Видове терапии
+│       ├── therapy-type-board/                 # Списък с терапии
+│       └── therapy-type-item/                  # Единична терапия
+├── guards/                                     # Route Guards
+│   ├── authenticated.guard.ts                  # Защита на private страници
+│   ├── unauthenticated.guard.ts                # Пренасочване от login/register
+│   └── admin.guard.ts                          # Само за администратори
+└── layout/                                     # Layout компоненти
+    ├── header/                                 # Navigation и меню
+    ├── footer/                                 # Footer
+    ├── carousel/                               # Image carousel за home page
+    ├── spinner/                                # Loading spinner
+    ├── pager/                                  # Pagination компонент
+    ├── toaster/                                # Toast notification система
+    └── page-not-found/                         # 404 страница
 ```
+
+#### Архитектурни модели и принципи
+
+##### 1. Feature-Based Architecture
+
+- Всеки feature е самостоятелен модул със собствени компоненти, сервиси и модели
+- Standalone компоненти без NgModules за по-добра tree-shaking оптимизация
+- Lazy loading за всички основни путища (routes)
+
+##### 2. Reactive Architecture с Angular Signals
+
+- Сигнал-базирано state management вместо традиционен RxJS за UI state
+- Computed values за derived state
+- Signal-based forms за реактивни форми
+
+##### 3. Base Classes за Code Reuse
+
+- `BaseTableComponent<T>` - generic базов клас за всички таблици
+  - Pagination, sorting, filtering логика
+  - Loading states, error handling
+  - Модални диалози за потвърждение
+- `BaseApplicationFormComponent` - базов клас за форми
+  - Server-side error handling
+  - Loading states
+  - Form validation интеграция
+
+##### 4. Centralized Configuration
+
+- API endpoints в `constants/api-endpoints.ts`
+- Firebase configuration в `common/firebase/firebase.config.ts` за file uploads
+- Environment-based конфигурация
+- Type-safe константи и enums
+
+##### 5. HTTP Interceptor Chain
+
+- **Auth Interceptor** (`features/auth/interceptors/auth.interceptor.ts`) - автоматично добавяне на JWT tokens
+- **Token Refresh Interceptor** (`features/auth/interceptors/token-refresh.interceptor.ts`) - автоматично обновяване на изтекли токени  
+- **Error Interceptor** (`common/interceptors/error.interceptor.ts`) - глобално error handling и toast notifications
+
+##### 6. Route Protection Strategy
+
+- Guard-based route protection на различни нива
+- Role-based access control
+- Automatic redirects базирани на authentication status
+
+#### Ключови технически решения
+
+**Signal-Based State Management:**
+
+```typescript
+// Пример от BaseTableComponent
+protected pagedList = signal<PagedResult<T> | null>(null);
+protected isLoading = signal<boolean>(false);
+protected currentPage = signal(1);
+
+// Computed values
+public hasData = computed(() => {
+    const list = this.pagedList();
+    return list && list.items.length > 0;
+});
+```
+
+**Generic Base Classes:**
+
+```typescript
+// Наследяване за конкретни таблици
+export class MyAppointmentsTable extends BaseTableComponent<MyAppointmentModel> {
+    // Само специфична логика, базовата е наследена
+    protected loadDataFromService(request: PagedFilteredRequest): Observable<HttpResponse<PagedResult<MyAppointmentModel>>> {
+        return this.appointmentService.getMyAppointments(this.patientId(), request);
+    }
+}
+```
+
+**Lazy Loading Strategy:**
+
+```typescript
+// Route-based lazy loading
+{ path: 'therapists', children: [
+    { path: '', loadComponent: () => import('./features/therapists/therapist-board/therapist-board').then(c => c.TherapistBoard) },
+    { path: 'details/:id', loadComponent: () => import('./features/therapists/therapist-details/therapist-details').then(c => c.TherapistDetails) }
+]}
+```
+
+Тази архитектура осигурява:
+
+- **Maintainability** - модулна организация и код reuse
+- **Performance** - lazy loading и tree-shaking
+- **Type Safety** - строго типизиран TypeScript код
+- **Developer Experience** - convention-over-configuration подход
+- **Scalability** - лесно добавяне на нови features без промени в съществуващия код
 
 ## Изпълнени изисквания от заданието
 
-### 1. Общи изисквания (30%)
+### 1. Общи изисквания
 
 #### ✅ Поне 4 различни динамични страници
 
@@ -116,7 +258,7 @@ client/src/app/
 - ✅ GitHub repository с meaningful commits
 - ✅ TypeScript с конкретни типове (без "any")
 
-### 2. Други изисквания (45%)
+### 2. Други изисквания
 
 #### ✅ Angular специфични концепции
 
@@ -158,13 +300,21 @@ this.httpClient.get<PagedResult<MyAppointmentModel>>(url)
 **Lifecycle hooks:**
 
 - `OnInit` - за инициализация на компоненти
-- `OnDestroy` - за cleanup на subscriptions
 - `AfterViewInit` - за работа с DOM
+
+**Modern Subscription Management:**
+
+- Вместо да използвам OnDestroy съм използвал - `DestroyRef` + `takeUntilDestroyed()` - Angular 16+ модерен подход за automatic cleanup на subscriptions без `OnDestroy`
+- Предимства пред традиционния OnDestroy подход:
+По-малко boilerplate код - не се налага да implement-ваме OnDestroy интерфейс
+Автоматично cleanup - Angular автоматично прави unsubscribe когато компонентът бъде унищожен
+Type safety - по-добра интеграция с TypeScript
+Functional reactive style - вписва се в модерния Angular стил с inject() и signal
 
 **Pipes:**
 
-- Built-in pipes: `DatePipe`, `CurrencyPipe`
-- Custom pipes за форматиране
+- Built-in pipes: `DatePipe`
+- Custom pipe: `appointment-time.pipe.ts` за форматиране на време на часове
 
 #### ✅ Route Guards
 
@@ -172,12 +322,23 @@ this.httpClient.get<PagedResult<MyAppointmentModel>>(url)
 - **GuestGuard** - пренасочва логнати потребители от login/register
 - **RoleGuard** - проверява роли (Admin, Therapist, Patient)
 
+#### ✅ Loading States & UX
+
+- **Signal-based loading management** - използване на Angular signals за reactive loading states
+- **BaseTableComponent loading** - `isLoading` signal в базовия клас за таблици
+- **Profile Service loading** - централизирано управление на loading states
+- **Component-specific loading** - `isUploading` за file uploads, form submissions
+- **Multiple loading indicators**:
+  - `<app-spinner />` - за цели компоненти/страници
+  - `fas fa-spinner fa-spin` - за бутони (Font Awesome)
+  - `spinner-border` - за малки бутони (Bootstrap)
+- **Button state management** - автоматично disable на бутони по време на операции
+
 #### ✅ Error Handling
 
 - Global error interceptor
 - Form validation
 - HTTP error responses
-- Loading states
 
 #### ✅ Component Styling
 
@@ -215,48 +376,55 @@ this.httpClient.get<PagedResult<MyAppointmentModel>>(url)
 
 - Управление на потребители
 - Преглед на всички данни
-- CRUD операции за всички ентити
 
 ### 4. Бонуси и допълнителни функционалности
 
 #### ✅ Реализирани бонуси
 
 - **Docker containerization** - backend в Docker
-- **File upload** - профилни снимки
-- **Real-time updates** - автоматично обновяване на данни
+- **Angular Animations** - scroll animations и toast notifications
+- **File upload** - профилни снимки (Firestore)
 - **Advanced filtering** - филтриране и сортиране
 - **Pagination** - страниране на данни
 - **Role-based access** - различни роли с различни права
-- **JWT authentication** - с refresh tokens
+- **JWT authentication** - с refresh tokens (виж [детайлно описание на архитектурата](./AUTHENTICATION.md))
 - **Responsive design** - mobile-friendly
 - **Loading states** - за по-добър UX
 - **Toast notifications** - за обратна връзка
 
 ## API Endpoints
 
-### Authentication
+### Account (Authentication & User Management)
 
-- `POST /api/auth/login` - влизане
-- `POST /api/auth/register` - регистрация
-- `POST /api/auth/refresh` - refresh token
+- `POST /api/account/login` - влизане в системата
+- `POST /api/account` - регистрация на нов потребител
+- `POST /api/account/refresh` - обновяване на JWT token
+- `GET /api/account` - списък на всички потребители (само Admin)
+- `GET /api/account/{id}` - детайли за потребител по ID
+- `PUT /api/account/{id}` - обновяване на потребител
+- `DELETE /api/account/{id}` - изтриване на потребител
+- `PATCH /api/account/change-password/{id}` - смяна на парола
+- `PATCH /api/account/add-role/{id}/{role}` - добавяне на роля (само Admin)
+- `PATCH /api/account/remove-role/{id}/{role}` - премахване на роля (само Admin)
 
 ### Appointments
 
-- `GET /api/appointments/patient/{id}` - часове на пациент
-- `GET /api/appointments/therapist/{id}` - часове на терапевт
-- `POST /api/appointments` - създаване на час
+- `GET /api/appointments/{therapistId}/{date}` - налични часове за терапевт на дата
+- `GET /api/appointments/by-patient` - часове на пациент (с query параметри)
+- `GET /api/appointments/by-therapist` - часове на терапевт (с query параметри)
+- `POST /api/appointments` - създаване на нов час
 - `DELETE /api/appointments/{id}` - отмяна на час
-- `PATCH /api/appointments/{id}/notes` - редактиране на бележки
+- `PATCH /api/appointments/{id}/notes` - редактиране на бележки на пациент
+- `PATCH /api/appointments/{id}/therapist-notes` - добавяне на терапевтични бележки (само Therapist)
 
 ### Therapists
 
-- `GET /api/therapists` - списък с терапевти
-- `GET /api/therapists/{id}` - детайли за терапевт
+- `GET /api/therapists` - списък с всички терапевти
+- `GET /api/therapists/{id}` - детайли за конкретен терапевт
 
-### Admin
+### Therapy Types
 
-- `GET /api/admin/users` - управление на потребители
-- `DELETE /api/admin/users/{id}` - изтриване на потребител
+- `GET /api/therapytype` - списък с всички типаве терапии и видове терапии които включват
 
 ## База данни
 
@@ -272,7 +440,7 @@ this.httpClient.get<PagedResult<MyAppointmentModel>>(url)
 
 - User 1:N Appointments (като Patient)
 - User 1:N Appointments (като Therapist)
-- TherapyType 1:N Appointments
+- Therapies 1:N Appointments
 
 ## Deployment
 
@@ -289,3 +457,4 @@ this.httpClient.get<PagedResult<MyAppointmentModel>>(url)
 3. **Резервиране на час** (изисква влизане)
 4. **Управление на часове** (различно за пациенти и терапевти)
 5. **Администраторски панел** (само за admin роля)
+   Влезте с потребител Administrator паролата на всички заредени акаунти е стандартна и ще бъде приложена в анкетата.
