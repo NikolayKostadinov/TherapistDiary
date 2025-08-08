@@ -56,7 +56,13 @@ export class Login extends BaseApplicationFormComponent {
             this.authService.login(loginData).subscribe({
                 next: (response) => {
                     this.isLoading.set(false);
+
+                    // Получаваме return URL или default към home
+                    const returnUrl = this.authService.getReturnUrl();
+                    this.authService.clearReturnUrl();
+
                     this.closeModal();
+                    this.router.navigate([returnUrl]);
                 },
                 error: (error) => {
                     this.isLoading.set(false);
@@ -70,7 +76,6 @@ export class Login extends BaseApplicationFormComponent {
 
     closeModal() {
         this.modalClosed.emit();
-        this.router.navigate(['/']);
     }
 
     goToRegister() {
@@ -83,7 +88,6 @@ export class Login extends BaseApplicationFormComponent {
         this.closeModal();
     }
 
-    // Предотвратяване на затварянето при клик върху съдържанието на модала
     onModalContentClick(event: Event) {
         event.stopPropagation();
     }

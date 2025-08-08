@@ -61,9 +61,11 @@ export class Register extends BaseApplicationFormComponent {
             next: () => {
                 this.toaster.success('Регистрацията е успешна! Добре дошли!');
 
-                // Check if user is logged in before navigating
+
                 if (this.authService.isLoggedIn()) {
-                    this.router.navigate(['/home']);
+                    const returnUrl = this.authService.getReturnUrl();
+                    this.authService.clearReturnUrl();
+                    this.router.navigate([returnUrl]);
                 } else {
                     this.router.navigate(['/auth/login']);
                 }

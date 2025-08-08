@@ -6,7 +6,6 @@ import { AuthService } from '../services/auth.service';
 import { HEADER_KEYS } from '../../../common/constants';
 import { Utils } from '../../../common/utils';
 
-// Shared state for refresh process
 const isRefreshing = signal<boolean>(false);
 const refreshTokenSubject = new Subject<boolean | null>();
 

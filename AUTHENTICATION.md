@@ -4,14 +4,56 @@
 
 TherapistDiary използва модерна JWT-базирана автентикация с автоматично обновяване на токени и multi-layered security подход.
 
+Multi-Layered Security Architecture
+
+### Layer 1: Client-Side Protection (Frontend)
+
+- Route Guards - Първа линия на защита
+- HTTP Interceptors - Автоматична защита на заявки
+
+### Layer 2: Token-Level Security
+
+- JWT Access Tokens:
+  - Short lifetime (15 минути) - минимизира exposure window
+  - Memory-only storage - не се запазват в localStorage за security
+  - Automatic expiration - built-in time-based invalidation
+
+- Refresh Token Strategy:
+  - Long-lived tokens (7 дни) но secure storage
+  - Token rotation - refresh tokens се invalidate-ват след употреба
+  - Concurrent request protection - един refresh process наведнъж
+
+### Layer 3: Backend API Protection
+
+- ASP.NET Core JWT Authentication
+- Controller-Level Authorization
+
+### Layer 4: Data-Level Security
+
+- Role-Based Data Access:
+  - Patient - вижда само своите часове
+  - Therapist - вижда часовете на своите пациенти
+  - Administrator - пълен достъп
+  
+- Endpoint-Specific Filtering
+
+Layer 5: Infrastructure Security
+
+- HTTPS Enforcement
+
+  - Всички заявки са криприрани
+  - Продукционната среда изисква HTTPS
+
+- CORS Protection
+
 ## Технологичен Stack
 
 ### Frontend
 
 - **Angular 20** - модерна standalone architecture
 - **JWT Tokens** - Access + Refresh token pattern
-- **HTTP Interceptors** - автоматично token injection и refresh
-- **Angular Signals** - reactive state management за authentication
+- **HTTP Interceptors** - автоматично поставяне на JWT в Authorization хедър(auth.interceptor.ts) и автоматично обновяване на токена (token-refresh.interceptor.ts)
+- **Angular Signals** - reactive state management за автентикация
 - **Route Guards** - role-based access control
 
 ### Backend
@@ -30,7 +72,7 @@ TherapistDiary използва модерна JWT-базирана автент
 - Login/Logout операции
 - Автоматично token refresh
 - Signal-based reactive state
-- User роли и permissions
+- Потребителски роли и пълномощия
 
 ```typescript
 export class AuthService {
@@ -51,14 +93,14 @@ export class AuthService {
 
 **Предимства на signal-based подходa:**
 
-- Реактивни updates в цялото приложение
-- По-добра performance от традиционен BehaviorSubject
+- Reactive updates в цялото приложение
+- По-добра производителност от традиционен BehaviorSubject
 - Type-safe state management
-- Автоматично change detection
+- Автоматичен change detection
 
 ### 2. HTTP Interceptor Chain
 
-Реализиран е sophisticated interceptor chain за authentication:
+Реализирана е усъвършенствана верига от интерсептори за автентикация.
 
 #### Auth Interceptor
 
@@ -84,7 +126,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 - Автоматично добавяне на Authorization header
 - Избягване на циклични заявки (login endpoint)
-- Използване на modern functional interceptors
+- Използване на модерния функционален подход за създаване на интерсептори
 
 #### Token Refresh Interceptor
 
@@ -103,7 +145,7 @@ export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
 };
 ```
 
-**Ключови features:**
+**Ключови функционалности:**
 
 - **Intelligent 401 handling** - само за private endpoints
 - **Concurrent request management** - избягване на множествени refresh заявки
@@ -198,7 +240,6 @@ export const adminGuard: CanActivateFn = () => {
 
 - Long-lived (7 дни)  
 - Secure storage в localStorage
-- HttpOnly cookies за production (препоръка)
 - Използва се за получаване на нови access tokens
 
 **Token Refresh Flow:**
@@ -207,8 +248,8 @@ export const adminGuard: CanActivateFn = () => {
 2. Token Refresh Interceptor го прихваща
 3. Автоматично се извиква refresh endpoint
 4. Нов access token се получава и запазва
-5. Оригиналната заявка се retry-ва с новия token
-6. Concurrent заявки чакат refresh-а да завърши
+5. Оригиналната заявка се опитва отново с новия token
+6. Останалите заявки чакат refresh-а да завърши
 
 ## Backend Authentication Architecture
 
@@ -275,17 +316,16 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 
 **Refresh Token:**
 
-- Cryptographically secure random string
-- Mapped към потребител в базата данни
-- Ротация при всеки refresh (за security)
+- Криптографски защитен произволен низ
+- Мапиран към потребител в базата данни
+- Променя при всеки refresh (за по-добра сигурност)
 
 ## Security Features
 
 ### 1. Token Security
 
 - **Short access token lifetime** - минимизира exposure window
-- **Automatic token rotation** - refresh tokens се ротират
-- **Secure storage considerations** - memory vs localStorage vs cookies
+- **Automatic token rotation** - refresh tokens се променят
 
 ### 2. Request Security  
 
@@ -295,9 +335,9 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 
 ### 3. Error Handling
 
-- **Graceful degradation** - smooth logout при auth грешки
-- **No sensitive data exposure** - generic error messages
-- **Audit logging** - track authentication events
+- **Graceful degradation** - автоматичен logout при грешки в автентикацията
+- **No sensitive data exposure** - Обобщени съобщения за грешки
+- **Audit logging** - проследяване на събитията при автентикация
 
 ## Frontend-Backend Integration
 
@@ -310,7 +350,7 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
    - Angular reactive form валидира входните данни
 
    **Стъпка 2: Form Submission**
-   - При submit се извиква `AuthService.login(email, password)`
+   - При submit се извиква `аuthService.login(email, password)`
    - Създава се `LoginRequest` обект с credentials
   
    **Стъпка 3: HTTP Request**
@@ -318,19 +358,20 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
    - Backend валидира credentials срещу AspNetUsers таблата
 
    **Стъпка 4: JWT Response**
-   - При успех: Backend връща `{ accessToken, refreshToken, user }`
+   - При успех: Backend връща `{ accessToken, refreshToken}` като хедъри
    - При грешка: 401 Unauthorized с error message
 
    **Стъпка 5: Token Storage**
-   - Access token се запазва в memory чрез `_accessToken.set(token)`
+   - Access token се запазва в памет чрез `_accessToken.set(token)` и в localStorage
    - Refresh token се запазва в localStorage
-   - User data се запазва в `_user.set(userInfo)`
+   - User data се запазва в памет `_user.set(userInfo)`
 
-   **Стъпка 6: UI Reactivity**
+   **Стъпка 6: UI Reactivity & Smart Redirect**
    - Angular signals автоматично trigger-ват UI updates
-   - Header показва user menu
+   - 'header' компонента показва меню съответстващо на пълномощията на потребителя
    - Route guards позволяват достъп до protected страници
-   - Redirect към home page или requested URL
+   - **Smart redirect**: пренасочване към requested URL (ако има) или home page
+   - Return URL се изчиства след успешно пренасочване
 
 2. **Protected Resource Access:**
 
@@ -362,7 +403,7 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 3. **Token Refresh Process:**
 
    **Стъпка 1: 401 Error Detection**
-   - HTTP заявка към protected endpoint върнала 401 Unauthorized
+   - HTTP заявка към protected endpoint връща 401 Unauthorized
    - `tokenRefreshInterceptor` прихваща грешката чрез `catchError`
    - Проверява че URL-ът не е public (`!Utils.isPublicUrl(req.url)`)
 
@@ -399,7 +440,10 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 
    **Стъпка 2: Token Cleanup**
    - Изчиства access token: `_accessToken.set(null)`
-   - Премахва refresh token от localStorage: `localStorage.removeItem('refreshToken')`
+   - Премахва refresh token от localStorage
+   - В настроения effect се премахват от localStorage съответно:
+     - localStorage.removeItem('X-Access-Token')
+     - localStorage.removeItem('X-Refresh-Token')
    - Изчиства user data: `_user.set(null)`
 
    **Стъпка 3: Signal Reset**
@@ -417,39 +461,34 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
    - Route guards блокират достъп до protected страници
    - Toast notification за успешен logout (опционално)
 
-   **Стъпка 6: Server Notification** (опционално)
-   - Може да се добави HTTP POST към `/api/account/logout`
-   - Сървърът invalidate-ва refresh token в базата данни
-   - Допълнителна security мярка за session management
-
 ## Benefits на тази архитектура
 
 ### Security Benefits
 
 - **Zero trust model** - всяка заявка се валидира
-- **Minimal token lifetime** - намален risk window  
-- **Automatic token management** - no manual handling
-- **Role-based granular access** - fine-grained permissions
+- **Minimal token lifetime** - намален времеви прозорец на риска  
+- **Automatic token management** - намя ръчно управление
+- **Role-based granular access** - фино гранилиране на разрешения
 
 ### Developer Experience
 
 - **Transparent authentication** - автоматично за всички заявки
 - **Type-safe state** - TypeScript + Angular signals
-- **Reactive UI updates** - автоматично re-rendering
+- **Reactive UI updates** - автоматично пререндериране
 - **Clean separation of concerns** - service + interceptors + guards
 
 ### User Experience
 
-- **Seamless login/logout** - smooth transitions
-- **No manual token refresh** - transparent за потребителя
-- **Persistent sessions** - refresh tokens поддържат сесията
+- **Seamless login/logout** - плавни преходи
+- **No manual token refresh** - прозрачно за потребителя
+- **Persistent sessions** - чрез запазване в Local Storage на рефреш токена се поддържат сесията
 - **Immediate security** - logout при грешки
 
 ## Performance Considerations
 
 ### Frontend Optimizations
 
-- **Signal-based reactivity** - efficient change detection
+- **Signal-based reactivity** - по-ефективно change detection
 - **Memory-only access tokens** - no localStorage overhead
 - **Concurrent request deduplication** - един refresh за всички заявки
 - **Lazy loading** - auth guards не блокират initial load
@@ -461,4 +500,4 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 - **Connection pooling** - optimized database connections
 - **Caching strategies** - user data caching
 
-Тази архитектура представлява modern, secure и maintainable authentication система, която използва най-новите Angular и .NET Core best practices.
+Тази архитектура представлява съвременна, сигурна и лесна за поддръжка система за автентикация, която използва най-новите Angular и .NET Core най-добри практики.

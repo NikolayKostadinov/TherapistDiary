@@ -9,7 +9,13 @@ export const AuthenticatedGuard: CanActivateFn = (
     const authService = inject(AuthService);
     const isAuthenticated = authService.isLoggedIn();
 
-    return isAuthenticated
-        ? true
-        : router.navigate(['/login']);
+    if (isAuthenticated) {
+        return true;
+    }
+
+    // Запазваме requested URL за след login
+    const returnUrl = state.url;
+    localStorage.setItem('returnUrl', returnUrl);
+
+    return router.navigate(['/login']);
 }; 
