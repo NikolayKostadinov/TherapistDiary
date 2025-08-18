@@ -78,10 +78,6 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
         this.showDeleteModal.set(false);
         const userId = this.clickedUser()?.id;
         if (!userId) return;
-
-        console.log('🔍 Deleting user with ID:', userId);
-        console.log('🔍 Full user object:', this.clickedUser());
-
         this.isLoading.set(true);
         this.userManagementService.deleteProfile(userId).subscribe({
             next: () => {
