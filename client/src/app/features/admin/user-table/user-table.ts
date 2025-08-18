@@ -124,13 +124,6 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
             });
     }
 
-    // Премахваме дублирания метод - вече е в базовия клас
-    // public onClearSearch(): void {
-    //     this.searchTerm.set("");
-    //     this.currentPage.set(1);
-    //     this.loadData();
-    // }
-
     // Override isSortable за специфичните колони
     public override isSortable(column: string): boolean {
         const sortableColumns = ["firstName", "midName", "lastName", "phoneNumber"];
