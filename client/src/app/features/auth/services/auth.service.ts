@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, effect, inject } from '@angular/core';
-import { Observable, throwError, of } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
+import { Observable, throwError, of, BehaviorSubject } from 'rxjs';
+import { map, catchError, tap, shareReplay, switchMap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { AuthHttpService } from '.';
 import { HEADER_KEYS, TOKEN_KEYS } from '../../../common/constants';
@@ -12,6 +12,9 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class AuthService {
     private readonly authHttpService = inject(AuthHttpService);
+
+    // Споделен Observable за refresh операцията
+    private refreshInProgress$: Observable<boolean> | null = null;
 
     private _accessToken = signal<string | null>(null);
     private _refreshToken = signal<string | null>(null);
@@ -163,7 +166,7 @@ export class AuthService {
                     this._refreshToken.set(refreshToken);
                 }
             }),
-            map(() => void 0), 
+            map(() => void 0),
             catchError((error) => {
                 return throwError(() => error);
             })
@@ -211,6 +214,9 @@ export class AuthService {
         this._accessToken.set(null);
         this._refreshToken.set(null);
         this._currentUser.set(null);
+
+        // Изчисти всяка активна refresh операция
+        this.refreshInProgress$ = null;
     }
 
     initializeAuth(): void {
@@ -237,13 +243,19 @@ export class AuthService {
     }
 
     refreshToken(): Observable<boolean> {
+        // Ако вече има refresh операция в ход, върни я
+        if (this.refreshInProgress$) {
+            return this.refreshInProgress$;
+        }
+
         const refreshToken = this._refreshToken();
 
         if (!refreshToken) {
             return throwError(() => new Error('Няма наличен токен за обновяване'));
         }
 
-        return this.authHttpService.refreshToken(refreshToken).pipe(
+        // Създай нова refresh операция и я сподели между всички извиквания
+        this.refreshInProgress$ = this.authHttpService.refreshToken(refreshToken).pipe(
             tap((httpResponse) => {
                 const accessToken = httpResponse.headers.get(HEADER_KEYS.AUTH_HEADER_KEY)?.replace(HEADER_KEYS.BEARER_KEY, '') ||
                     httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN)
@@ -258,11 +270,15 @@ export class AuthService {
                 if (newRefreshToken) {
                     this._refreshToken.set(newRefreshToken);
                 }
+
+                // Изчисти refresh операцията след успех
+                this.refreshInProgress$ = null;
             }),
-            map(() => {
-                return true;
-            }),
+            map(() => true),
             catchError((error) => {
+                // Изчисти refresh операцията при грешка
+                this.refreshInProgress$ = null;
+
                 if (error?.status === 401 || error?.status === 403 ||
                     (error?.message && error.message.includes('refresh')) ||
                     (error?.error && typeof error.error === 'string' &&
@@ -272,8 +288,11 @@ export class AuthService {
                 } else {
                     return throwError(() => new Error('Временен проблем със сървъра. Моля, опитайте отново.'));
                 }
-            })
+            }),
+            shareReplay(1) // Сподели резултата между всички subscribers
         );
+
+        return this.refreshInProgress$;
     }
 
     processAuthResponse(response: AuthResponse): void {
@@ -318,5 +337,31 @@ export class AuthService {
 
     clearReturnUrl(): void {
         localStorage.removeItem('returnUrl');
+    }
+
+    /**
+     * Асинхронна проверка на автентикацията с автоматичен refresh при нужда
+     */
+    checkAuthenticationAsync(): Observable<boolean> {
+        // Ако няма токени изобщо
+        if (!this._accessToken() && !this._refreshToken()) {
+            return of(false);
+        }
+
+        // Ако токенът е валиден
+        if (this.isAuthenticated()) {
+            return of(true);
+        }
+
+        // Ако токенът е изтекъл, но има refresh token
+        if (this._accessToken() && !this.isTokenValid() && this._refreshToken()) {
+            return this.refreshToken().pipe(
+                map(() => this.isAuthenticated()),
+                catchError(() => of(false))
+            );
+        }
+
+        // Други случаи
+        return of(false);
     }
 }

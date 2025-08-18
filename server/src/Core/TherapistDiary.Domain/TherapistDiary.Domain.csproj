@@ -30,6 +30,11 @@
     <ItemGroup>
       <EmbeddedResource Update="Resources\ErrorMessages.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\IdentityErrorMessages.bg.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
 

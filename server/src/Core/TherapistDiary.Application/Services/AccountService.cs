@@ -241,7 +241,6 @@ public class AccountService : IAccountService
         var (jwtToken, expirationDateInUtc) = await _authTokenProcessor.GenerateJwtToken(user);
         var refreshTokenValue = _authTokenProcessor.GenerateRefreshToken();
 
-        // todo: get this from configuration
         var refreshTokenExpirationDateInUtc = _timeProvider.GetUtcDateTime().AddDays(refreshTokenValue.ExpirationTimeInDays);
 
         user.RefreshToken = refreshTokenValue.Token;
