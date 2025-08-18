@@ -1,6 +1,6 @@
 import { Component, signal, Output, EventEmitter, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { LoginRequest } from '../models';
@@ -75,7 +75,13 @@ export class Login extends BaseApplicationFormComponent {
     }
 
     closeModal() {
-        this.modalClosed.emit();
+        // Ако сме в модал режим (има parent component да слуша modalClosed)
+        if (this.modalClosed.observed) {
+            this.modalClosed.emit();
+        } else {
+            // Ако сме на login страница, навигираме към home
+            this.router.navigate(['/']);
+        }
     }
 
     goToRegister() {

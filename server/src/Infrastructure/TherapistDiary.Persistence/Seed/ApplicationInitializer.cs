@@ -423,7 +423,7 @@ public class ApplicationInitializer : ISeeder
         }
     }
 
-    private async Task AppointmentSeed(List<User> therapists, List<User> patients, List<Therapy>therapies)
+    private async Task AppointmentSeed(List<User> therapists, List<User> patients, List<Therapy> therapies)
     {
         var appointments = new List<Appointment>();
         var random = new Random();
@@ -511,9 +511,9 @@ public class ApplicationInitializer : ISeeder
         Thread.Sleep(200);
         var therapyType2 = TherapyType.Create("Тийнейджъри", "https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-2.jpg?alt=media&token=d8809dcf-aa5f-4457-80cb-4ff8b424ba44").Value;
         Thread.Sleep(200);
-        var therapyType3 = TherapyType.Create("Семейства & Двойки","https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-3.jpg?alt=media&token=c6a63126-082b-4e91-bb4b-b0d28812b4a2").Value;
+        var therapyType3 = TherapyType.Create("Семейства & Двойки", "https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-3.jpg?alt=media&token=c6a63126-082b-4e91-bb4b-b0d28812b4a2").Value;
         Thread.Sleep(200);
-        var therapyType4 = TherapyType.Create("Възрастни","https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-4.jpg?alt=media&token=9c1248bc-4f55-47c7-84e2-9da09598e18c").Value;
+        var therapyType4 = TherapyType.Create("Възрастни", "https://firebasestorage.googleapis.com/v0/b/menuimages-c16e0.appspot.com/o/therapy-types%2Fservice-4.jpg?alt=media&token=9c1248bc-4f55-47c7-84e2-9da09598e18c").Value;
 
         therapyType1.Therapies.AddRange([
             Therapy.Create("Психодиагностика").Value,
@@ -530,7 +530,7 @@ public class ApplicationInitializer : ISeeder
             Therapy.Create("Хранителни разтройства").Value,
             Therapy.Create("Емоционални крайности").Value,
             Therapy.Create("Гняв и агресия").Value,
-            Therapy.Create("Трежовност").Value,
+            Therapy.Create("Тревожност").Value,
             Therapy.Create("Фобии / страхове").Value,
             Therapy.Create("Изолация").Value,
             Therapy.Create("Трудности в общуването").Value,
@@ -540,7 +540,7 @@ public class ApplicationInitializer : ISeeder
             Therapy.Create("Фамилна терапия").Value,
             Therapy.Create("Терапия на брачни двойки").Value,
             Therapy.Create("Терапия на двойки").Value,
-            Therapy.Create("Трежовност").Value,
+            Therapy.Create("Тревожност").Value,
         ]);
 
         therapyType4.Therapies.AddRange([

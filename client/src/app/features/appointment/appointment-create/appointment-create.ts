@@ -25,7 +25,7 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
     private therapyTypesService = inject(TherapyTypeService);
     private therapistsService = inject(TherapistsService);
     private appointmentService = inject(AppointmentService);
-    private destroyref = inject(DestroyRef);
+    private destroyRef = inject(DestroyRef);
     private toasterService = inject(ToasterService);
     private router = inject(Router);
     private authService = inject(AuthService);
@@ -52,32 +52,34 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
         this.attachEventHandlers();
     }
 
+
     private attachEventHandlers() {
         this.form.get('therapyType')?.valueChanges
-            .pipe(takeUntilDestroyed(this.destroyref))
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(therapyTypeId => {
                 this.onTherapyTypeChange(therapyTypeId);
             });
 
         this.form.get('therapy')?.valueChanges
-            .pipe(takeUntilDestroyed(this.destroyref))
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((therapyId: string) => {
                 this.onTherapyChange(therapyId);
             });
 
         this.form.get('therapist')?.valueChanges
-            .pipe(takeUntilDestroyed(this.destroyref))
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((therapistId: string) => {
                 this.onTherapistChange(therapistId);
             });
 
         this.form.get('date')?.valueChanges
-            .pipe(takeUntilDestroyed(this.destroyref))
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(appointmentDate => {
                 this.onAppointmentDateChange(appointmentDate);
             });
     }
 
+    // Cascade selects loading
     private onTherapyTypeChange(therapyTypeId: string) {
         const therapyControl = this.form.get('therapy');
         therapyControl?.setValue('');
@@ -121,7 +123,7 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
         this.loadTherapists();
     }
 
-    onAppointmentDateChange(appointmentDate: Date): void {
+    private onAppointmentDateChange(appointmentDate: Date): void {
         const therapistControl = this.form.get('therapist');
         const dateControl = this.form.get('date');
         const timeControl = this.form.get('time');
@@ -138,7 +140,7 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
             if (therapistId && selectedDate) {
                 this.appointmentService.getAvailableAppointments(therapistId, selectedDate)
                     .pipe(
-                        takeUntilDestroyed(this.destroyref)
+                        takeUntilDestroyed(this.destroyRef)
                     )
                     .subscribe({
                         next: (availableAppointments: AppointmentTimeModel[]) => {
@@ -160,8 +162,6 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
     ngOnInit(): void {
         this.loadTherapyTypes();
     }
-
-
 
     onSubmit(): void {
         if (this.form.invalid) {
@@ -196,7 +196,7 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
         };
 
         this.appointmentService.createAppointment(appointmentData)
-            .pipe(takeUntilDestroyed(this.destroyref))
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
                 next: () => {
                     this.isSubmitting.set(false);
@@ -213,7 +213,7 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
     private loadTherapyTypes() {
         this.therapyTypesService
             .getTherapyTypes()
-            .pipe(takeUntilDestroyed(this.destroyref))
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
                 next: (therapyTypes) => {
                     this.therapyTypes.set(therapyTypes);
@@ -229,7 +229,7 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
     private loadTherapists() {
         this.therapistsService
             .getAllTherapists()
-            .pipe(takeUntilDestroyed(this.destroyref))
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
                 next: (therapists) => {
                     this.therapists.set(therapists);

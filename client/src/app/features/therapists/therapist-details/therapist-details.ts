@@ -32,7 +32,7 @@ export class TherapistDetails implements OnInit {
       .getTherapist(this.therapistId)
       .pipe(takeUntilDestroyed(this.DestroyRef))
       .subscribe({
-        next: (therapist) => {
+        next: (therapist:TherapistDetailsModel) => {
           this.therapistDetails.set(therapist);
         },
         error: (error) => {

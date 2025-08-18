@@ -3,6 +3,7 @@
     border-left: 1px solid #15b9d9;
     border-right: 1px solid #15b9d9;
 }
+
 .therapists-item .therapists-img {
     position: relative;
     overflow: hidden;
@@ -33,6 +34,7 @@
 }
 
 .therapists-item:hover .therapists-img::before {
+    cursor: pointer;
     background: rgba(21, 185, 217, .3);
 }
 

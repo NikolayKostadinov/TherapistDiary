@@ -12,7 +12,9 @@
         <h3>Възникна грешка</h3>
         <p>{{ errorMessage() }}</p>
         <div class="error-actions">
-            <button class="clear-btn" (click)="onClearError()" routerLink="/home">
+            <button class="clear-btn"
+                    (click)="onClearError()"
+                    routerLink="/home">
                 Затвори
             </button>
         </div>
@@ -24,20 +26,30 @@
 @if (userProfile() && !isLoading() && !hasError()) {
 <div class="profile-container service">
     <div class="container py-4 px-4">
-        <div class="section-title mb-5" appScrollAnimation animationType="fadeInDown" [animationDelay]="200">
+        <div class="section-title mb-5"
+             appScrollAnimation
+             animationType="fadeInDown"
+             [animationDelay]="200">
             <div class="sub-style">
                 <h4 class="sub-title px-3 mb-0">Потребителски профил</h4>
             </div>
             <h1 class="display-3 mb-4">{{userProfile()?.fullName}}</h1>
         </div>
 
-        <div class="details" appScrollAnimation animationType="fadeInUp" [animationDelay]="200">
+        <div class="details"
+             appScrollAnimation
+             animationType="fadeInUp"
+             [animationDelay]="200">
             <div class="row g-4">
                 <div class="col-3">
                     @if (userProfile()?.profilePictureUrl) {
-                    <img [src]="userProfile()?.profilePictureUrl" alt="Profile Picture" class="profile-picture" />
+                    <img [src]="userProfile()?.profilePictureUrl"
+                         alt="Profile Picture"
+                         class="profile-picture" />
                     } @else {
-                    <img src="img/no-profile.jpg" alt="Profile Picture" class="profile-picture">
+                    <img src="img/no-profile.jpg"
+                         alt="Profile Picture"
+                         class="profile-picture">
                     }
                 </div>
                 <div class="col-9">
@@ -46,17 +58,21 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <h5 class="form-label">
-                                    <i class="fa fa-check text-primary me-2"></i>Име
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Име
                                 </h5>
-                                <p class="property-content">{{userProfile()?.firstName}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.firstName}}</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <h5 class="form-label">
-                                    <i class="fa fa-check text-primary me-2"></i>Фамилия
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Фамилия
                                 </h5>
-                                <p class="property-content">{{userProfile()?.lastName}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.lastName}}</p>
                             </div>
                         </div>
                     </div>
@@ -65,25 +81,31 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <h5 class="form-label">
-                                    <i class="fa fa-check text-primary me-2"></i>Име
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Име
                                 </h5>
-                                <p class="property-content">{{userProfile()?.firstName}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.firstName}}</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <h5 class="form-label">
-                                    <i class="fa fa-check text-primary me-2"></i>Презиме
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Презиме
                                 </h5>
-                                <p class="property-content">{{userProfile()?.midName}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.midName}}</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <h5 class="form-label">
-                                    <i class="fa fa-check text-primary me-2"></i>Фамилия
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Фамилия
                                 </h5>
-                                <p class="property-content">{{userProfile()?.lastName}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.lastName}}</p>
                             </div>
                         </div>
                     </div>
@@ -93,17 +115,23 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <h5 class="form-label">
-                                    <i class="fa fa-check text-primary me-2"></i>Потребителско име
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Потребителско
+                                    име
                                 </h5>
-                                <p class="property-content">{{userProfile()?.userName}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.userName}}</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <h5 class="form-label">
-                                    <i class="fa fa-check text-primary me-2"></i>Електронна поща
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Електронна
+                                    поща
                                 </h5>
-                                <p class="property-content">{{userProfile()?.email}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.email}}</p>
                             </div>
                         </div>
                     </div>
@@ -111,9 +139,11 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <h5 class="form-label">
-                                    <i class="fa fa-check text-primary me-2"></i>Телефон
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Телефон
                                 </h5>
-                                <p class="property-content">{{userProfile()?.phoneNumber}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.phoneNumber}}</p>
                             </div>
                         </div>
                         @if(userProfile()?.specialty){
@@ -121,10 +151,12 @@
                             <div class="mb-3">
                                 <h5 class="form-label">
 
-                                    <i class="fa fa-check text-primary me-2"></i>Специалност
+                                    <i
+                                       class="fa fa-check text-primary me-2"></i>Специалност
 
                                 </h5>
-                                <p class="property-content">{{userProfile()?.specialty}}</p>
+                                <p class="property-content">
+                                    {{userProfile()?.specialty}}</p>
                             </div>
                         </div>
                         }
@@ -135,23 +167,26 @@
                         <div class="mb-4">
                             <h5 class="form-label mb-3">
 
-                                <i class="fa fa-check text-primary me-2"></i> Биографични данни
+                                <i class="fa fa-check text-primary me-2"></i>
+                                Биографични данни
 
                             </h5>
-                            <p class="mb-0 bio-text">{{userProfile()?.biography}}.</p>
+                            <p class="mb-0 bio-text">
+                                {{userProfile()?.biography}}</p>
                         </div>
                     </div>
                     }
                 </div>
             </div>
             <div class="command-buttons">
-                <button class="btn btn-primary rounded-pill text-white py-2 px-4" routerLink="edit"><i
-                       class="fas fa-edit"></i>
+                <button class="btn btn-primary rounded-pill text-white py-2 px-4"
+                        routerLink="edit"><i class="fas fa-edit"></i>
                     Редакция</button>
-                <button class="btn btn-secondary rounded-pill text-white py-2 px-4" routerLink="change-password"><i
-                       class="fas fa-lock"></i>
+                <button class="btn btn-secondary rounded-pill text-white py-2 px-4"
+                        routerLink="change-password"><i class="fas fa-lock"></i>
                     Смяна на парола</button>
-                <button class="btn btn-danger rounded-pill text-white py-2 px-4" (click)="onDeleteClick()"><i
+                <button class="btn btn-danger rounded-pill text-white py-2 px-4"
+                        (click)="onDeleteClick()"><i
                        class="far fa-trash-alt"></i>
                     Изтриване</button>
             </div>
@@ -161,9 +196,12 @@
 }
 
 <!-- Модал за потвърждение на изтриване -->
-<app-confirmation-modal [isVisible]="showDeleteModal()" title="Изтриване на профил"
+<app-confirmation-modal [isVisible]="showDeleteModal()"
+                        title="Изтриване на профил"
                         message="Сигурни ли сте, че искате да изтриете профила си?"
                         warningText="Това действие е необратимо! Всички ваши данни ще бъдат изтрити завинаги."
-                        confirmText="Изтрий профила" cancelText="Отказ" (confirm)="onConfirmDelete()"
+                        confirmText="Изтрий профила"
+                        cancelText="Отказ"
+                        (confirm)="onConfirmDelete()"
                         (cancel)="onCancelDelete()">
 </app-confirmation-modal>
