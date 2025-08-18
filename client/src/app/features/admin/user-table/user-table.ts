@@ -69,7 +69,7 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
     }
 
     // Специфични методи за този компонент
-    public onDeleteClick(user: UserListModel): void {
+    public onUserDelete(user: UserListModel): void {
         this.clickedUser.set(user);
         this.showDeleteModal.set(true);
     }

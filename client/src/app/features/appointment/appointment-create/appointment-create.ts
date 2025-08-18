@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, DestroyRef, inject, OnInit, signal, Signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from "@angular/forms";
 import { BaseApplicationFormComponent, ScrollAnimationDirective, Utils } from "../../../common";
 import { TherapyTypeService } from "../../therapy-types/services/therapytype.service";

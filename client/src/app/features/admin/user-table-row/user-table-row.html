@@ -1,36 +1,40 @@
-<td>{{ index }}</td>
-<td class="image-container"><img [src]="user.profilePictureUrl ? user.profilePictureUrl : 'img/no-profile.jpg'"
-         alt="{{ user.firstName }}" class="user-image" /></td>
-<td>{{ user.userName }}</td>
-<td>{{ user.email }}</td>
-<td>{{ user.firstName }}</td>
-<td>{{ user.midName || '-' }}</td>
-<td>{{ user.lastName }}</td>
-<td>{{ user.phoneNumber || '-' }}</td>
-<td>{{user.rolesView }} </td>
+<td>{{ index() }}</td>
+<td class="image-container"><img [src]="user().profilePictureUrl ? user().profilePictureUrl : 'img/no-profile.jpg'"
+         alt="{{ user().firstName }}" class="user-image" /></td>
+<td>{{ user().userName }}</td>
+<td>{{ user().email }}</td>
+<td>{{ user().firstName }}</td>
+<td>{{ user().midName || '-' }}</td>
+<td>{{ user().lastName }}</td>
+<td>{{ user().phoneNumber || '-' }}</td>
+<td>{{ user().rolesView }} </td>
 <td>
     <div class="dropdown">
-        <button class="btn btn-sm btn-light text-primary me-1" type="button" title="Редактирай потребител">
+        <button class="btn btn-sm btn-light text-primary me-1" type="button" id="dropdownMenuButton-{{user().id}}"
+                data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false" title="Управление на роли">
             <i class="fas fa-edit"></i>
         </button>
-        <div class="dropdown-menu">
-
+        <ul class="dropdown-menu">
             @if(isTherapist) {
-            <button class="dropdown-item" (click)="onToggleRole('Therapist')"><i
-                   class="fas fa-user-slash text-secondary"></i> Премахни терапевт</button>
+            <li><button class="dropdown-item" type="button" (click)="onToggleRole('Therapist')">
+                    <i class="fas fa-user-slash text-secondary"></i> Премахни терапевт
+                </button></li>
             }@else {
-            <button class="dropdown-item" (click)="onToggleRole('Therapist')"><i
-                   class="fas fa-user-nurse text-primary"></i> Назначи терапевт</button>
+            <li><button class="dropdown-item" type="button" (click)="onToggleRole('Therapist')">
+                    <i class="fas fa-user-nurse text-primary"></i> Назначи терапевт
+                </button></li>
             }
 
             @if(isAdministrator){
-            <button class="dropdown-item" (click)="onToggleRole('Administrator')"><i
-                   class="fas fa-user-slash text-secondary"></i> Премахни администратор</button>
+            <li><button class="dropdown-item" type="button" (click)="onToggleRole('Administrator')">
+                    <i class="fas fa-user-slash text-secondary"></i> Премахни администратор
+                </button></li>
             }@else {
-            <button class="dropdown-item" (click)="onToggleRole('Administrator')"><i
-                   class="fas fa-user-tie text-primary"></i> Назначи администратор</button>
+            <li><button class="dropdown-item" type="button" (click)="onToggleRole('Administrator')">
+                    <i class="fas fa-user-tie text-primary"></i> Назначи администратор
+                </button></li>
             }
-        </div>
+        </ul>
     </div>
     <button class="btn btn-sm btn-light text-danger" title="Изтрий потребител" (click)="onDeleteClick()">
         <i class="fas fa-trash"></i>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { UserListModel } from '../../profile/models/user-list.model';
 import { ToggleRoleModel } from '../models/toggle-role.model';
 
@@ -9,25 +9,25 @@ import { ToggleRoleModel } from '../models/toggle-role.model';
     styleUrl: './user-table-row.css'
 })
 export class UserTableRow {
-    @Input() index!: number;
-    @Input() user!: UserListModel;
+    index = input.required<number>();
+    user = input.required<UserListModel>();
 
-    @Output() delete = new EventEmitter();
-    @Output() toggleRole = new EventEmitter<ToggleRoleModel>();
+    delete = output<void>();
+    toggleRole = output<ToggleRoleModel>();
 
     onDeleteClick() {
         this.delete.emit();
     }
 
     get isTherapist(): boolean {
-        return this.user.roles.some(x => x.name == 'Therapist');
+        return this.user().roles.some(x => x.name == 'Therapist');
     }
 
     get isAdministrator(): boolean {
-        return this.user.roles.some(x => x.name == 'Administrator');
+        return this.user().roles.some(x => x.name == 'Administrator');
     }
 
     onToggleRole(role: "Therapist" | "Administrator"): void {
-        this.toggleRole.emit(<ToggleRoleModel>{ user: this.user, role });
+        this.toggleRole.emit(<ToggleRoleModel>{ user: this.user(), role });
     }
 }

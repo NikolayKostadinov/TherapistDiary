@@ -79,7 +79,7 @@
                         usersPagedList()!.items.length > 0) {
                         @for (user of usersPagedList()!.items; track user.id) {
                         <tr app-user-table-row [index]="pageOffset() + $index  + 1" [user]="user"
-                            (delete)="onDeleteClick(user)" (toggleRole)="onToggleRole($event)"></tr>
+                            (delete)="onUserDelete(user)" (toggleRole)="onToggleRole($event)"></tr>
                         }
                         } @else {
                         <tr>
