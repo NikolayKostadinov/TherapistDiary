@@ -3,7 +3,7 @@ import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
 import { AdminGuard, AuthenticatedGuard } from './guards';
 import { UnauthenticatedGuard } from './guards/unauthenticated.guard';
-import { PageNotFound } from './layout/page-not-found/page-not-found';
+import { PageNotFound, Unauthorized } from './common';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -44,5 +44,6 @@ export const routes: Routes = [
     /*--------------------------End Of Lazy Loading Components-----------------------------*/
     { path: 'login', component: Login, canActivate: [UnauthenticatedGuard] },
     { path: 'register', component: Register, canActivate: [UnauthenticatedGuard] },
+    { path: 'unauthorized', component: Unauthorized },
     { path: '**', component: PageNotFound },
 ];

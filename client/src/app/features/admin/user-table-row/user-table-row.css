@@ -30,6 +30,10 @@
     }
 }
 
+button[data-bs-toggle="dropdown"]::after {
+    display: none;
+}
+
 /* Задържане на менюто видимо когато мишката е върху него */
 .dropdown-menu:hover {
     display: block !important;

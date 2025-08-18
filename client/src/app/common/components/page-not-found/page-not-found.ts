@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ScrollAnimationDirective } from '../../common/directives';
+import { ScrollAnimationDirective } from '../../directives';
 
 @Component({
     selector: 'app-page-not-found',

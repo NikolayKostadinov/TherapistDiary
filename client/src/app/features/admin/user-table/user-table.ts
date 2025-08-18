@@ -69,7 +69,7 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
     }
 
     // Специфични методи за този компонент
-    public onDeleteClick(user: UserListModel): void {
+    public onUserDelete(user: UserListModel): void {
         this.clickedUser.set(user);
         this.showDeleteModal.set(true);
     }
@@ -78,10 +78,6 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
         this.showDeleteModal.set(false);
         const userId = this.clickedUser()?.id;
         if (!userId) return;
-
-        console.log('🔍 Deleting user with ID:', userId);
-        console.log('🔍 Full user object:', this.clickedUser());
-
         this.isLoading.set(true);
         this.userManagementService.deleteProfile(userId).subscribe({
             next: () => {
@@ -123,13 +119,6 @@ export class UserTable extends BaseTableComponent<UserListModel> implements OnIn
                 },
             });
     }
-
-    // Премахваме дублирания метод - вече е в базовия клас
-    // public onClearSearch(): void {
-    //     this.searchTerm.set("");
-    //     this.currentPage.set(1);
-    //     this.loadData();
-    // }
 
     // Override isSortable за специфичните колони
     public override isSortable(column: string): boolean {
