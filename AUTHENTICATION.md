@@ -14,7 +14,7 @@ Multi-Layered Security Architecture
 ### Layer 2: Token-Level Security
 
 - JWT Access Tokens:
-  - Short lifetime (15 минути) - минимизира exposure window
+  - Short lifetime (5 минути) - минимизира exposure window
   - Memory-only storage - не се запазват в localStorage за security
   - Automatic expiration - built-in time-based invalidation
 
