@@ -227,7 +227,66 @@ export const adminGuard: CanActivateFn = () => {
 };
 ```
 
-### 4. Token Management Strategy
+### 4. AuthService Core Methods
+
+**Оптимизирани основни методи:**
+
+```typescript
+// Публични Authentication методи
+login(loginData: LoginRequest): Observable<HttpResponse<AuthResponse>>
+register(registerData: RegisterRequest): Observable<HttpResponse<AuthResponse>>
+logout(): void
+refreshToken(): Observable<boolean>
+
+// Computed Properties (Angular Signals)
+readonly isLoggedIn: boolean
+readonly currentUser: UserInfo | null
+readonly accessToken: string | null
+readonly isTokenValid: boolean
+readonly isAuthenticated: boolean
+
+// Utility методи
+getReturnUrl(): string
+setReturnUrl(url: string): void
+clearReturnUrl(): void
+checkAuthenticationAsync(): Observable<boolean>
+
+// Helper методи за token управление
+extractTokensFromResponse(httpResponse: HttpResponse<any>): { accessToken: string | null; refreshToken: string | null }
+updateTokens(accessToken: string | null, refreshToken: string | null): void
+```
+
+**Оптимизации в последната версия:**
+
+✅ **Премахнати излишни методи:**
+
+- `ensureValidToken()` - не се използваше в проекта
+- `processAuthResponse()` - дублираше функционалността на helper методите
+
+✅ **Добавени централизирани helper методи:**
+
+- `extractTokensFromResponse()` - унифицирана логика за екстракция на токени от HTTP headers/body
+- `updateTokens()` - централизирано обновяване на tokens и user state
+- `isTokenExpired()` - проверка за изтекли токени
+
+✅ **Подобрена консистентност:**
+
+- Всички методи (login, register, refreshToken) използват същите helper функции
+- DRY принцип - елиминиране на дублиращ код
+- Унифициран approach за token extraction от различни източници
+
+✅ **Type Safety подобрения:**
+
+- `login()` и `register()` връщат `Observable<HttpResponse<AuthResponse>>` вместо `void`
+- По-добра type inferrence и error handling възможности
+
+✅ **Cross-Service Integration:**
+
+- ProfileService сега използва същите helper методи (`extractTokensFromResponse`, `updateTokens`)
+- Унифициран token handling във всички services
+- Консистентна обработка на auth responses през цялото приложение
+
+### 5. Token Management Strategy
 
 **Access Token:**
 
@@ -476,6 +535,8 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 - **Type-safe state** - TypeScript + Angular signals
 - **Reactive UI updates** - автоматично пререндериране
 - **Clean separation of concerns** - service + interceptors + guards
+- **DRY principle adherence** - елиминиране на дублиращ код чрез helper методи
+- **Unified token handling** - консистентна обработка във всички services
 
 ### User Experience
 
@@ -489,7 +550,7 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 ### Frontend Optimizations
 
 - **Signal-based reactivity** - по-ефективно change detection
-- **Memory-only access tokens** - no localStorage overhead
+- **Memory-only access tokens** - no localStorage overhead за access tokens
 - **Concurrent request deduplication** - един refresh за всички заявки
 - **Lazy loading** - auth guards не блокират initial load
 
