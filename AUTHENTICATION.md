@@ -130,50 +130,28 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 #### Token Refresh Interceptor
 
-```typescript
-export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
-    const authService = inject(AuthService);
+HTTP интерсептор, който автоматично засича 401 грешки и обновява изтекли токени без прекъсване на потребителската заявка.
 
-    return next(req).pipe(
-        catchError((error: HttpErrorResponse) => {
-            if (error.status === 401 && !Utils.isPublicUrl(req.url)) {
-                return handle401Error(req, next, authService);
-            }
-            return throwError(() => error);
-        })
-    );
-};
-```
+**Ключови възможности:**
 
-**Ключови функционалности:**
+- Автоматично засичане на 401 Unauthorized грешки
+- Интелигентно refresh-ване само за защитени endpoints
+- Прозрачен retry на неуспешни заявки с новия токен
+- Интегриран с AuthService за централизирано управление на токени
 
-- **Intelligent 401 handling** - само за private endpoints
-- **Concurrent request management** - избягване на множествени refresh заявки
-- **Shared refresh state** - използване на signals за координация
-- **Graceful error handling** - разграничаване между auth и server грешки
-
-**Concurrent Request Management:**
+**Архитектура:**
 
 ```typescript
-// Shared state за refresh процеса
-const isRefreshing = signal<boolean>(false);
-const refreshTokenSubject = new Subject<boolean | null>();
-
-function handle401Error(request, next, authService) {
-    if (!isRefreshing()) {
-        // Започваме refresh процес
-        isRefreshing.set(true);
-        return authService.refreshToken().pipe(/* ... */);
-    } else {
-        // Чакаме завършване на текущия refresh
-        return refreshTokenSubject.pipe(
-            filter(result => result !== null),
-            take(1),
-            switchMap(success => /* retry request */)
-        );
-    }
-}
+// Минималистична структура - 3 специализирани функции
+shouldHandleAuthError() → handleAuthenticationError() → retryRequestWithNewToken()
 ```
+
+**Работен поток:**
+
+1. 🔍 Детектира 401 грешки на защитени routes
+2. 🔄 Извиква AuthService.refreshToken() за обновяване  
+3. ✅ Автоматично retry на оригиналната заявка с новия токен
+4. 🚪 При неуспех - logout и пренасочване към login
 
 ### 3. Route Protection Strategy
 
@@ -198,17 +176,22 @@ export const authenticatedGuard: CanActivateFn = (route, state) => {
 #### Unauthenticated Guard (Guest Guard)
 
 ```typescript
-export const unauthenticatedGuard: CanActivateFn = () => {
+export const UnauthenticatedGuard: CanActivateFn = (
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot) => {
     const authService = inject(AuthService);
     const router = inject(Router);
-    
-    if (!authService.isAuthenticated()) {
-        return true;
-    }
-    
-    router.navigate(['/']);
-    return false;
-};
+
+    return authService.checkAuthenticationAsync().pipe(
+        switchMap((isAuthenticated) => {
+            if (isAuthenticated) {
+                return router.navigate(['/unauthorized'])
+                    .then(() => false);
+            }
+            return of(true);
+        })
+    );
+}; 
 ```
 
 #### Admin Guard

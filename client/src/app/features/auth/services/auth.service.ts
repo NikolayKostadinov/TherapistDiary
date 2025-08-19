@@ -234,7 +234,7 @@ export class AuthService {
         let refreshToken: string | null = null;
 
         // Търси в headers
-        accessToken =  httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
+        accessToken = httpResponse.headers.get(TOKEN_KEYS.ACCESS_TOKEN);
         refreshToken = httpResponse.headers.get(TOKEN_KEYS.REFRESH_TOKEN);
 
         return { accessToken, refreshToken };

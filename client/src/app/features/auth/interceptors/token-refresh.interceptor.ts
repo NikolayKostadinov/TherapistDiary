@@ -1,95 +1,66 @@
 import { HttpInterceptorFn, HttpErrorResponse, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
-import { inject, signal } from '@angular/core';
-import { catchError, switchMap, filter, take, finalize } from 'rxjs/operators';
-import { throwError, Subject, Observable } from 'rxjs';
+import { inject } from '@angular/core';
+import { catchError, switchMap } from 'rxjs/operators';
+import { throwError, Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { HEADER_KEYS } from '../../../common/constants';
 import { Utils } from '../../../common/utils';
-
-const isRefreshing = signal<boolean>(false);
-const refreshTokenSubject = new Subject<boolean | null>();
+import { HEADER_KEYS } from '../../../common';
 
 export const tokenRefreshInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
     const authService = inject(AuthService);
 
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
-            // Only handle 401 errors for private endpoints (not login/refresh endpoints)
-            if (error.status === 401 && !Utils.isPublicUrl(req.url)) {
-                return handle401Error(req, next, authService);
+            if (shouldHandleAuthError(error, req.url)) {
+                return handleAuthenticationError(req, next, authService);
             }
-
             return throwError(() => error);
         })
     );
 };
 
-function handle401Error(request: HttpRequest<unknown>, next: HttpHandlerFn, authService: AuthService): Observable<HttpEvent<unknown>> {
-    if (!isRefreshing()) {
-        isRefreshing.set(true);
-        refreshTokenSubject.next(null); // Reset subject
+function shouldHandleAuthError(error: HttpErrorResponse, url: string): boolean {
+    return error.status === 401 && !Utils.isPublicUrl(url);
+}
 
-        return authService.refreshToken().pipe(
-            switchMap((success: boolean) => {
-                isRefreshing.set(false);
-                refreshTokenSubject.next(success);
+function handleAuthenticationError(
+    req: HttpRequest<unknown>,
+    next: HttpHandlerFn,
+    authService: AuthService
+): Observable<HttpEvent<unknown>> {
 
-                // Retry the original request with new token
-                const newToken = authService.accessToken();
+    return authService.refreshToken().pipe(
+        switchMap((success) => {
+            if (success && authService.isAuthenticated()) {
+                return retryRequestWithNewToken(req, next, authService);
+            } else {
+                authService.logout();
+                return throwError(() => new Error('Неуспешна автентикация. Моля влезте отново!'));
+            }
+        })
+    );
+}
 
-                if (newToken && success) {
-                    const authHeaderValue = Utils.getAuthorizationHeader(newToken);
-                    const authRequest = request.clone({
-                        setHeaders: {
-                            Authorization: authHeaderValue
-                        }
-                    });
-                    return next(authRequest);
-                }
 
-                return throwError(() => new Error('Неуспешно обновяване на токена'));
-            }),
-            catchError((err) => {
-                isRefreshing.set(false);
-                refreshTokenSubject.next(false);
-                
-                // Only logout if this is actually an authentication error
-                // Don't logout for general server errors or network issues
-                if (err?.status === 401 || err?.status === 403 || 
-                    (err?.message && err.message.includes('token')) ||
-                    (err?.error && typeof err.error === 'string' && err.error.includes('token'))) {
-                    console.log('🚪 Authentication error detected, logging out:', err.status, err.message);
-                    authService.logout();
-                } else {
-                    console.log('⚠️ Server error during refresh, but not logging out:', err.status, err.message);
-                }
-                
-                return throwError(() => err);
-            })
-        );
-    } else {
-        // If refresh is already in progress, wait for it to complete
-        return refreshTokenSubject.pipe(
-            filter(result => result !== null && result !== undefined),
-            take(1),
-            switchMap((success: boolean) => {
-                if (success) {
-                    const newToken = authService.accessToken();
-                    if (newToken) {
-                        const authHeaderValue = Utils.getAuthorizationHeader(newToken);
-                        const authRequest = request.clone({
-                            setHeaders: {
-                                Authorization: authHeaderValue
-                            }
-                        });
-                        return next(authRequest);
-                    }
-                }
+function retryRequestWithNewToken(
+    req: HttpRequest<unknown>,
+    next: HttpHandlerFn,
+    authService: AuthService
+): Observable<HttpEvent<unknown>> {
+    const accessToken = authService.accessToken();
 
-                return throwError(() => new Error('Неуспешно обновяване на токена'));
-            })
-        );
+    if (accessToken) {
+        const authReq = req.clone({
+            setHeaders: {
+                Authorization: `${HEADER_KEYS.BEARER_KEY} ${accessToken}`
+            }
+        });
+        return next(authReq);
     }
+
+    // No valid token available
+    authService.logout();
+    return throwError(() => new Error('Няма наличен валиден токен за достъп'));
 }
 
 
