@@ -1,9 +1,10 @@
 import { effect, Injectable, signal, DestroyRef, inject, computed } from '@angular/core';
-import { AuthHttpService, AuthService } from "../../auth";
+import { AuthHttpService, AuthResponse, AuthService } from "../../auth";
 import { ChangePasswordModel, UserEditProfileModel, UserProfileModel } from '../models';
 import { map, Observable, tap, throwError } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Utils } from '../../../common/utils';
+import { HttpResponse } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root'
@@ -40,18 +41,19 @@ export class ProfileServices {
         this._errorMessage.set(null);
     }
 
-    public updateProfile(updatedProfile: UserEditProfileModel): Observable<void> {
+    public updateProfile(updatedProfile: UserEditProfileModel): Observable<HttpResponse<AuthResponse>> {
         return this.authHttpService.updateProfile(updatedProfile).pipe(
             tap(
                 (httpResponse) => {
-                    this.authService.updateTokensFromResponse(httpResponse);
-                }),
-            map(() => void 0) // Return void
+                    // Използваме новите helper методи вместо processAuthResponse
+                    const { accessToken, refreshToken } = this.authService.extractTokensFromResponse(httpResponse);
+                    this.authService.updateTokens(accessToken, refreshToken);
+                })
         );
         // Глобалният interceptor ще обработи грешките автоматично
     }
 
-    public deleteProfile(id: string): Observable<void> {
+    public deleteProfile(id: string): Observable<HttpResponse<void>> {
         return this.authHttpService.deleteProfile(id)
             .pipe(
                 tap(() => {
@@ -60,7 +62,6 @@ export class ProfileServices {
                     this._isLoading.set(false);
                     this.authService.logout();
                 }),
-                map(() => void 0), // Return void
                 takeUntilDestroyed(this.destroyRef)
             );
         // Глобалният interceptor ще обработи грешките автоматично
@@ -93,7 +94,7 @@ export class ProfileServices {
             });
     }
 
-    public changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    public changePassword(currentPassword: string, newPassword: string): Observable<HttpResponse<void>> {
         const currentUser = this.authService.currentUser();
         if (!currentUser) {
             const errorMessage = 'Потребителят не е автентифициран';
@@ -106,10 +107,7 @@ export class ProfileServices {
             newPassword
         };
 
-        return this.authHttpService.changePassword(currentUser.id, changePasswordRequest).pipe(
-            map(() => void 0) // Return void
-        );
-        // Глобалният interceptor ще обработи грешките автоматично
+        return this.authHttpService.changePassword(currentUser.id, changePasswordRequest);
     }
 
 }
