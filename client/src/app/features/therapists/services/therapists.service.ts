@@ -11,7 +11,6 @@ import { API_ENDPOINTS } from '../../../common/constants/api-endpoints';
 export class TherapistsService {
     private readonly httpClient = inject(HttpClient);
 
-
     private apiUrl = `${environment.baseUrl}${API_ENDPOINTS.THERAPISTS}`;
 
     constructor() { }
