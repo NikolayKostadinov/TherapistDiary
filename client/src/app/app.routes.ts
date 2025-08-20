@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
-import { AdminGuard, AuthenticatedGuard } from './guards';
+import { AdminGuard, AuthenticatedGuard, PatientOnlyGuard, TherapistOnlyGuard } from './guards';
 import { UnauthenticatedGuard } from './guards/unauthenticated.guard';
 import { PageNotFound, Unauthorized } from './common';
 
@@ -32,13 +32,13 @@ export const routes: Routes = [
     },
     {
         path: 'appointment', children: [
-            { path: 'my-appointments', loadComponent: () => import('./features/appointment/my-appointments/my-appointments-table/my-appointments-table').then(c => c.MyAppointmentsTable), canActivate: [AuthenticatedGuard] },
+            { path: 'my-appointments', loadComponent: () => import('./features/appointment/my-appointments/my-appointments-table/my-appointments-table').then(c => c.MyAppointmentsTable), canActivate: [AuthenticatedGuard, PatientOnlyGuard] },
             {
                 path: 'therapist-appointments',
                 loadComponent: () => import('./features/appointment/therapist-appointments/therapist-appointments-table/therapist-appointments-table').then(c => c.TherapistAppointmentsTable),
-                canActivate: [AuthenticatedGuard]
+                canActivate: [AuthenticatedGuard, TherapistOnlyGuard]
             },
-            { path: 'create', loadComponent: () => import('./features/appointment/appointment-create/appointment-create').then(c => c.AppointmentCreate), canActivate: [AuthenticatedGuard] }
+            { path: 'create', loadComponent: () => import('./features/appointment/appointment-create/appointment-create').then(c => c.AppointmentCreate), canActivate: [AuthenticatedGuard, PatientOnlyGuard] }
         ]
     },
     /*--------------------------End Of Lazy Loading Components-----------------------------*/
