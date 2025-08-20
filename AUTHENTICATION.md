@@ -14,7 +14,7 @@ Multi-Layered Security Architecture
 ### Layer 2: Token-Level Security
 
 - JWT Access Tokens:
-  - Short lifetime (15 минути) - минимизира exposure window
+  - Short lifetime (5 минути) - минимизира exposure window
   - Memory-only storage - не се запазват в localStorage за security
   - Automatic expiration - built-in time-based invalidation
 
@@ -130,50 +130,28 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 #### Token Refresh Interceptor
 
-```typescript
-export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
-    const authService = inject(AuthService);
+HTTP интерсептор, който автоматично засича 401 грешки и обновява изтекли токени без прекъсване на потребителската заявка.
 
-    return next(req).pipe(
-        catchError((error: HttpErrorResponse) => {
-            if (error.status === 401 && !Utils.isPublicUrl(req.url)) {
-                return handle401Error(req, next, authService);
-            }
-            return throwError(() => error);
-        })
-    );
-};
-```
+**Ключови възможности:**
 
-**Ключови функционалности:**
+- Автоматично засичане на 401 Unauthorized грешки
+- Интелигентно refresh-ване само за защитени endpoints
+- Прозрачен retry на неуспешни заявки с новия токен
+- Интегриран с AuthService за централизирано управление на токени
 
-- **Intelligent 401 handling** - само за private endpoints
-- **Concurrent request management** - избягване на множествени refresh заявки
-- **Shared refresh state** - използване на signals за координация
-- **Graceful error handling** - разграничаване между auth и server грешки
-
-**Concurrent Request Management:**
+**Архитектура:**
 
 ```typescript
-// Shared state за refresh процеса
-const isRefreshing = signal<boolean>(false);
-const refreshTokenSubject = new Subject<boolean | null>();
-
-function handle401Error(request, next, authService) {
-    if (!isRefreshing()) {
-        // Започваме refresh процес
-        isRefreshing.set(true);
-        return authService.refreshToken().pipe(/* ... */);
-    } else {
-        // Чакаме завършване на текущия refresh
-        return refreshTokenSubject.pipe(
-            filter(result => result !== null),
-            take(1),
-            switchMap(success => /* retry request */)
-        );
-    }
-}
+// Минималистична структура - 3 специализирани функции
+shouldHandleAuthError() → handleAuthenticationError() → retryRequestWithNewToken()
 ```
+
+**Работен поток:**
+
+1. 🔍 Детектира 401 грешки на защитени routes
+2. 🔄 Извиква AuthService.refreshToken() за обновяване  
+3. ✅ Автоматично retry на оригиналната заявка с новия токен
+4. 🚪 При неуспех - logout и пренасочване към login
 
 ### 3. Route Protection Strategy
 
@@ -198,17 +176,22 @@ export const authenticatedGuard: CanActivateFn = (route, state) => {
 #### Unauthenticated Guard (Guest Guard)
 
 ```typescript
-export const unauthenticatedGuard: CanActivateFn = () => {
+export const UnauthenticatedGuard: CanActivateFn = (
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot) => {
     const authService = inject(AuthService);
     const router = inject(Router);
-    
-    if (!authService.isAuthenticated()) {
-        return true;
-    }
-    
-    router.navigate(['/']);
-    return false;
-};
+
+    return authService.checkAuthenticationAsync().pipe(
+        switchMap((isAuthenticated) => {
+            if (isAuthenticated) {
+                return router.navigate(['/unauthorized'])
+                    .then(() => false);
+            }
+            return of(true);
+        })
+    );
+}; 
 ```
 
 #### Admin Guard
@@ -227,7 +210,66 @@ export const adminGuard: CanActivateFn = () => {
 };
 ```
 
-### 4. Token Management Strategy
+### 4. AuthService Core Methods
+
+**Оптимизирани основни методи:**
+
+```typescript
+// Публични Authentication методи
+login(loginData: LoginRequest): Observable<HttpResponse<AuthResponse>>
+register(registerData: RegisterRequest): Observable<HttpResponse<AuthResponse>>
+logout(): void
+refreshToken(): Observable<boolean>
+
+// Computed Properties (Angular Signals)
+readonly isLoggedIn: boolean
+readonly currentUser: UserInfo | null
+readonly accessToken: string | null
+readonly isTokenValid: boolean
+readonly isAuthenticated: boolean
+
+// Utility методи
+getReturnUrl(): string
+setReturnUrl(url: string): void
+clearReturnUrl(): void
+checkAuthenticationAsync(): Observable<boolean>
+
+// Helper методи за token управление
+extractTokensFromResponse(httpResponse: HttpResponse<any>): { accessToken: string | null; refreshToken: string | null }
+updateTokens(accessToken: string | null, refreshToken: string | null): void
+```
+
+**Оптимизации в последната версия:**
+
+✅ **Премахнати излишни методи:**
+
+- `ensureValidToken()` - не се използваше в проекта
+- `processAuthResponse()` - дублираше функционалността на helper методите
+
+✅ **Добавени централизирани helper методи:**
+
+- `extractTokensFromResponse()` - унифицирана логика за екстракция на токени от HTTP headers/body
+- `updateTokens()` - централизирано обновяване на tokens и user state
+- `isTokenExpired()` - проверка за изтекли токени
+
+✅ **Подобрена консистентност:**
+
+- Всички методи (login, register, refreshToken) използват същите helper функции
+- DRY принцип - елиминиране на дублиращ код
+- Унифициран approach за token extraction от различни източници
+
+✅ **Type Safety подобрения:**
+
+- `login()` и `register()` връщат `Observable<HttpResponse<AuthResponse>>` вместо `void`
+- По-добра type inferrence и error handling възможности
+
+✅ **Cross-Service Integration:**
+
+- ProfileService сега използва същите helper методи (`extractTokensFromResponse`, `updateTokens`)
+- Унифициран token handling във всички services
+- Консистентна обработка на auth responses през цялото приложение
+
+### 5. Token Management Strategy
 
 **Access Token:**
 
@@ -476,6 +518,8 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 - **Type-safe state** - TypeScript + Angular signals
 - **Reactive UI updates** - автоматично пререндериране
 - **Clean separation of concerns** - service + interceptors + guards
+- **DRY principle adherence** - елиминиране на дублиращ код чрез helper методи
+- **Unified token handling** - консистентна обработка във всички services
 
 ### User Experience
 
@@ -489,7 +533,7 @@ public async Task<IActionResult> AddTherapistNotes(string id, [FromBody] string 
 ### Frontend Optimizations
 
 - **Signal-based reactivity** - по-ефективно change detection
-- **Memory-only access tokens** - no localStorage overhead
+- **Memory-only access tokens** - no localStorage overhead за access tokens
 - **Concurrent request deduplication** - един refresh за всички заявки
 - **Lazy loading** - auth guards не блокират initial load
 
