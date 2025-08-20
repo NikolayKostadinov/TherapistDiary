@@ -52,7 +52,7 @@ export class ProfileEdit extends BaseApplicationFormComponent implements OnInit 
             profilePictureUrl: [""],
         });
 
-        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors, this.generalError);
 
         effect(() => {
             const profile = this.profileService.userProfile();

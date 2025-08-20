@@ -28,7 +28,7 @@ export class Login extends BaseApplicationFormComponent {
             username: ['', [Validators.required, Validators.minLength(3)]],
             password: ['', [Validators.required, Validators.minLength(8)]]
         });
-        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors, this.generalError);
     }
 
     get username() {

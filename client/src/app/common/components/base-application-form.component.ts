@@ -16,6 +16,11 @@ export abstract class BaseApplicationFormComponent {
     constructor() {
     }
 
+    protected setupFormErrorClearing(): void {
+        // Използвай Utils метода за изчистване на всички грешки
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors, this.generalError);
+    }
+
     protected clearErrors(): void {
         this.serverErrors.set([]);
         this.generalError.set('');

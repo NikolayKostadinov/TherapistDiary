@@ -42,7 +42,7 @@ export class TherapistAppointmentsRow extends BaseApplicationFormComponent imple
             therapistNotes: [this.appointment.therapistNotes || '', [Validators.maxLength(500)]]
         });
 
-        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors, this.generalError);
     }
 
     public deleteElement(): void {

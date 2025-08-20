@@ -32,7 +32,7 @@ export class Register extends BaseApplicationFormComponent {
             validators: this.passwordMatchValidator
         });
 
-        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors, this.generalError);
         Utils.setupClearPasswordMismatchError(this.form);
     }
 

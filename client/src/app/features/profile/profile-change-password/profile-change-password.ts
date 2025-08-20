@@ -35,7 +35,7 @@ export class ProfileChangePassword extends BaseApplicationFormComponent implemen
         }, { validators: this.passwordMatchValidator });
 
         // Setup automatic clearing of server errors when user starts typing
-        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors, this.generalError);
 
         // Clear password mismatch errors when user starts typing
         Utils.setupClearPasswordMismatchError(this.form, 'newPassword', 'confirmPassword');

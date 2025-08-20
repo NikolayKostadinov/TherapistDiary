@@ -48,7 +48,7 @@ export class AppointmentCreate extends BaseApplicationFormComponent implements O
             time: [{ value: "", disabled: true }, [Validators.required]],
             comment: ["", [Validators.maxLength(500)]],
         });
-        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors, this.generalError);
         this.attachEventHandlers();
     }
 

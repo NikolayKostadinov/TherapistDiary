@@ -33,7 +33,7 @@ export class MyAppointmentsRow extends BaseApplicationFormComponent implements O
             notes: [this.appointment.notes || '', [Validators.maxLength(500)]]
         });
 
-        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
+        Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors, this.generalError);
     }
 
     public deleteElement(): void {
