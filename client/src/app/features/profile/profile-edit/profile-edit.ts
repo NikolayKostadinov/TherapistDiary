@@ -1,12 +1,5 @@
 import { CommonModule } from "@angular/common";
-import {
-    Component,
-    OnInit,
-    Signal,
-    effect,
-    inject,
-    signal,
-} from "@angular/core";
+import { Component, OnInit, Signal, effect, inject, signal } from "@angular/core";
 import { ReactiveFormsModule, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { BaseApplicationFormComponent, VALIDATION_PATTERNS } from "../../../common";
@@ -55,6 +48,10 @@ export class ProfileEdit extends BaseApplicationFormComponent implements OnInit 
         Utils.setupClearServerErrorsOnValueChange(this.form, this.serverErrors);
 
         effect(() => {
+            /*
+                The effect serves as an automatic bridge between asynchronous data from the service and the form.
+                It ensures that regardless of when the data arrives, the form will be properly initialized.
+            */
             const profile = this.profileService.userProfile();
             const isLoading = this.profileService.isLoading();
 
