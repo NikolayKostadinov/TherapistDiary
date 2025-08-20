@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpParams } from '@angular/common/http';
-import { catchError, map, throwError, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { UserListModel } from '../../profile/models/user-list.model';
 import { UserProfileModel } from '../../profile/models';
 import { PagedFilteredRequest, PagedResult } from '../../../common';
@@ -30,8 +30,7 @@ export class UserManagementService {
     deleteProfile(userId: string): Observable<void> {
         return this.authHttpService.deleteProfile(userId)
             .pipe(
-                map(() => void 0),
-                catchError((error) => throwError(() => error))
+                map(() => void 0)
             );
     }
 
@@ -39,14 +38,12 @@ export class UserManagementService {
         if (this.userInRole(user, role)) {
             return this.removeRoleFromUser(user.id, role)
                 .pipe(
-                    map(() => void 0),
-                    catchError((error) => throwError(() => error))
+                    map(() => void 0)
                 );
         } else {
             return this.addRoleToUser(user.id, role)
                 .pipe(
-                    map(() => void 0),
-                    catchError((error) => throwError(() => error))
+                    map(() => void 0)
                 );
         }
     }
