@@ -45,7 +45,6 @@ export class ProfileServices {
         return this.authHttpService.updateProfile(updatedProfile).pipe(
             tap(
                 (httpResponse) => {
-                    // Използваме новите helper методи вместо processAuthResponse
                     const { accessToken, refreshToken } = this.authService.extractTokensFromResponse(httpResponse);
                     this.authService.updateTokens(accessToken, refreshToken);
                 })
@@ -68,7 +67,6 @@ export class ProfileServices {
     }
 
     private loadUserProfile(id: string): void {
-        // Set loading state
         this._isLoading.set(true);
         this._errorMessage.set(null);
 
@@ -87,7 +85,6 @@ export class ProfileServices {
                     this._user.set(null);
                     this._isLoading.set(false);
 
-                    // Set user-friendly error message using Utils
                     const errorMsg = Utils.getErrorMessage(error, 'профилните данни');
                     this._errorMessage.set(errorMsg);
                 }
